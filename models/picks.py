@@ -9,5 +9,5 @@ class Pick(db.Model):
     winner = db.StringProperty()
     away_score = db.IntegerProperty()
     home_score = db.IntegerProperty()
-    created = db.DateTimeProperty()
-    modified = db.DateTimeProperty()
+    created = db.DateTimeProperty(auto_now_add=True)
+    modified = db.DateTimeProperty(auto_now=True)

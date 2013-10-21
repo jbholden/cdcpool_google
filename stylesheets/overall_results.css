@@ -1,0 +1,75 @@
+.results-header {
+   color: #E6E6FF;
+   background-color: #0000E6;
+   font-size: 8pt;
+   padding: 0px 4px;
+   font-family: Helvetica;
+   font-weight: 100;
+}
+
+#header {
+   text-align: center;
+   padding: 1px 4px;
+}
+
+#content {
+   color: black;
+   background-color: white;
+   font-size: 10pt;
+   padding: 0px 4px;
+   font-family: Helvetica;
+   font-weight: 100;
+   white-space: nowrap;
+   text-align: center;
+}
+
+#player-content {
+   color: black;
+   background-color: lightyellow;
+   font-size: 10pt;
+   padding: 0px 4px;
+   font-family: Helvetica;
+   font-weight: 100;
+   white-space: nowrap;
+   text-align: left;
+   width : 15em;
+}
+
+#highlight-content {
+   color: black;
+   background-color: lightgray;
+   font-size: 10pt;
+   padding: 0px 4px;
+   font-family: Helvetica;
+   font-weight: 100;
+   white-space: nowrap;
+   text-align: center;
+}
+
+#link-header {
+   text-align: center;
+   padding: 1px 4px;
+   color: #E6E6FF;
+   background-color: #0000E6;
+   font-size: 8pt;
+   padding: 0px 4px;
+   font-family: Helvetica;
+   font-weight: 100;
+}
+
+#table-line {
+   width: 100%;
+   border-bottom: 1px solid lightgray;
+   padding: 0 0 0 0;
+}
+
+#week-link {
+   color: black;
+   background-color: white;
+   font-size: 10pt;
+   padding: 0px 4px;
+   font-family: Helvetica;
+   font-weight: 100;
+   white-space: nowrap;
+   text-align: center;
+}

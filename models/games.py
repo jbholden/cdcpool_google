@@ -2,14 +2,14 @@ from google.appengine.ext import db
 from teams import *
 
 class Game(db.Model):
-    number = db.IntegerProperty(required=True)
-    away_team = db.ReferenceProperty(Team,required=True)
-    home_team = db.ReferenceProperty(Team,required=True)
-    away_score = db.IntegerProperty(required=True)
-    home_score = db.IntegerProperty(required=True)
-    favored = db.StringProperty(required=True)
-    spread = db.FloatProperty(required=True)
-    state = db.StringProperty(required=True)
+    number = db.IntegerProperty()
+    away_team = db.ReferenceProperty(Team,collection_name="away_team")
+    home_team = db.ReferenceProperty(Team,collection_name="home_team")
+    away_score = db.IntegerProperty()
+    home_score = db.IntegerProperty()
+    favored = db.StringProperty()
+    spread = db.FloatProperty()
+    state = db.StringProperty()
     quarter = db.StringProperty()
     time_left = db.StringProperty()
     date = db.DateTimeProperty()

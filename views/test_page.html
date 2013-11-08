@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>cdcpool tests</title>
+        <link href="/stylesheets/test.css" rel="stylesheet" type="text/css" media="all">
+    </head>
+    <body>
+        <div class="title">Tests</div>
+        <hr>
+        <span class="summary-total">{{ summary.num_tests }} Tests Run&nbsp;&nbsp;</span>
+        <span class="summary-pass">{{ summary.num_passed }} Passed&nbsp;&nbsp;</span>
+        <span class="summary-fail">{{ summary.num_failed }} Failed</span>
+        <hr>
+        <br>
+        <table>
+            {% for test in results %}
+                <tr>
+                    {% if test.result == "PASS" %}
+                        <td id="test-pass">{{ test.result }}</td>
+                    {% else %}
+                        <td id="test-fail">{{ test.result }}</td>
+                    {% endif %}
+                    <td id="test-name">{{ test.name }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        <br>
+        <br>
+        <br>
+        <br>
+        {% for test in results %}
+            {% if test.result == "FAIL" %}
+                <div class="test-output">{{ test.name }} Details</div>
+                <hr>
+                <pre>{{ test.output }}</pre>
+                <br>
+            {% endif %}
+        {% endfor %}
+    </body>
+</html>    

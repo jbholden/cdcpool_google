@@ -11,7 +11,6 @@ class CalculateResults:
         self.__players = player_picks.keys()
 
     def get_team_player_picked_to_win(self,player_name,game):
-    #def get_team_picked_to_win(self,player_name,game):
         picks = self.__picks.get(player_name)
         assert picks != None
         for pick in picks:
@@ -20,114 +19,132 @@ class CalculateResults:
         raise AssertionError, "Could not find game"
 
 
-   def get_team_name_picked_to_win(self):
+    def get_team_name_player_picked_to_win(self,player_name,game):
+        winner = self.get_team_player_picked_to_win(player_name,game)
+        if winner == "home":
+            return game.home_team.name
+        elif winner == "away":
+            return game.away_team.name
+        raise AssertionError,"Error determining winner name"
+
+    def is_home_team_winning_pool(self,game):
+        score_diff = game.home_score-game.away_score
+        if game.favored == "home":
+            spread = game.spread
+        elif game.favored == "away":
+            spread = -game.spread
+        else:
+            raise AssertionError,"game.favored has an invalid value"
+        return score_diff > spread
+
+    def is_away_team_winning_pool(self):
+        score_diff = game.home_score-game.away_score
+        if game.favored == "home":
+            spread = game.spread
+        elif game.favored == "away":
+            spread = -game.spread
+        else:
+            raise AssertionError,"game.favored has an invalid value"
+        return score_diff < spread
+
+    def get_pool_game_winner(self):
        pass
 
-   def get_game(self):
+    def get_pool_game_winner_team_name(self):
        pass
 
-   def get_game_pick(self):
+    def get_game_winner(self):
        pass
 
-   def get_team_name(self):
+    def get_game_winner_team_name(self):
        pass
 
-   def is_home_team_winning_pool(self):
+    def get_game_away_team(self):
        pass
 
-   def is_away_team_winning_pool(self):
+    def get_game_home_team(self):
        pass
 
-   def get_pool_game_winner(self):
+    def get_team_winning_pool_game(self):
        pass
 
-   def get_pool_game_winner_team_name(self):
+    def get_team_name_winning_pool_game(self):
        pass
 
-   def get_game_winner(self):
+    def get_team_winning_game(self):
        pass
 
-   def get_game_winner_team_name(self):
+    def get_team_name_winning_game(self):
        pass
 
-   def get_game_away_team(self):
+    def get_game_state(self):
        pass
 
-   def get_game_home_team(self):
+    def did_player_win_game(self):
        pass
 
-   def get_team_winning_pool_game(self):
+    def get_number_of_wins(self):
        pass
 
-   def get_team_name_winning_pool_game(self):
+    def did_player_lose_game(self):
        pass
 
-   def get_team_winning_game(self):
+    def get_number_of_losses(self):
        pass
 
-   def get_team_name_winning_game(self):
+    def is_player_winning_game(self):
        pass
 
-   def get_game_state(self):
+    def is_player_losing_game(self):
        pass
 
-   def did_player_win_game(self):
+    def is_player_projected_to_win_game(self):
        pass
 
-   def get_number_of_wins(self):
+    def is_player_possible_to_win_game(self):
        pass
 
-   def did_player_lose_game(self):
+    def get_number_of_projected_wins(self):
        pass
 
-   def get_number_of_losses(self):
+    def get_number_of_possible_wins(self):
        pass
 
-   def is_player_winning_game(self):
+    def all_games_final(self):
        pass
 
-   def is_player_losing_game(self):
+    def no_games_started(self):
        pass
 
-   def is_player_projected_to_win_game(self):
+    def at_least_one_game_in_progress(self):
        pass
 
-   def is_player_possible_to_win_game(self):
+    def get_summary_state_of_all_games(self):
        pass
 
-   def get_number_of_projected_wins(self):
+    def get_game_result_string(self):
        pass
 
-   def get_number_of_possible_wins(self):
+    def get_favored_team_name(self):
        pass
 
-   def all_games_final(self):
+    def get_game_score_spread(self):
        pass
 
-   def no_games_started(self):
+    def get_pick_score_spread(self):
        pass
 
-   def at_least_one_game_in_progress(self):
+    def player_did_not_pick(self):
        pass
 
-   def get_summary_state_of_all_games(self):
+    def get_featured_game(self):
        pass
 
-   def get_game_result_string(self):
+    def get_game(self):
        pass
 
-   def get_favored_team_name(self):
+    def get_game_pick(self):
        pass
 
-   def get_game_score_spread(self):
+    def get_team_name(self):
        pass
-
-   def get_pick_score_spread(self):
-       pass
-
-   def player_did_not_pick(self):
-       pass
-
-   def get_featured_game(self):
-       pass
-

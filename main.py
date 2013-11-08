@@ -37,89 +37,6 @@ class MainHandler(webapp2.RequestHandler):
         self.response.write('Main Page')
         return
 
-# run a worker to get around request timeout in 30 seconds.
-class LoadDatabasePage(webapp2.RequestHandler):
-    def get(self):
-        taskqueue.add(url='/worker')
-        self.response.write('Running worker')
-
-class Worker(webapp2.RequestHandler):
-    def __load_player(self):
-        p = Player(name="Brent",year=2013)
-        p.put()
-
-    def post(self):
-        load = LoadDatabase()
-        load.load_players()
-        #self.__load_player()
-        #load = LoadDatabase()
-        #load.load_players()
-        #def txn():
-            #load = LoadDatabase()
-            #load.load_players()
-            #load.load_all()
-        #db.run_in_transaction(txn)
-
-class Purge(webapp2.RequestHandler):
-    def get(self):
-        q = taskqueue.Queue('default')
-        q.purge()
-        self.response.write('Taskqueue Purged.')
-
-class TaskqueueStatus(webapp2.RequestHandler):
-    def get(self):
-        players = Player.all()
-        if not(players):
-            self.response.write('Players loaded=0.')
-        else:
-            self.response.write('Players loaded=%d' % (players.count()))
-
-class LoadPlayersTest(webapp2.RequestHandler):
-    def get(self):
-        index = self.request.get('index')
-        batch = self.request.get('batch_size')
-
-        if not(index):
-            start_index = 0
-        else:
-            start_index = int(index)
-
-        if not(batch):
-            batch_size = 1
-        else:
-            batch_size = int(batch)
-
-        load_all = not(index) and not(batch)
-        end_index = start_index + batch_size
-
-        if load_all:
-            load = LoadDatabase()
-            done = load.load_players()
-        else:
-            load = LoadDatabase()
-            done = load.load_players(start_index,batch_size)
-
-        finished = done == "done"
-
-        if finished:
-            self.response.write('Finished loading players.')
-        else:
-            code = "<form type='post'>"
-            code += "<input type='hidden' name='index' value='%s'>" % (end_index)
-            code += "<input type='hidden' name='batch_size' value='%s'>" % (batch_size)
-            code += "Load Next Batch&nbsp;"
-            code += "<input type='submit' value='next'>"
-            code += "</form>"
-            self.response.write(code)
-            #rs = '/loadplayers?index=%d&batch_size=%d' % (end_index,batch_size)
-            #self.response.write('Redirect: %s' % (rs))
-
-    def post(self):
-        self.response.write('Redirecting...')
-        index = self.request.get("index")
-        batch_size = self.request.get("batch_size")
-        self.redirect('/loadplayers?index=%s&batch_size=%s' % (index,batch_size))
-
 class DatabaseTest(webapp2.RequestHandler):
 
     def __week_str(self,week):
@@ -160,13 +77,7 @@ class DatabaseTest(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    #('/delete', DeleteDatabase),
-    ('/dbtest',DatabaseTest),
-    ('/load', LoadDatabasePage),
-    ('/worker', Worker),
-    ('/purge', Purge),
-    ('/status', TaskqueueStatus),
-    ('/loadplayers', LoadPlayersTest),
+    #('/dbtest',DatabaseTest),
     ('/a/tests', MainTestPage),
     ('/a/delete', DeleteDatabase),
     ('/a/delete_players', DeletePlayers),

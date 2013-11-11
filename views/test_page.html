@@ -21,6 +21,7 @@
                     {% else %}
                         <td id="test-fail">{{ test.result }}</td>
                     {% endif %}
+                    <td id="test-time">{{ test.time }}</td>
                     <td id="test-name">{{ test.name }}</td>
                 </tr>
             {% endfor %}
@@ -30,12 +31,10 @@
         <br>
         <br>
         {% for test in results %}
-            {% if test.result == "FAIL" %}
                 <div class="test-output">{{ test.name }} Details</div>
                 <hr>
                 <pre>{{ test.output }}</pre>
                 <br>
-            {% endif %}
         {% endfor %}
     </body>
 </html>    

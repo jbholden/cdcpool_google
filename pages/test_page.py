@@ -6,6 +6,7 @@ from handler import *
 from tests.test_calculator import *
 from tests.test_database import *
 from tests.index import *
+import time
 
 # runs the tests in tests/index.py
 
@@ -13,6 +14,7 @@ class ResultData:
     name = None
     result = None
     output = None
+    time = None
 
 class SummaryData:
     num_tests = None
@@ -31,7 +33,7 @@ class MainTestPage(Handler):
         output.close()
 
         num_tests = test_result.testsRun
-        num_failures = len(test_result.failures)
+        num_failures = len(test_result.failures) + len(test_result.errors)
 
         return num_tests,num_failures,output_text
 
@@ -40,13 +42,18 @@ class MainTestPage(Handler):
         for item in test_classes:
             name = item[0]
             test_class = item[1]
+
+            start_time = time.time()
             num_tests,num_failures,test_output = self.__run_test(test_class)
+            elapsed_time = time.time() - start_time
+
             all_passed = num_failures == 0
 
             r = ResultData()
             r.name = name
             r.result = "PASS" if all_passed else "FAIL"
             r.output = test_output
+            r.time = "%0.2f Sec." % (elapsed_time)
             results.append(r)
         return results
 

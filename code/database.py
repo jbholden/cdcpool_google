@@ -1,11 +1,22 @@
 from google.appengine.ext import db
+import logging
+import time
 
 class Database:
 
     def load_week_data(self,year,week_number):
+        start = time.time()
         week = self.__get_week_in_database(year,week_number)
+        week_elapsed_time = time.time()-start
+        start = time.time()
         games = self.__get_week_games_in_database(week)
+        games_elapsed_time = time.time()-start
+        start = time.time()
         picks = self.__get_player_week_picks_in_database(week)
+        picks_elapsed_time = time.time()-start
+        logging.debug("Load weeks = %f" % (week_elapsed_time))
+        logging.debug("Load games = %f" % (games_elapsed_time))
+        logging.debug("Load picks = %f" % (picks_elapsed_time))
         return week,games,picks
 
     def __get_week_in_database(self,year,week):
@@ -22,16 +33,45 @@ class Database:
         assert len(games) == 10
         return games
 
-    def __get_player_week_picks_in_database(self,week):
-        picks_query = db.GqlQuery('SELECT * FROM Pick WHERE week=:week',week=week)
-        assert picks_query != None
-        picks = list(picks_query)
+    def __get_players_in_database(self,year):
+        players_query = db.GqlQuery('select * from Player where year=:year',year=year)
+        assert players_query != None
+        return list(players_query)
 
-        player_picks = dict()
+    def __get_player_week_picks_in_database(self,week):
+        start = time.time()
+        picks_query = db.GqlQuery('select * from Pick where week=:week',week=week)
+        assert picks_query != None
+        picks = list(picks_query) 
+        elapsed = time.time()-start
+        logging.debug("Load picks time 1 = %f" % (elapsed))
+
+        start = time.time()
+        players = self.__get_players_in_database(week.year)
+        elapsed = time.time()-start
+        logging.debug("Load picks time 2 = %f" % (elapsed))
+
+        start = time.time()
+        player_picks = { player.name:[] for player in players }
+        elapsed = time.time()-start
+        logging.debug("Load picks time 3 = %f" % (elapsed))
+        start = time.time()
+        name_time = 0.0
+        dict_time = 0.0
         for pick in picks:
-            if pick.player.name not in player_picks:
-                player_picks[pick.player.name] = [ pick ]
-            else:
-                player_picks[pick.player.name].append(pick)
+
+            nstart = time.time()
+            player_name = pick.player.name
+            elapsed = time.time()-nstart
+            name_time += elapsed
+
+            pstart = time.time()
+            player_picks[player_name].append(pick)
+            elapsed = time.time()-pstart
+            dict_time += elapsed
+        elapsed = time.time()-start
+        logging.debug("Load picks name time = %f" % (name_time))
+        logging.debug("Load picks dict time = %f" % (dict_time))
+        logging.debug("Load picks time 4 = %f" % (elapsed))
 
         return player_picks

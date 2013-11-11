@@ -28,6 +28,13 @@ body {
    text-align: center;
 }
 
+#test-time {
+   color : gray;
+   font-size: 8pt;
+   text-align: center;
+}
+
+
 .test-output {
     color : gray;
     font-size: 12pt;

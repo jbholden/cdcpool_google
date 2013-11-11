@@ -22,7 +22,7 @@ class LoadGames:
     def __lookup_team(self,team):
         q = db.GqlQuery('SELECT * FROM Team WHERE name=:name',name=team)
         assert q
-        assert q.count() == 1
+        assert q.count() == 1,"Error! name=%s, count=%d" % (team,q.count())
         return q[0]
 
     def add_game(self,game):

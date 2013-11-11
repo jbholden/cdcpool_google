@@ -4,4 +4,5 @@ from google.appengine.ext import db
 
 class Player(db.Model):
     name = db.StringProperty(required=True)
-    year = db.IntegerProperty(required=True)
+    year = db.IntegerProperty(int,required=True)
+    #years = db.ListProperty(int,required=True)

@@ -70,7 +70,16 @@ class MainTestPage(Handler):
                 s.num_failed += 1
         return s
 
-    def get(self):
+    def post(self):
         results = self.__run_all_tests()
         summary = self.__summary_data(results)
         self.render('test_page.html',results=results,summary=summary)
+
+    def get(self):
+        code = "<html><body>"
+        code += "<form action='tests' method='post'>"
+        code += "Run the tests&nbsp;"
+        code += "<input type='submit' value='Submit'>"
+        code += "</form>"
+        code += "</body></html>"
+        self.response.write(code)

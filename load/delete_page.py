@@ -2,7 +2,17 @@ import webapp2
 from load import *
 
 class DeleteDatabase(webapp2.RequestHandler):
+
     def get(self):
+        code = "<html><body>"
+        code += "<form action='delete' method='post'>"
+        code += "Delete the Database&nbsp;"
+        code += "<input type='submit' value='Submit'>"
+        code += "</form>"
+        code += "</body></html>"
+        self.response.write(code)
+
+    def post(self):
         load = LoadDatabase()
         load.delete_all()
         self.response.write('Database deleted.')

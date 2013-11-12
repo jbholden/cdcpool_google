@@ -60,8 +60,14 @@ class Database:
         dict_time = 0.0
         for pick in picks:
 
+            # idea:  create key,value dict with player_key,player_name
+            # idea:  create key,value dict with player_key,picks array
+
             nstart = time.time()
-            player_name = pick.player.name
+            player_key = pick.player.key()
+            #player_name = str(player_key)
+            player_name = db.get(player_key).name
+            #player_name = pick.player.name
             elapsed = time.time()-nstart
             name_time += elapsed
 

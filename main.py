@@ -26,6 +26,7 @@ from load.load import *
 from load.delete_page import *
 from load.load_page import *
 from load.stats_page import *
+from load.load_all_page import *
 from code.update import *
 from pages.test_page import *
 from google.appengine.api import taskqueue
@@ -80,17 +81,18 @@ app = webapp2.WSGIApplication([
     #('/dbtest',DatabaseTest),
     ('/a/tests', MainTestPage),
     ('/a/delete', DeleteDatabase),
-    ('/a/delete_players', DeletePlayers),
-    ('/a/delete_teams', DeleteTeams),
-    ('/a/delete_games', DeleteGames),
-    ('/a/delete_weeks', DeleteWeeks),
-    ('/a/delete_picks', DeletePicks),
-    ('/a/delete_lookups', DeleteLookups),
-    ('/a/load', LoadAllPage),
-    ('/a/load_players', LoadPlayersPage),
-    ('/a/load_teams', LoadTeamsPage),
-    ('/a/load_games', LoadGamesPage),
-    ('/a/load_weeks', LoadWeeksPage),
-    ('/a/load_picks', LoadPicksPage),
+    #('/a/delete_players', DeletePlayers),
+    #('/a/delete_teams', DeleteTeams),
+    #('/a/delete_games', DeleteGames),
+    #('/a/delete_weeks', DeleteWeeks),
+    #('/a/delete_picks', DeletePicks),
+    #('/a/delete_lookups', DeleteLookups),
+    #('/a/load', LoadAllPage),
+    ('/a/loadall', LoadEveryThingPage),
+    #('/a/load_players', LoadPlayersPage),
+    #('/a/load_teams', LoadTeamsPage),
+    #('/a/load_games', LoadGamesPage),
+    #('/a/load_weeks', LoadWeeksPage),
+    #('/a/load_picks', LoadPicksPage),
     ('/a/stats', DatabaseStats)
 ], debug=True)

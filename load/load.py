@@ -8,6 +8,7 @@ from loadteams import *
 from loadweeks import *
 from loadpicks import *
 from loadgames import *
+import logging
 
 # this class breaks up the database load into smaller batch sizes.
 # google app engine times out in 30 seconds and this is not enough
@@ -45,11 +46,21 @@ class LoadDatabase:
         return self.__load(LoadPicks(),index,batch_size)
 
     def load_all(self):
+        logging.info("loading players...")
         done = self.load_players()
+        logging.info("loading players done.")
+        logging.info("loading teams...")
         done = self.load_teams()
+        logging.info("loading teams done.")
+        logging.info("loading games...")
         done = self.load_games()
+        logging.info("loading games done.")
+        logging.info("loading weeks...")
         done = self.load_weeks()
+        logging.info("loading weeks done.")
+        logging.info("loading picks...")
         done = self.load_picks()
+        logging.info("loading picks done.")
 
     def delete_all(self):
         self.delete_players()

@@ -5,6 +5,12 @@ import time
 class Database:
 
     def load_week_data(self,year,week_number):
+        week = self.__get_week_in_database(year,week_number)
+        games = self.__get_week_games_in_database(week)
+        picks = self.__get_player_week_picks_in_database(week)
+        return week,games,picks
+
+    def load_week_data_timed(self,year,week_number):
         start = time.time()
         week = self.__get_week_in_database(year,week_number)
         week_elapsed_time = time.time()-start
@@ -34,50 +40,25 @@ class Database:
         return games
 
     def __get_players_in_database(self,year):
-        players_query = db.GqlQuery('select * from Player where year=:year',year=year)
+        players_query = db.GqlQuery('select * from Player where years IN :year',year=[year])
         assert players_query != None
         return list(players_query)
 
     def __get_player_week_picks_in_database(self,week):
-        start = time.time()
-        picks_query = db.GqlQuery('select * from Pick where week=:week',week=week)
+        picks_query = db.GqlQuery('select * from Pick where week=:week',week=str(week.key()))
         assert picks_query != None
         picks = list(picks_query) 
-        elapsed = time.time()-start
-        logging.debug("Load picks time 1 = %f" % (elapsed))
 
-        start = time.time()
         players = self.__get_players_in_database(week.year)
-        elapsed = time.time()-start
-        logging.debug("Load picks time 2 = %f" % (elapsed))
 
-        start = time.time()
         player_picks = { player.name:[] for player in players }
-        elapsed = time.time()-start
-        logging.debug("Load picks time 3 = %f" % (elapsed))
-        start = time.time()
-        name_time = 0.0
-        dict_time = 0.0
+
         for pick in picks:
 
             # idea:  create key,value dict with player_key,player_name
             # idea:  create key,value dict with player_key,picks array
 
-            nstart = time.time()
-            player_key = pick.player.key()
-            #player_name = str(player_key)
-            player_name = db.get(player_key).name
-            #player_name = pick.player.name
-            elapsed = time.time()-nstart
-            name_time += elapsed
-
-            pstart = time.time()
-            player_picks[player_name].append(pick)
-            elapsed = time.time()-pstart
-            dict_time += elapsed
-        elapsed = time.time()-start
-        logging.debug("Load picks name time = %f" % (name_time))
-        logging.debug("Load picks dict time = %f" % (dict_time))
-        logging.debug("Load picks time 4 = %f" % (elapsed))
+            player = db.get(db.Key(pick.player))
+            player_picks[player.name].append(pick)
 
         return player_picks

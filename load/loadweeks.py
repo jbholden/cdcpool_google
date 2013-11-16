@@ -20,7 +20,16 @@ class LoadWeeks:
             d = self.transactions[i]
             self.add_week(d)
 
-    def __lookup(self,name,recno):
+    def __lookup_winner(self,name,recno):
+        if not(name) or not(recno):
+            return None
+        q = db.GqlQuery('SELECT * FROM Lookup WHERE name=:name and recno=:recno',name=name,recno=recno)
+        assert q
+        result = list(q)
+        assert len(result) == 1
+        return result[0].instance_key
+
+    def __lookup_game(self,name,recno):
         if not(name) or not(recno):
             return None
         q = db.GqlQuery('SELECT * FROM Lookup WHERE name=:name and recno=:recno',name=name,recno=recno)
@@ -31,8 +40,8 @@ class LoadWeeks:
 
     def add_week(self,week):
         w = Week(number=week['number'],year=week['year'])
-        w.winner = self.__lookup('player',week['winner'])
-        w.games = [self.__lookup('game',id) for id in week['games'] ]
+        w.winner = self.__lookup_winner('player',week['winner'])
+        w.games = [self.__lookup_game('game',id) for id in week['games'] ]
         w.lock_picks = datetime.datetime.now()
         w.lock_scores = datetime.datetime.now()
         key = w.put()

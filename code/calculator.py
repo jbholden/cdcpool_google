@@ -148,3 +148,6 @@ class CalculateResults:
 
     def get_team_name(self):
        pass
+
+    def is_pick_tiebreaker_score_missing(self):
+        pass

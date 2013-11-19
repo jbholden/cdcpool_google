@@ -38,61 +38,23 @@ class MainHandler(webapp2.RequestHandler):
         self.response.write('Main Page')
         return
 
-class DatabaseTest(webapp2.RequestHandler):
-
-    def __week_str(self,week):
-        s = ''
-        s += 'year=%d<br>' % (week.year)
-        s += 'number=%d<br>' % (week.number)
-        s += 'winner=%s<br>' % (week.winner.name)
-        s += 'games=%s<br>' % (week.games)
-        return s
-
-    def __game_str(self,game):
-        s = ''
-        s += 'game.number=%d<br>' % (game.number)
-        s += 'game.away_team=%s<br>' % (game.away_team.name)
-        s += 'game.home_team=%s<br>' % (game.home_team.name)
-        return s
-
-    def __pick_str(self,pick):
-        s = ''
-        s += 'pick.week.number=%d<br>' % (pick.week.number)
-        s += 'pick.week.year=%d<br>' % (pick.week.year)
-        s += 'pick.player.name=%s<br>' % (pick.player.name)
-        return s
-
-    def get(self):
-        u = Update()
-        week,games,picks = u.run_test()
-
-        week_str = self.__week_str(week)
-        game_str = ''
-        for g in games:
-            game_str += self.__game_str(g)
-
-        #pick_str = self.__pick_str(picks[0])
-
-        self.response.write('Test Complete<br>week:<br>%s<br>games<br>%s<br>picks<br>%s<br>'%(week_str,game_str,picks))
-
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    #('/dbtest',DatabaseTest),
     ('/a/tests', MainTestPage),
     ('/a/delete', DeleteDatabase),
-    #('/a/delete_players', DeletePlayers),
-    #('/a/delete_teams', DeleteTeams),
-    #('/a/delete_games', DeleteGames),
-    #('/a/delete_weeks', DeleteWeeks),
-    #('/a/delete_picks', DeletePicks),
-    #('/a/delete_lookups', DeleteLookups),
-    #('/a/load', LoadAllPage),
+    ('/a/delete_players', DeletePlayers),
+    ('/a/delete_teams', DeleteTeams),
+    ('/a/delete_games', DeleteGames),
+    ('/a/delete_weeks', DeleteWeeks),
+    ('/a/delete_picks', DeletePicks),
+    ('/a/delete_lookups', DeleteLookups),
+    ('/a/load', LoadPage),
     ('/a/loadall', LoadEveryThingPage),
-    #('/a/load_players', LoadPlayersPage),
-    #('/a/load_teams', LoadTeamsPage),
-    #('/a/load_games', LoadGamesPage),
-    #('/a/load_weeks', LoadWeeksPage),
-    #('/a/load_picks', LoadPicksPage),
-    ('/a/stats', DatabaseStats)
+    ('/a/load_players', LoadPlayersPage),
+    ('/a/load_teams', LoadTeamsPage),
+    ('/a/load_games', LoadGamesPage),
+    ('/a/load_weeks', LoadWeeksPage),
+    ('/a/load_picks', LoadPicksPage)
+    #('/a/stats', DatabaseStats)
 ], debug=True)

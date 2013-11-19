@@ -1,6 +1,4 @@
-# data needed:
-# - player pick for each game
-# - games to calculate
+# TODO:  decide if want to use game key or game object (currently use key)
 
 class CalculateResults:
 

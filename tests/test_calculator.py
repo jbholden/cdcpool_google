@@ -2,7 +2,8 @@ from code.update import *
 from code.calculator import *
 from code.database import *
 from models.games import *
-
+import time
+import logging
 import unittest
 
 class TestCalculator(unittest.TestCase):
@@ -15,14 +16,22 @@ class TestCalculator(unittest.TestCase):
         self.games = games
         self.picks = picks
 
-    def setUp(self):
+    def __setUp(self):
         self.__load_test_week()
 
-    def test_t1_get_team_player_picked_to_win(self):
+    def __test_t1_get_team_player_picked_to_win(self):
         self.__t1_invalid_player_name()
         self.__t1_game_missing()
-        self.__t1_home_winner()
-        self.__t1_away_winner()
+        self.__t1_team1_winner()
+        self.__t1_team2_winner()
+
+    def test_load_time(self):
+        start = time.time()
+        d = Database()
+        week,games,picks = d.load_week_data_timed(2013,3)
+        elapsed_time = time.time()-start
+        logging.debug("Elapsed load time = %f" % (elapsed_time))
+        self.assertLess(elapsed_time,1.00)
 
     def test_t2_get_team_name_player_picked_to_win(self):
         #self.__t2_invalid_player_name()
@@ -52,22 +61,35 @@ class TestCalculator(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.calc.get_team_player_picked_to_win("Brent H.",None)
 
-    def __t1_home_winner(self):
-        game = self.__find_game("North Carolina","South Carolina")
-        team = self.get_team_player_picked_to_win("Brent H.",game)
-        self.assertEqual(team,"home")
+    def __t1_team2_winner(self):
+        game = self.__find_game_key("North Carolina","South Carolina")
+        team = self.calc.get_team_player_picked_to_win("Brent H.",game)
+        self.assertEqual(team,"team2")
 
-    def __t1_away_winner(self):
-        game = self.__find_game("LSU","TCU")
-        team = self.get_team_player_picked_to_win("Brent H.",game)
-        self.assertEqual(team,"away")
+    def __t1_team1_winner(self):
+        game = self.__find_game_key("LSU","TCU")
+        team = self.calc.get_team_player_picked_to_win("Brent H.",game)
+        self.assertEqual(team,"team1")
 
-    def __find_game(self,away_team,home,team):
+    def __find_game_key(self,team1,team2):
+        game = self.__find_game(team1,team2)
+        if game:
+            return str(game.key())
+        return None
+
+    def __find_game(self,team1,team2):
         for g in self.games:
-            same_teams = away_team == g.away_team.name and home_team == g.home_team.name
+            game_team1 = self.__lookup_object(g.team1).name
+            game_team2 = self.__lookup_object(g.team2).name
+            same_teams = team1 == game_team1 and team2 == game_team2
             if same_teams:
                 return g
         raise AssertionError, "Could not find game"
+
+    def __lookup_object(self,key_value):
+        o = db.get(db.Key(key_value))
+        return o
+
 
     def __t2_invalid_player_name(self):
         with self.assertRaises(AssertionError):

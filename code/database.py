@@ -20,9 +20,9 @@ class Database:
         start = time.time()
         picks = self.__get_player_week_picks_in_database(week)
         picks_elapsed_time = time.time()-start
-        logging.debug("Load weeks = %f" % (week_elapsed_time))
-        logging.debug("Load games = %f" % (games_elapsed_time))
-        logging.debug("Load picks = %f" % (picks_elapsed_time))
+        logging.info("Load weeks = %f" % (week_elapsed_time))
+        logging.info("Load games = %f" % (games_elapsed_time))
+        logging.info("Load picks = %f" % (picks_elapsed_time))
         return week,games,picks
 
     def __get_week_in_database(self,year,week):
@@ -44,6 +44,22 @@ class Database:
         assert players_query != None
         return list(players_query)
 
+    def __get_player_week_picks_in_database_v2(self,week):
+        players = self.__get_players_in_database(week.year)
+
+        week_key = str(week.key())
+
+        player_picks = dict()
+        for player in players:
+            player_key = str(player.key())
+
+            picks_query = db.GqlQuery('select * from Pick where week=:week and player=:player',week=week_key,player=player_key)
+            assert picks_query != None
+            picks = list(picks_query) 
+
+            player_picks[player.name] = picks
+        return player_picks
+
     def __get_player_week_picks_in_database(self,week):
         picks_query = db.GqlQuery('select * from Pick where week=:week',week=str(week.key()))
         assert picks_query != None
@@ -52,6 +68,8 @@ class Database:
         players = self.__get_players_in_database(week.year)
 
         player_picks = { player.name:[] for player in players }
+
+        # speedup idea: do query for each player's picks instead of all the picks
 
         for pick in picks:
 

@@ -5,6 +5,7 @@ from database.test_players import *
 from database.test_teams import *
 from database.test_games import *
 from database.test_picks import *
+from database.test_load_week import *
 
 # Instructions.
 # 1. create a test using the unittest class
@@ -16,4 +17,6 @@ test_classes = [('test players in datastore',TestPlayers),
                 ('test teams in datastore',TestTeams),
                 ('test weeks in datastore',TestWeeks),
                 ('test games in datastore',TestGames),
-                ('test picks in datastore',TestPicks) ]
+                ('test picks in datastore',TestPicks),
+                ('test load week data function',TestWeekLoad),
+                ('test the calculator class',TestCalculator) ]

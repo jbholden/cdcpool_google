@@ -17,6 +17,7 @@
 import webapp2
 import cgi
 import cgitb; cgitb.enable()
+from utils.utils import is_debug
 from models.games import *
 from models.players import *
 from models.teams import *
@@ -35,6 +36,8 @@ from google.appengine.ext import db
 class MainHandler(webapp2.RequestHandler):
 
     def get(self):
+        if is_debug():
+            self.response.write('***DEVELOPMENT SERVER***')
         self.response.write('Main Page')
         return
 

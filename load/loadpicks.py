@@ -28,7 +28,7 @@ class LoadPicks:
         assert q
         result = list(q)
         assert len(result) == 1
-        return result[0].instance_key
+        return db.get(db.Key(result[0].instance_key))
 
     def add_pick(self,pick):
         p = Pick()

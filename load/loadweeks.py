@@ -27,7 +27,7 @@ class LoadWeeks:
         assert q
         result = list(q)
         assert len(result) == 1
-        return result[0].instance_key
+        return db.get(db.Key(result[0].instance_key))
 
     def __lookup_game(self,name,recno):
         if not(name) or not(recno):
@@ -74,5 +74,5 @@ class LoadWeeks:
         self.transactions.append({'recno':22,'number':9,'year':2013,'winner':75,'games':[211, 212, 213, 214, 215, 216, 217, 218, 219, 220]})
         self.transactions.append({'recno':23,'number':10,'year':2013,'winner':62,'games':[221, 222, 223, 224, 225, 226, 227, 228, 229, 230]})
         self.transactions.append({'recno':24,'number':11,'year':2013,'winner':76,'games':[231, 232, 233, 234, 235, 236, 237, 238, 239, 240]})
-        self.transactions.append({'recno':25,'number':12,'year':2013,'winner':None,'games':[241, 242, 243, 244, 245, 246, 247, 248, 249, 250]})
+        self.transactions.append({'recno':25,'number':12,'year':2013,'winner':81,'games':[241, 242, 243, 244, 245, 246, 247, 248, 249, 250]})
 

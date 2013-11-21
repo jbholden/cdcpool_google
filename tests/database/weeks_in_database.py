@@ -4,7 +4,7 @@ class WeeksInDatabase:
     def get_all_weeks(self):
         weeks = dict()
         weeks[2012] = range(1,14)
-        weeks[2013] = range(1,12)
+        weeks[2013] = range(1,13)
         return weeks
 
     def __init__(self):

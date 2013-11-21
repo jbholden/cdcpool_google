@@ -3,8 +3,8 @@ from teams import *
 
 class Game(db.Model):
     number = db.IntegerProperty()
-    team1 = db.StringProperty()     # key of type Team
-    team2 = db.StringProperty()     # key of type Team
+    team1 = db.ReferenceProperty(Team,collection_name="team1")     # key of type Team
+    team2 = db.ReferenceProperty(Team,collection_name="team2")     # key of type Team
     team1_score = db.IntegerProperty()
     team2_score = db.IntegerProperty()
     favored = db.StringProperty()

@@ -45,15 +45,9 @@ class TestWeeks(unittest.TestCase):
         self.assertEqual(week.number,week_number)
         self.assertEqual(len(week.games),10)
         if week.winner != None:
-            self.__check_player_key_exists(week.winner)
+            self.assertIsNotNone(week.winner.name)
         for game in week.games:
             self.__check_game_key_exists(game)
-
-    def __check_player_key_exists(self,key_value):
-        dbkey = db.Key(key_value)
-        value = db.get(dbkey)
-        self.assertIsNotNone(value)
-        self.assertEqual(dbkey.kind(),'Player')
 
     def __check_game_key_exists(self,game):
         value = db.get(game)

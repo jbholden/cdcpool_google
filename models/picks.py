@@ -3,9 +3,9 @@ from players import *
 from weeks import *
 
 class Pick(db.Model):
-    week = db.StringProperty()    # string key of type Week
-    player = db.StringProperty()  # string key of type Player
-    game = db.StringProperty()    # string key of type Game
+    week = db.ReferenceProperty(Week)
+    player = db.ReferenceProperty(Player)
+    game = db.ReferenceProperty(Game)
     winner = db.StringProperty()
     team1_score = db.IntegerProperty()
     team2_score = db.IntegerProperty()

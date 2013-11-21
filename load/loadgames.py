@@ -24,7 +24,7 @@ class LoadGames:
         assert q
         result = list(q)
         assert len(result) == 1
-        return str(q[0].key())
+        return q[0]
 
     def add_game(self,game):
         g = Game()
@@ -285,14 +285,14 @@ class LoadGames:
         self.transactions.append({'recno':238,'number':8,'team1':'Auburn', 'team2':'Tennessee', 'team1_score':55, 'team2_score':23, 'favored':'team1','spread':7.5,'state':'final'})
         self.transactions.append({'recno':239,'number':9,'team1':'Kansas State', 'team2':'Texas Tech', 'team1_score':49, 'team2_score':26, 'favored':'team2','spread':2.5,'state':'final'})
         self.transactions.append({'recno':240,'number':10,'team1':'Oregon', 'team2':'Stanford', 'team1_score':20, 'team2_score':26, 'favored':'team1','spread':10.5,'state':'final'})
-        self.transactions.append({'recno':241,'number':1,'team1':'Georgia Tech', 'team2':'Clemson', 'team1_score':None, 'team2_score':None, 'favored':'team2','spread':10.5,'state':'not_started'})
-        self.transactions.append({'recno':242,'number':2,'team1':'Washington', 'team2':'UCLA', 'team1_score':None, 'team2_score':None, 'favored':'team2','spread':2.5,'state':'not_started'})
-        self.transactions.append({'recno':243,'number':3,'team1':'Michigan State', 'team2':'Nebraska', 'team1_score':None, 'team2_score':None, 'favored':'team1','spread':6.5,'state':'not_started'})
-        self.transactions.append({'recno':244,'number':4,'team1':'Florida', 'team2':'South Carolina', 'team1_score':None, 'team2_score':None, 'favored':'team2','spread':13.5,'state':'not_started'})
-        self.transactions.append({'recno':245,'number':5,'team1':'Georgia', 'team2':'Auburn', 'team1_score':None, 'team2_score':None, 'favored':'team2','spread':4.5,'state':'not_started'})
-        self.transactions.append({'recno':246,'number':6,'team1':'Stanford', 'team2':'Southern Cal', 'team1_score':None, 'team2_score':None, 'favored':'team1','spread':3.5,'state':'not_started'})
-        self.transactions.append({'recno':247,'number':7,'team1':'Oklahoma State', 'team2':'Texas', 'team1_score':None, 'team2_score':None, 'favored':'team1','spread':2.5,'state':'not_started'})
-        self.transactions.append({'recno':248,'number':8,'team1':'West Virginia', 'team2':'Kansas', 'team1_score':None, 'team2_score':None, 'favored':'team1','spread':6.5,'state':'not_started'})
-        self.transactions.append({'recno':249,'number':9,'team1':'Utah', 'team2':'Oregon', 'team1_score':None, 'team2_score':None, 'favored':'team2','spread':10.5,'state':'not_started'})
-        self.transactions.append({'recno':250,'number':10,'team1':'Miami-Florida', 'team2':'Duke', 'team1_score':None, 'team2_score':None, 'favored':'team1','spread':2.5,'state':'not_started'})
+        self.transactions.append({'recno':241,'number':1,'team1':'Georgia Tech', 'team2':'Clemson', 'team1_score':31, 'team2_score':55, 'favored':'team2','spread':10.5,'state':'final'})
+        self.transactions.append({'recno':242,'number':2,'team1':'Washington', 'team2':'UCLA', 'team1_score':31, 'team2_score':41, 'favored':'team2','spread':2.5,'state':'final'})
+        self.transactions.append({'recno':243,'number':3,'team1':'Michigan State', 'team2':'Nebraska', 'team1_score':41, 'team2_score':28, 'favored':'team1','spread':6.5,'state':'final'})
+        self.transactions.append({'recno':244,'number':4,'team1':'Florida', 'team2':'South Carolina', 'team1_score':14, 'team2_score':19, 'favored':'team2','spread':13.5,'state':'final'})
+        self.transactions.append({'recno':245,'number':5,'team1':'Georgia', 'team2':'Auburn', 'team1_score':38, 'team2_score':43, 'favored':'team2','spread':4.5,'state':'final'})
+        self.transactions.append({'recno':246,'number':6,'team1':'Stanford', 'team2':'Southern Cal', 'team1_score':17, 'team2_score':20, 'favored':'team1','spread':3.5,'state':'final'})
+        self.transactions.append({'recno':247,'number':7,'team1':'Oklahoma State', 'team2':'Texas', 'team1_score':38, 'team2_score':13, 'favored':'team1','spread':2.5,'state':'final'})
+        self.transactions.append({'recno':248,'number':8,'team1':'West Virginia', 'team2':'Kansas', 'team1_score':19, 'team2_score':31, 'favored':'team1','spread':6.5,'state':'final'})
+        self.transactions.append({'recno':249,'number':9,'team1':'Utah', 'team2':'Oregon', 'team1_score':21, 'team2_score':44, 'favored':'team2','spread':10.5,'state':'final'})
+        self.transactions.append({'recno':250,'number':10,'team1':'Miami-Florida', 'team2':'Duke', 'team1_score':30, 'team2_score':48, 'favored':'team1','spread':2.5,'state':'final'})
 

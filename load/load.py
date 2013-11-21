@@ -9,6 +9,7 @@ from loadweeks import *
 from loadpicks import *
 from loadgames import *
 import logging
+from google.appengine.api import memcache
 
 # this class breaks up the database load into smaller batch sizes.
 # google app engine times out in 30 seconds and this is not enough
@@ -63,6 +64,7 @@ class LoadDatabase:
         logging.info("loading picks done.")
 
     def delete_all(self):
+        memcache.flush_all()
         self.delete_players()
         self.delete_teams()
         self.delete_games()

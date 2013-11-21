@@ -77,12 +77,11 @@ class TestWeekLoad(unittest.TestCase):
         self.assertEqual(len(games),10)
         for game in games:
             self.__check_game_state(game)
-        week_key = str(week.key())
         self.assertGreater(len(picks.keys()),0)
         for player in picks:
             player_picks = picks[player]
             for pick in player_picks:
-                self.__check_pick_state(pick,week_key)
+                self.__check_pick_state(pick,week)
 
     def __test_invalid_week_query(self,year,week_number):
         d = Database()
@@ -97,15 +96,9 @@ class TestWeekLoad(unittest.TestCase):
         self.assertEqual(week.number,week_number)
         self.assertEqual(len(week.games),10)
         if week.winner != None:
-            self.__check_player_key_exists(week.winner)
+            self.assertIsNotNone(week.winner)
         for game in week.games:
             self.__check_game_key_exists(game)
-
-    def __check_player_key_exists(self,key_value):
-        dbkey = db.Key(key_value)
-        value = db.get(dbkey)
-        self.assertIsNotNone(value)
-        self.assertEqual(dbkey.kind(),'Player')
 
     def __check_game_key_exists(self,game):
         value = db.get(game)
@@ -117,8 +110,8 @@ class TestWeekLoad(unittest.TestCase):
         self.assertIn(game.number,range(1,11))
         self.assertIsNotNone(game.team1)
         self.assertIsNotNone(game.team2)
-        self.__check_team_key_exists(game.team1)
-        self.__check_team_key_exists(game.team2)
+        self.assertIsNotNone(game.team1.name)
+        self.assertIsNotNone(game.team2.name)
         self.assertIsNotNone(game.favored)
         self.assertIn(game.favored,['team1','team2'])
         self.assertIsNotNone(game.spread)
@@ -126,30 +119,20 @@ class TestWeekLoad(unittest.TestCase):
         self.assertIsNotNone(game.state)
         self.assertIn(game.state,['not_started','in_progress','final'])
 
-    def __check_team_key_exists(self,key_value):
-        dbkey = db.Key(key_value)
-        value = db.get(dbkey)
-        self.assertIsNotNone(value)
-        self.assertEqual(dbkey.kind(),'Team')
-
     def __ensure_spread_value_is_a_half(self,spread):
         fraction = spread - int(spread)
         return self.assertEqual(fraction,0.5)
 
-    def __check_pick_state(self,pick,week_key):
-        self.assertEqual(pick.week,week_key)
+    def __check_pick_state(self,pick,week):
+        self.assertIsNotNone(pick.week)
+        self.assertEqual(pick.week.number,week.number)
+        self.assertEqual(pick.week.year,week.year)
         self.assertIsNotNone(pick.player)
+        self.assertIsNotNone(pick.player.name)
         self.assertIsNotNone(pick.game)
-        self.__check_key_exists('Player',pick.player)
-        self.__check_key_exists('Game',pick.game)
+        self.assertIsNotNone(pick.game.number)
         if pick.winner != None:
             self.assertIn(pick.winner,['team1','team2'])
         current_time = datetime.datetime.now()
         self.assertLess(pick.created,current_time)
         self.assertLess(pick.modified,current_time)
-
-    def __check_key_exists(self,kind,key_value):
-        dbkey = db.Key(key_value)
-        value = db.get(dbkey)
-        self.assertIsNotNone(value)
-        self.assertEqual(dbkey.kind(),kind)

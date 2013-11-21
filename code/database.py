@@ -62,13 +62,9 @@ class Database:
     def __get_player_week_picks_in_database_v2(self,week):
         players = self.__get_players_in_database(week.year)
 
-        week_key = str(week.key())
-
         player_picks = dict()
         for player in players:
-            player_key = str(player.key())
-
-            picks_query = db.GqlQuery('select * from Pick where week=:week and player=:player',week=week_key,player=player_key)
+            picks_query = db.GqlQuery('select * from Pick where week=:week and player=:player',week=week,player=player)
             assert picks_query != None
             picks = list(picks_query) 
 
@@ -79,7 +75,7 @@ class Database:
         key = "player_picks_%d_%d" % (week.year,week.number)
         player_picks = memcache.get(key)
         if update or not(player_picks):
-            picks_query = db.GqlQuery('select * from Pick where week=:week',week=str(week.key()))
+            picks_query = db.GqlQuery('select * from Pick where week=:week',week=week)
             assert picks_query != None
             picks = list(picks_query) 
 
@@ -89,8 +85,7 @@ class Database:
             for pick in picks:
                 # idea:  create key,value dict with player_key,player_name
                 # idea:  create key,value dict with player_key,picks array
-                player = db.get(db.Key(pick.player))
-                player_picks[player.name].append(pick)
+                player_picks[pick.player.name].append(pick)
 
             memcache.set(key,player_picks)
 

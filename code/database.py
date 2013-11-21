@@ -1,13 +1,14 @@
 from google.appengine.ext import db
+from google.appengine.api import memcache
 import logging
 import time
 
 class Database:
 
-    def load_week_data(self,year,week_number):
-        week = self.__get_week_in_database(year,week_number)
-        games = self.__get_week_games_in_database(week)
-        picks = self.__get_player_week_picks_in_database(week)
+    def load_week_data(self,year,week_number,update=False):
+        week = self.__get_week_in_database(year,week_number,update)
+        games = self.__get_week_games_in_database(week,update)
+        picks = self.__get_player_week_picks_in_database(week,update)
         return week,games,picks
 
     def load_week_data_timed(self,year,week_number):
@@ -25,24 +26,38 @@ class Database:
         logging.info("Load picks = %f" % (picks_elapsed_time))
         return week,games,picks
 
-    def __get_week_in_database(self,year,week):
-        weeks_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year and number=:week',year=year,week=week)
-        assert weeks_query != None
-        weeks = list(weeks_query)
-        assert len(weeks) == 1
-        return weeks[0]
+    def __get_week_in_database(self,year,week_number,update):
+        key = "week_%d_%d" % (year,week_number)
+        week = memcache.get(key)
+        if update or not(week):
+            weeks_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year and number=:week',year=year,week=week_number)
+            assert weeks_query != None
+            weeks = list(weeks_query)
+            assert len(weeks) == 1
+            week = weeks[0]
+            memcache.set(key,week)
+        return week
 
-    def __get_week_games_in_database(self,week):
-        games = []
-        for game_key in week.games:
-            games.append(db.get(game_key))
-        assert len(games) == 10
+    def __get_week_games_in_database(self,week,update):
+        key = "games_%d_%d" % (week.year,week.number)
+        games = memcache.get(key)
+        if update or not(games):
+            games = []
+            for game_key in week.games:
+                games.append(db.get(game_key))
+            assert len(games) == 10
+            memcache.set(key,games)
         return games
 
-    def __get_players_in_database(self,year):
-        players_query = db.GqlQuery('select * from Player where years IN :year',year=[year])
-        assert players_query != None
-        return list(players_query)
+    def __get_players_in_database(self,year,update):
+        key = "players_%d" % (year)
+        players = memcache.get(key)
+        if update or not(players):
+            players_query = db.GqlQuery('select * from Player where years IN :year',year=[year])
+            assert players_query != None
+            players = list(players_query)
+            memcache.set(key,players)
+        return players
 
     def __get_player_week_picks_in_database_v2(self,week):
         players = self.__get_players_in_database(week.year)
@@ -60,23 +75,23 @@ class Database:
             player_picks[player.name] = picks
         return player_picks
 
-    def __get_player_week_picks_in_database(self,week):
-        picks_query = db.GqlQuery('select * from Pick where week=:week',week=str(week.key()))
-        assert picks_query != None
-        picks = list(picks_query) 
+    def __get_player_week_picks_in_database(self,week,update):
+        key = "player_picks_%d_%d" % (week.year,week.number)
+        player_picks = memcache.get(key)
+        if update or not(player_picks):
+            picks_query = db.GqlQuery('select * from Pick where week=:week',week=str(week.key()))
+            assert picks_query != None
+            picks = list(picks_query) 
 
-        players = self.__get_players_in_database(week.year)
+            players = self.__get_players_in_database(week.year,update)
+            player_picks = { player.name:[] for player in players }
 
-        player_picks = { player.name:[] for player in players }
+            for pick in picks:
+                # idea:  create key,value dict with player_key,player_name
+                # idea:  create key,value dict with player_key,picks array
+                player = db.get(db.Key(pick.player))
+                player_picks[player.name].append(pick)
 
-        # speedup idea: do query for each player's picks instead of all the picks
-
-        for pick in picks:
-
-            # idea:  create key,value dict with player_key,player_name
-            # idea:  create key,value dict with player_key,picks array
-
-            player = db.get(db.Key(pick.player))
-            player_picks[player.name].append(pick)
+            memcache.set(key,player_picks)
 
         return player_picks

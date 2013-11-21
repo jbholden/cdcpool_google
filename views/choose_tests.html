@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>cdcpool tests</title>
+        <link href="/stylesheets/test.css" rel="stylesheet" type="text/css" media="all">
+    </head>
+    <body>
+        <div class="title">Tests</div>
+        <hr>
+        <br>
+        <form action='tests' method='post'>
+            <div>Choose the tests to run:&nbsp;
+                <input type='submit' value='Run All' name='run_all_button'></div>
+            <br>
+            <table>
+            {% for test in tests %}
+                <tr>
+                    <td><input type="checkbox" name="checkbox_{{test.index}}" value='checked'></td>
+                    <td>{{test.name}}</td>
+                </tr>
+            {% endfor %}
+            </table>
+            <br>
+            <input type='submit' value='Run Selected' name='run_selected_button'></div>
+        </form>
+    </body>
+</html>
+                        

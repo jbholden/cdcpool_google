@@ -1,5 +1,4 @@
 from test_calculator import *
-from test_database import *
 from database.test_weeks import *
 from database.test_players import *
 from database.test_teams import *

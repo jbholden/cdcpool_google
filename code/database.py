@@ -3,13 +3,31 @@ from google.appengine.api import memcache
 import logging
 import time
 
+# TODO:  test load teams
+# TODO:  implement and test load players
+
+
 class Database:
+
+    def load_players(self,year):
+        pass
 
     def load_week_data(self,year,week_number,update=False):
         week = self.__get_week_in_database(year,week_number,update)
         games = self.__get_week_games_in_database(week,update)
         picks = self.__get_player_week_picks_in_database(week,update)
         return week,games,picks
+
+    def load_teams(self,update=False):
+        key = "teams"
+        teams = memcache.get(key)
+        if update or not(teams):
+            teams_query = db.GqlQuery('select * from Team')
+            assert teams_query != None
+            teams = list(teams_query)
+            memcache.set(key,teams)
+        return teams
+
 
     def load_week_data_timed(self,year,week_number):
         start = time.time()

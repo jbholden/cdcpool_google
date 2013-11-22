@@ -4,7 +4,6 @@ import StringIO
 import string
 from handler import *
 from tests.test_calculator import *
-from tests.test_database import *
 from tests.index import *
 from tests.database.weeks_in_database import *
 from tests.database.test_weeks import *

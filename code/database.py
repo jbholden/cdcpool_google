@@ -11,15 +11,15 @@ class Database:
         picks = self.__get_player_week_picks_in_database(week,update)
         return week,games,picks
 
-    def load_week_data_timed(self,year,week_number):
+    def load_week_data_timed(self,year,week_number,update=False):
         start = time.time()
-        week = self.__get_week_in_database(year,week_number)
+        week = self.__get_week_in_database(year,week_number,update)
         week_elapsed_time = time.time()-start
         start = time.time()
-        games = self.__get_week_games_in_database(week)
+        games = self.__get_week_games_in_database(week,update)
         games_elapsed_time = time.time()-start
         start = time.time()
-        picks = self.__get_player_week_picks_in_database(week)
+        picks = self.__get_player_week_picks_in_database(week,update)
         picks_elapsed_time = time.time()-start
         logging.info("Load weeks = %f" % (week_elapsed_time))
         logging.info("Load games = %f" % (games_elapsed_time))

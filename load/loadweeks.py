@@ -75,4 +75,5 @@ class LoadWeeks:
         self.transactions.append({'recno':23,'number':10,'year':2013,'winner':62,'games':[221, 222, 223, 224, 225, 226, 227, 228, 229, 230]})
         self.transactions.append({'recno':24,'number':11,'year':2013,'winner':76,'games':[231, 232, 233, 234, 235, 236, 237, 238, 239, 240]})
         self.transactions.append({'recno':25,'number':12,'year':2013,'winner':81,'games':[241, 242, 243, 244, 245, 246, 247, 248, 249, 250]})
+        self.transactions.append({'recno':26,'number':13,'year':2013,'winner':64,'games':[251, 252, 253, 254, 255, 256, 257, 258, 259, 260]})
 

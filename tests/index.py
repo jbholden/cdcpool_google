@@ -1,4 +1,5 @@
 from test_calculator import *
+from test_week_data import *
 from database.test_weeks import *
 from database.test_players import *
 from database.test_teams import *
@@ -17,5 +18,6 @@ test_classes = [('test players in datastore',TestPlayers),
                 ('test weeks in datastore',TestWeeks),
                 ('test games in datastore',TestGames),
                 ('test picks in datastore',TestPicks),
-                ('test load week data function',TestWeekLoad),
+                ('test load week data',TestWeekLoad),
+                ('test week data class',TestWeekData),
                 ('test the calculator class',TestCalculator) ]

@@ -45,8 +45,8 @@ class TestGames(unittest.TestCase):
         self.assertIn(game.number,range(1,11))
         self.assertIsNotNone(game.team1)
         self.assertIsNotNone(game.team2)
-        self.assertIsNotNone(game.team1.name)
-        self.assertIsNotNone(game.team2.name)
+        self.__check_team_key_exists(game.team1)
+        self.__check_team_key_exists(game.team2)
         self.assertIsNotNone(game.favored)
         self.assertIn(game.favored,['team1','team2'])
         self.assertIsNotNone(game.spread)
@@ -57,3 +57,9 @@ class TestGames(unittest.TestCase):
     def __ensure_spread_value_is_a_half(self,spread):
         fraction = spread - int(spread)
         return self.assertEqual(fraction,0.5)
+
+    def __check_team_key_exists(self,key_value):
+        dbkey = db.Key(key_value)
+        value = db.get(dbkey)
+        self.assertIsNotNone(value)
+        self.assertEqual(dbkey.kind(),'Team')

@@ -45,8 +45,14 @@ class MainTestPage(Handler):
         #weeks_to_test = w.get_weeks()
         #weeks_to_test = None
 
-        for name in testnames:
-            suite.addTest(test_class(name))
+        if hasattr(test_class,"run_subset"):
+            subset = test_class.run_subset()
+            for name in testnames:
+                if name in subset:
+                    suite.addTest(test_class(name))
+        else:
+            for name in testnames:
+                suite.addTest(test_class(name))
 
     def __run_test(self,test_class):
         suite = unittest.TestSuite()

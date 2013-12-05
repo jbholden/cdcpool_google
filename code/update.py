@@ -20,8 +20,9 @@ class Update:
         pass
 
     def get_week_results(self,year,week_number):
-        database = Database()
-        week,games,picks = database.load(year,week_number)
+        pass
+        #database = Database()
+        #week,games,picks = database.load(year,week_number)
 
     def get_overall_results(self,year):
         pass

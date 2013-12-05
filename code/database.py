@@ -2,21 +2,33 @@ from google.appengine.ext import db
 from google.appengine.api import memcache
 import logging
 import time
+from week_data import *
 
-# TODO:  test load teams
-# TODO:  implement and test load players
-
+# TODO:  test load teams, load players
 
 class Database:
 
-    def load_players(self,year):
-        pass
-
     def load_week_data(self,year,week_number,update=False):
-        week = self.__get_week_in_database(year,week_number,update)
-        games = self.__get_week_games_in_database(week,update)
-        picks = self.__get_player_week_picks_in_database(week,update)
-        return week,games,picks
+        data = WeekData()
+        data.week = self.__get_week_in_database(year,week_number,update)
+        data.games = self.__get_week_games_in_database(data.week,update)
+        data.player_picks = self.__get_player_week_picks_in_database(data.week,update)
+        data.picks = self.__get_week_picks_in_database(data.week,update)
+        data.players = self.load_players(data.week.year,update)
+        data.teams = self.load_teams(update)
+        return data
+
+    def load_players(self,year,update=False):
+        key = "players_%d" % (year)
+        players = memcache.get(key)
+        if update or not(players):
+            players_query = db.GqlQuery('select * from Player where years IN :year',year=[year])
+            assert players_query != None
+            results = list(players_query)
+            players = { str(player.key()):player for player in results }
+            memcache.set(key,players)
+        return players
+
 
     def load_teams(self,update=False):
         key = "teams"
@@ -24,7 +36,8 @@ class Database:
         if update or not(teams):
             teams_query = db.GqlQuery('select * from Team')
             assert teams_query != None
-            teams = list(teams_query)
+            results = list(teams_query)
+            teams = { str(team.key()):team for team in results }
             memcache.set(key,teams)
         return teams
 
@@ -60,51 +73,40 @@ class Database:
         key = "games_%d_%d" % (week.year,week.number)
         games = memcache.get(key)
         if update or not(games):
-            games = []
-            for game_key in week.games:
-                games.append(db.get(game_key))
+            games = { str(game_key):db.get(game_key) for game_key in week.games }
             assert len(games) == 10
             memcache.set(key,games)
         return games
 
-    def __get_players_in_database(self,year,update):
-        key = "players_%d" % (year)
-        players = memcache.get(key)
-        if update or not(players):
-            players_query = db.GqlQuery('select * from Player where years IN :year',year=[year])
-            assert players_query != None
-            players = list(players_query)
-            memcache.set(key,players)
-        return players
-
-    def __get_player_week_picks_in_database_v2(self,week):
-        players = self.__get_players_in_database(week.year)
-
-        player_picks = dict()
-        for player in players:
-            picks_query = db.GqlQuery('select * from Pick where week=:week and player=:player',week=week,player=player)
-            assert picks_query != None
-            picks = list(picks_query) 
-
-            player_picks[player.name] = picks
-        return player_picks
-
     def __get_player_week_picks_in_database(self,week,update):
         key = "player_picks_%d_%d" % (week.year,week.number)
         player_picks = memcache.get(key)
+        week_key = str(week.key())
         if update or not(player_picks):
-            picks_query = db.GqlQuery('select * from Pick where week=:week',week=week)
+            picks_query = db.GqlQuery('select * from Pick where week=:week',week=week_key)
             assert picks_query != None
             picks = list(picks_query) 
 
-            players = self.__get_players_in_database(week.year,update)
-            player_picks = { player.name:[] for player in players }
+            players = self.load_players(week.year,update)
+            player_picks = { player_key:[] for player_key in players }
 
             for pick in picks:
-                # idea:  create key,value dict with player_key,player_name
-                # idea:  create key,value dict with player_key,picks array
-                player_picks[pick.player.name].append(pick)
+                player_picks[pick.player].append(pick)
 
             memcache.set(key,player_picks)
 
         return player_picks
+
+    def __get_week_picks_in_database(self,week,update):
+        key = "week_picks_%d_%d" % (week.year,week.number)
+        week_picks = memcache.get(key)
+        week_key = str(week.key())
+        if update or not(week_picks):
+            picks_query = db.GqlQuery('select * from Pick where week=:week',week=week_key)
+            assert picks_query != None
+            picks = list(picks_query) 
+
+            week_picks = { str(pick.key()):pick for pick in picks }
+            memcache.set(key,week_picks)
+
+        return week_picks

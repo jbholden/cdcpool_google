@@ -24,7 +24,7 @@ class LoadGames:
         assert q
         result = list(q)
         assert len(result) == 1
-        return q[0]
+        return str(q[0].key())
 
     def add_game(self,game):
         g = Game()

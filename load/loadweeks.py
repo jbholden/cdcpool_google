@@ -27,7 +27,7 @@ class LoadWeeks:
         assert q
         result = list(q)
         assert len(result) == 1
-        return db.get(db.Key(result[0].instance_key))
+        return result[0].instance_key
 
     def __lookup_game(self,name,recno):
         if not(name) or not(recno):

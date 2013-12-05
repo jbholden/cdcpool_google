@@ -25,8 +25,8 @@ class TestWeekLoad(unittest.TestCase):
         for year in self.weeks:
             for week_number in self.weeks[year]:
                 logging.info("load empty cache week testing:  %d week %d..." % (year,week_number))
-                week,games,picks = self.__test_week_load(year,week_number)
-                self.__check_load_week_state(year,week_number,week,games,picks)
+                week_data = self.__test_week_load(year,week_number)
+                self.__check_load_week_state(year,week_number,week_data)
 
     def test_weeks_with_cache_populated(self):
         logging.info("load populated cache week testing...")
@@ -36,9 +36,9 @@ class TestWeekLoad(unittest.TestCase):
             for week_number in self.weeks[year]:
                 logging.info("load populated cache week testing:  %d week %d..." % (year,week_number))
                 start = time.time()
-                week,games,picks = self.__test_week_load(year,week_number)
+                week_data = self.__test_week_load(year,week_number)
                 elapsed_time = time.time()-start
-                self.__check_load_week_state(year,week_number,week,games,picks)
+                self.__check_load_week_state(year,week_number,week_data)
                 self.assertLess(elapsed_time,1.00)
 
     def test_invalid_weeks_with_empty_cache(self):
@@ -56,37 +56,85 @@ class TestWeekLoad(unittest.TestCase):
         self.__test_invalid_week_query(year=2012,week_number=0)
         self.__test_invalid_week_query(year=1776,week_number=1)
 
+    def test_load_teams_with_empty_cache(self):
+        logging.info("load teams empty cache testing...")
+        memcache.flush_all()
+        self.__load_teams_test()
+
+    def test_load_teams_with_populated_cache(self):
+        logging.info("load teams populated cache testing...")
+        memcache.flush_all()
+        self.__load_memcache_with_teams()
+        self.__load_teams_test()
+
+    def test_load_players_with_empty_cache(self):
+        logging.info("load players empty cache testing...")
+        memcache.flush_all()
+        self.__load_players_test(2012)
+        self.__load_players_test(2013)
+
+    def test_load_players_with_populated_cache(self):
+        logging.info("load players populated cache testing...")
+        memcache.flush_all()
+        self.__load_memcache_with_players()
+        self.__load_players_test(2012)
+        self.__load_players_test(2013)
+
     def __load_memcache_with_all_weeks(self):
         logging.info("loading memcache with all weeks (make take a few minutes)...")
         for year in self.weeks:
             for week_number in self.weeks[year]:
                 #logging.info("loading week into memcache:  %d week %d..." % (year,week_number))
                 d = Database()
-                week,games,picks = d.load_week_data(year,week_number,update=True)
+                week_data = d.load_week_data(year,week_number,update=True)
+
+    def __load_memcache_with_teams(self):
+        d = Database()
+        ignore_return_value = d.load_teams(update=True)
+
+    def __load_memcache_with_players(self):
+        d = Database()
+        ignore_return_value = d.load_players(year=2012,update=True)
+        ignore_return_value = d.load_players(year=2013,update=True)
 
     def __test_week_load(self,year,week_number):
         d = Database()
-        week,games,picks = d.load_week_data(year,week_number)
-        self.assertIsNotNone(week)
-        self.assertIsNotNone(games)
-        self.assertIsNotNone(picks)
-        return week,games,picks
+        week_data = d.load_week_data(year,week_number)
+        self.assertIsNotNone(week_data.week)
+        self.assertIsNotNone(week_data.games)
+        self.assertIsNotNone(week_data.picks)
+        self.assertIsNotNone(week_data.player_picks)
+        self.assertIsNotNone(week_data.players)
+        self.assertIsNotNone(week_data.teams)
+        return week_data
 
-    def __check_load_week_state(self,year,week_number,week,games,picks):
-        self.__check_week_state(week,year,week_number)
-        self.assertEqual(len(games),10)
-        for game in games:
+    def __check_load_week_state(self,year,week_number,week_data):
+        self.__check_week_state(week_data.week,year,week_number)
+
+        self.assertEqual(len(week_data.games),10)
+        for game_key in week_data.games:
+            game = week_data.games[game_key]
             self.__check_game_state(game)
-        self.assertGreater(len(picks.keys()),0)
-        for player in picks:
-            player_picks = picks[player]
-            for pick in player_picks:
-                self.__check_pick_state(pick,week)
+
+        week_key = str(week_data.week.key())
+
+        self.assertGreater(len(week_data.picks.keys()),0)
+        for pick_key in week_data.picks:
+            self.__check_pick_state(week_data.picks[pick_key],week_key)
+
+        self.assertGreater(len(week_data.player_picks.keys()),0)
+        for player_key in week_data.player_picks:
+            for pick in week_data.player_picks[player_key]:
+                self.__check_pick_state(pick,week_key)
+
+        self.assertGreater(len(week_data.players.keys()),0)
+        self.assertGreater(len(week_data.teams.keys()),0)
+
 
     def __test_invalid_week_query(self,year,week_number):
         d = Database()
         with self.assertRaises(AssertionError):
-            week,games,picks = d.load_week_data(year,week_number)
+            week_data = d.load_week_data(year,week_number)
 
     def __check_week_state(self,week,year,week_number):
         self.assertIsNotNone(week.year)
@@ -96,9 +144,15 @@ class TestWeekLoad(unittest.TestCase):
         self.assertEqual(week.number,week_number)
         self.assertEqual(len(week.games),10)
         if week.winner != None:
-            self.assertIsNotNone(week.winner)
+            self.__check_player_key_exists(week.winner)
         for game in week.games:
             self.__check_game_key_exists(game)
+
+    def __check_player_key_exists(self,key_value):
+        dbkey = db.Key(key_value)
+        value = db.get(dbkey)
+        self.assertIsNotNone(value)
+        self.assertEqual(dbkey.kind(),'Player')
 
     def __check_game_key_exists(self,game):
         value = db.get(game)
@@ -110,8 +164,8 @@ class TestWeekLoad(unittest.TestCase):
         self.assertIn(game.number,range(1,11))
         self.assertIsNotNone(game.team1)
         self.assertIsNotNone(game.team2)
-        self.assertIsNotNone(game.team1.name)
-        self.assertIsNotNone(game.team2.name)
+        self.__check_team_key_exists(game.team1)
+        self.__check_team_key_exists(game.team2)
         self.assertIsNotNone(game.favored)
         self.assertIn(game.favored,['team1','team2'])
         self.assertIsNotNone(game.spread)
@@ -119,20 +173,51 @@ class TestWeekLoad(unittest.TestCase):
         self.assertIsNotNone(game.state)
         self.assertIn(game.state,['not_started','in_progress','final'])
 
+    def __check_team_key_exists(self,key_value):
+        dbkey = db.Key(key_value)
+        value = db.get(dbkey)
+        self.assertIsNotNone(value)
+        self.assertEqual(dbkey.kind(),'Team')
+
     def __ensure_spread_value_is_a_half(self,spread):
         fraction = spread - int(spread)
         return self.assertEqual(fraction,0.5)
 
-    def __check_pick_state(self,pick,week):
-        self.assertIsNotNone(pick.week)
-        self.assertEqual(pick.week.number,week.number)
-        self.assertEqual(pick.week.year,week.year)
+    def __check_pick_state(self,pick,week_key):
+        self.assertEqual(pick.week,week_key)
         self.assertIsNotNone(pick.player)
-        self.assertIsNotNone(pick.player.name)
         self.assertIsNotNone(pick.game)
-        self.assertIsNotNone(pick.game.number)
+        self.__check_key_exists('Player',pick.player)
+        self.__check_key_exists('Game',pick.game)
         if pick.winner != None:
             self.assertIn(pick.winner,['team1','team2'])
         current_time = datetime.datetime.now()
         self.assertLess(pick.created,current_time)
         self.assertLess(pick.modified,current_time)
+
+    def __check_key_exists(self,kind,key_value):
+        dbkey = db.Key(key_value)
+        value = db.get(dbkey)
+        self.assertIsNotNone(value)
+        self.assertEqual(dbkey.kind(),kind)
+
+    def __load_teams_test(self):
+        d = Database()
+        teams = d.load_teams()
+        self.assertIsNotNone(teams)
+        self.assertGreater(len(teams),0)
+        for team_key in teams:
+            team = teams[team_key]
+            self.assertIsNotNone(team.name)
+            self.assertIsNotNone(team.conference)
+
+    def __load_players_test(self,year):
+        d = Database()
+        players = d.load_players(year)
+        self.assertIsNotNone(players)
+        self.assertGreater(len(players),0)
+        for player_key in players:
+            player = players[player_key]
+            self.assertIsNotNone(player.name)
+            self.assertIn(year,player.years)
+

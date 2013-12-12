@@ -203,6 +203,17 @@ class CalculateResults:
                 wins += 1
         return wins
 
+    def __debug_print_game(self,player_key,game_key):
+        team1 = self.__data.get_team1_name(game_key)
+        team2 = self.__data.get_team2_name(game_key)
+        if self.did_player_win_game(player_key,game_key):
+            result = "win"
+        elif self.did_player_lose_game(player_key,game_key):
+            result = "loss"
+        else:
+            result = "indeterminate"
+        print "%s vs. %s: %s" % (team1,team2,result)
+
     def get_number_of_losses(self,player_key):
         losses = 0
         for game_key in self.__data.games:
@@ -382,6 +393,20 @@ class CalculateResults:
             if game.number == 10:
                 return game
         raise AssertionError,"did not find a featured game"
+
+    def get_win_percent(self,player_key):
+        wins = self.get_number_of_wins(player_key)
+        losses = self.get_number_of_losses(player_key)
+        num_games = wins+losses
+
+        if num_games == 0:
+            return 0.0
+        return float(wins) / float(num_games)
+
+    def get_win_percent_string(self,player_key):
+        win_pct = self.get_win_percent(player_key)
+        return "%0.3f" % (win_pct)
+
 
     def __find_player_pick_for_game(self,picks,game_key):
         for pick in picks:

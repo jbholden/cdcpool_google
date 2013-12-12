@@ -18,6 +18,22 @@ class Database:
         data.teams = self.load_teams(update)
         return data
 
+    def get_week_numbers(self,year,update=False):
+        weeks_and_years = self.load_weeks_and_years(update)
+        return sorted(weeks_and_years[year])
+
+    def get_years(self,update=False):
+        weeks_and_years = self.load_weeks_and_years(update)
+        return sorted(weeks_and_years.keys())
+
+    def load_weeks_and_years(self,update=False):
+        key = "weeks_and_years"
+        weeks_and_years = memcache.get(key)
+        if update or not(weeks_and_years):
+            weeks_and_years = self.__load_week_numbers_and_years()
+            memcache.set(key,weeks_and_years)
+        return weeks_and_years
+
     def load_players(self,year,update=False):
         key = "players_%d" % (year)
         players = memcache.get(key)
@@ -110,3 +126,20 @@ class Database:
             memcache.set(key,week_picks)
 
         return week_picks
+
+    def __load_week_numbers_and_years(self):
+        weeks_query = db.GqlQuery('select * from Week')
+        assert weeks_query != None
+        weeks = list(weeks_query)
+
+        week_numbers_and_years = dict()
+
+        for week in weeks:
+            year = int(week.year)
+            week_number = int(week.number)
+            if year not in week_numbers_and_years:
+                week_numbers_and_years[year] = [ week_number ]
+            else:
+                week_numbers_and_years[year].append(week_number)
+
+        return week_numbers_and_years

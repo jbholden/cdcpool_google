@@ -8,6 +8,10 @@ from google.appengine.api import memcache
 
 class TestWeekLoad(unittest.TestCase):
 
+    #@staticmethod
+    #def run_subset():
+        #return ["test_get_week_numbers_with_populated_cache"]
+
     # all this __init__ code is necessary to pass in weeks_to_test parameter
     # http://eli.thegreenplace.net/2011/08/02/python-unit-testing-parametrized-test-cases/
     # this will run only the passed in weeks instead of all the weeks in the database
@@ -79,6 +83,45 @@ class TestWeekLoad(unittest.TestCase):
         self.__load_memcache_with_players()
         self.__load_players_test(2012)
         self.__load_players_test(2013)
+
+    def test_load_weeks_and_years_with_empty_cache(self):
+        logging.info("load weeks and years empty cache...")
+        memcache.flush_all()
+        self.__load_weeks_and_years_test()
+
+    def test_load_weeks_and_years_with_populated_cache(self):
+        logging.info("load weeks and years populated cache...")
+        memcache.flush_all()
+        self.__load_memcache_with_weeks_and_years()
+        self.__load_weeks_and_years_test()
+
+    def test_get_years_with_empty_cache(self):
+        logging.info("load get_years empty cache...")
+        memcache.flush_all()
+        self.__get_years_test()
+
+    def test_get_years_with_populated_cache(self):
+        logging.info("load get_years populated cache...")
+        memcache.flush_all()
+        self.__load_memcache_with_years()
+        self.__get_years_test()
+
+    def test_get_week_numbers_with_empty_cache(self):
+        logging.info("load get_weeks empty cache...")
+        memcache.flush_all()
+        self.__get_weeks_test(2012,[1,2,3,4,5,6,7,8,9,10,11,12,13])
+        memcache.flush_all()
+        self.__get_weeks_test(2013,[1,2,3,4,5,6,7,8,9,10,11,12,13])
+        memcache.flush_all()
+        self.__get_weeks_invalid_year_test()
+
+    def test_get_week_numbers_with_populated_cache(self):
+        logging.info("load get_weeks populated cache...")
+        memcache.flush_all()
+        self.__load_memcache_with_weeks()
+        self.__get_weeks_test(2012,[1,2,3,4,5,6,7,8,9,10,11,12,13])
+        self.__get_weeks_test(2013,[1,2,3,4,5,6,7,8,9,10,11,12,13])
+        self.__get_weeks_invalid_year_test()
 
     def __load_memcache_with_all_weeks(self):
         logging.info("loading memcache with all weeks (make take a few minutes)...")
@@ -220,4 +263,44 @@ class TestWeekLoad(unittest.TestCase):
             player = players[player_key]
             self.assertIsNotNone(player.name)
             self.assertIn(year,player.years)
+
+    def __load_memcache_with_weeks_and_years(self):
+        d = Database()
+        ignore_return_value = d.load_weeks_and_years(update=True)
+
+    def __load_memcache_with_years(self):
+        d = Database()
+        ignore_return_value = d.get_years(update=True)
+
+    def __load_memcache_with_weeks(self):
+        d = Database()
+        ignore_return_value = d.get_week_numbers(2013,update=True)
+
+    def __load_weeks_and_years_test(self):
+        d = Database()
+        weeks_and_years = d.load_weeks_and_years()
+        self.assertIsNotNone(weeks_and_years)
+        self.assertIn(2012,weeks_and_years)
+        self.assertIn(2013,weeks_and_years)
+        self.assertEqual(sorted(weeks_and_years[2012]),[1,2,3,4,5,6,7,8,9,10,11,12,13])
+        self.assertEqual(sorted(weeks_and_years[2013]),[1,2,3,4,5,6,7,8,9,10,11,12,13])
+
+    def __get_years_test(self):
+        d = Database()
+        years = d.get_years()
+        self.assertIsNotNone(years)
+        self.assertIn(2012,years)
+        self.assertIn(2013,years)
+
+    def __get_weeks_test(self,year,expected_weeks):
+        d = Database()
+        weeks = d.get_week_numbers(year)
+        self.assertIsNotNone(weeks)
+        self.assertEqual(weeks,expected_weeks)
+
+    def __get_weeks_invalid_year_test(self):
+        d = Database()
+        with self.assertRaises(Exception):
+            weeks = d.get_week_numbers(1900)
+        
 

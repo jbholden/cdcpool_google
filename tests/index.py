@@ -1,5 +1,6 @@
 from test_calculator import *
 from test_week_data import *
+from test_update import *
 from database.test_weeks import *
 from database.test_players import *
 from database.test_teams import *
@@ -11,8 +12,6 @@ from database.test_load_week import *
 # 1. create a test using the unittest class
 # 2. import the class
 # 3. modify this array to contain the test (name,test class)
-#test_classes = [('test calculator.py',TestCalculator) ]
-#test_classes = [('test database accesses',TestDatabase) ]
 test_classes = [('test players in datastore',TestPlayers),
                 ('test teams in datastore',TestTeams),
                 ('test weeks in datastore',TestWeeks),
@@ -20,4 +19,5 @@ test_classes = [('test players in datastore',TestPlayers),
                 ('test picks in datastore',TestPicks),
                 ('test load week data',TestWeekLoad),
                 ('test week data class',TestWeekData),
-                ('test the calculator class',TestCalculator) ]
+                ('test the calculator class',TestCalculator),
+                ('test the update class',TestUpdate) ]

@@ -324,6 +324,20 @@ class TestCalculator(unittest.TestCase):
         self.__t32_featured_game_missing()
         self.__t32_featured_game()
 
+    def test_t33_get_win_percent(self):
+        self.__t33_invalid_player()
+        self.__t33_games_not_started()
+        self.__t33_games_in_progress()
+        self.__t33_games_mixed()
+        self.__t33_games_final()
+
+    def test_t34_get_win_percent_string(self):
+        self.__t34_invalid_player()
+        self.__t34_games_not_started()
+        self.__t34_games_in_progress()
+        self.__t34_games_mixed()
+        self.__t34_games_final()
+
     def __t1_invalid_player(self):
         game_key = self.__get_a_valid_game_key()
         with self.assertRaises(KeyError):
@@ -2601,6 +2615,72 @@ class TestCalculator(unittest.TestCase):
             self.calc.get_featured_game()
 
         self.week1.games[featured_game_key].number = 10
+
+    def __t33_invalid_player(self):
+        with self.assertRaises(Exception):
+            self.calc.get_win_percent("bad key")
+
+    def __t33_games_not_started(self):
+        player_key = self.week1.get_player_key("Brent H.")
+        self.__modify_game_states(['not_started']*10)
+        self.assertEqual(self.calc.get_win_percent(player_key),0.00)
+        self.__restore_games()
+
+    def __t33_games_in_progress(self):
+        player_key = self.week1.get_player_key("Brent H.")
+        states = ['in_progress']*10
+        self.__modify_game_states(states)
+        self.assertEqual(self.calc.get_win_percent(player_key),0.00)
+        self.__restore_games()
+
+    def __t33_games_mixed(self):
+        player_key = self.week1.get_player_key("Brent H.")
+        states = ['final']*3 + ['not_started']*3 + ['in_progress']*4
+
+        num_wins_in_first_3_games = 2
+        num_games_final = 3
+        expected_win_pct = float(num_wins_in_first_3_games) / float(num_games_final)
+
+        self.__modify_game_states(states)
+        self.assertEqual(self.calc.get_win_percent(player_key),expected_win_pct)
+        self.__restore_games()
+
+    def __t33_games_final(self):
+        player_key = self.week1.get_player_key("Brent H.")
+        num_wins = 5
+        num_games_final = 10 
+        expected_win_pct = float(num_wins) / float(num_games_final)
+
+        self.assertEqual(self.calc.get_win_percent(player_key),expected_win_pct)
+
+    def __t34_invalid_player(self):
+        with self.assertRaises(Exception):
+            self.calc.get_win_percent_string("bad key")
+
+    def __t34_games_not_started(self):
+        player_key = self.week1.get_player_key("Brent H.")
+        self.__modify_game_states(['not_started']*10)
+        self.assertEqual(self.calc.get_win_percent_string(player_key),"0.000")
+        self.__restore_games()
+
+    def __t34_games_in_progress(self):
+        player_key = self.week1.get_player_key("Brent H.")
+        states = ['in_progress']*10
+        self.__modify_game_states(states)
+        self.assertEqual(self.calc.get_win_percent_string(player_key),"0.000")
+        self.__restore_games()
+
+    def __t34_games_mixed(self):
+        player_key = self.week1.get_player_key("Brent H.")
+        states = ['final']*3 + ['not_started']*3 + ['in_progress']*4
+
+        self.__modify_game_states(states)
+        self.assertEqual(self.calc.get_win_percent_string(player_key),"0.667")
+        self.__restore_games()
+
+    def __t34_games_final(self):
+        player_key = self.week1.get_player_key("Brent H.")
+        self.assertEqual(self.calc.get_win_percent_string(player_key),"0.500")
 
     def __get_a_valid_game_key(self):
         game_keys = self.week1.games.keys()

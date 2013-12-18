@@ -37,7 +37,6 @@ class Update:
         pass
 
     def get_week_results(self,year,week_number,update=False):
-        # TODO:  tests
         key = "week_results_%d_%d" % (year,week_number)
         results = memcache.get(key)
         if update or not(results):

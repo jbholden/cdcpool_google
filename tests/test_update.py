@@ -1,3 +1,5 @@
+from google.appengine.ext import db
+from google.appengine.api import memcache
 from code.update import *
 from code.week_results import *
 from code.database import *
@@ -6,24 +8,52 @@ import logging
 import unittest
 import copy
 import random
-from test_data import *
+from tests.data.test_data import *
+from tests.data.week_not_started import *
+from tests.data.week_not_started_with_defaulters import *
+from tests.data.week_in_progress import *
+from tests.data.week_in_progress_games_in_progress import *
+
 
 class TestUpdate(unittest.TestCase):
 
-    def test_get_week_results(self):
-        self.__test_get_week_results(2013,1,TestData.week_results_2013_week1())
-        self.__test_get_week_results(2013,2,TestData.week_results_2013_week2())
-        self.__test_get_week_results(2013,3,TestData.week_results_2013_week3())
-        self.__test_get_week_results(2013,4,TestData.week_results_2013_week4())
-        self.__test_get_week_results(2013,5,TestData.week_results_2013_week5())
-        self.__test_get_week_results(2013,6,TestData.week_results_2013_week6())
-        self.__test_get_week_results(2013,7,TestData.week_results_2013_week7())
-        self.__test_get_week_results(2013,8,TestData.week_results_2013_week8())
-        self.__test_get_week_results(2013,9,TestData.week_results_2013_week9())
-        self.__test_get_week_results(2013,10,TestData.week_results_2013_week10())
-        self.__test_get_week_results(2013,11,TestData.week_results_2013_week11())
-        self.__test_get_week_results(2013,12,TestData.week_results_2013_week12())
-        self.__test_get_week_results(2013,13,TestData.week_results_2013_week13())
+    #@staticmethod
+    #def run_subset():
+        #return  [ 'test_t4_get_week_results_week_in_progress' ]
+
+    def test_get_week_results_empty_cache(self):
+        self.__test_get_week_results_empty_cache(2013,1,TestData.week_results_2013_week1())
+        self.__test_get_week_results_empty_cache(2013,2,TestData.week_results_2013_week2())
+        self.__test_get_week_results_empty_cache(2013,3,TestData.week_results_2013_week3())
+        self.__test_get_week_results_empty_cache(2013,4,TestData.week_results_2013_week4())
+        self.__test_get_week_results_empty_cache(2013,5,TestData.week_results_2013_week5())
+        self.__test_get_week_results_empty_cache(2013,6,TestData.week_results_2013_week6())
+        self.__test_get_week_results_empty_cache(2013,7,TestData.week_results_2013_week7())
+        self.__test_get_week_results_empty_cache(2013,8,TestData.week_results_2013_week8())
+        self.__test_get_week_results_empty_cache(2013,9,TestData.week_results_2013_week9())
+        self.__test_get_week_results_empty_cache(2013,10,TestData.week_results_2013_week10())
+        self.__test_get_week_results_empty_cache(2013,11,TestData.week_results_2013_week11())
+        self.__test_get_week_results_empty_cache(2013,12,TestData.week_results_2013_week12())
+        self.__test_get_week_results_empty_cache(2013,13,TestData.week_results_2013_week13())
+
+    def test_get_week_results_populated_cache(self):
+        self.__test_get_week_results_populated_cache(2013,1,TestData.week_results_2013_week1())
+        self.__test_get_week_results_populated_cache(2013,2,TestData.week_results_2013_week2())
+        self.__test_get_week_results_populated_cache(2013,3,TestData.week_results_2013_week3())
+        self.__test_get_week_results_populated_cache(2013,4,TestData.week_results_2013_week4())
+        self.__test_get_week_results_populated_cache(2013,5,TestData.week_results_2013_week5())
+        self.__test_get_week_results_populated_cache(2013,6,TestData.week_results_2013_week6())
+        self.__test_get_week_results_populated_cache(2013,7,TestData.week_results_2013_week7())
+        self.__test_get_week_results_populated_cache(2013,8,TestData.week_results_2013_week8())
+        self.__test_get_week_results_populated_cache(2013,9,TestData.week_results_2013_week9())
+        self.__test_get_week_results_populated_cache(2013,10,TestData.week_results_2013_week10())
+        self.__test_get_week_results_populated_cache(2013,11,TestData.week_results_2013_week11())
+        self.__test_get_week_results_populated_cache(2013,12,TestData.week_results_2013_week12())
+        self.__test_get_week_results_populated_cache(2013,13,TestData.week_results_2013_week13())
+
+    def test_t1_get_week_results_week_not_started(self):
+        self.__t1_week_not_started()
+        self.__t1_week_not_started_with_defaulters()
 
     def test_t2_assign_rank(self):
         self.__t2_win_loss_all_different()
@@ -51,6 +81,21 @@ class TestUpdate(unittest.TestCase):
         self.__t3_first_place_tie_with_winner_specified()
         self.__t3_winner_missing()
         self.__t3_winner_insane()
+
+    def test_t4_get_week_results_week_in_progress(self):
+        self.__t4_week_in_progress()
+        self.__t4_week_in_progress_with_games_in_progress()
+
+    def __t1_week_not_started(self):
+        testdata = WeekNotStarted()
+        self.__test_get_week_results(testdata.year,testdata.week_number,testdata.get_expected_results())
+        testdata.cleanup()
+
+    def __t1_week_not_started_with_defaulters(self):
+        testdata = WeekNotStartedWithDefaulters()
+        self.__test_get_week_results(testdata.year,testdata.week_number,testdata.get_expected_results())
+        testdata.cleanup()
+
 
     def __t2_win_loss_all_different(self):
         self.__week_results = []
@@ -438,9 +483,15 @@ class TestUpdate(unittest.TestCase):
         with self.assertRaises(Exception):
             self.__run_assign_projected_rank_test(projected_winner="player6",num_tests=1)
 
+    def __t4_week_in_progress(self):
+        testdata = WeekInProgress()
+        self.__test_get_week_results(testdata.year,testdata.week_number,testdata.get_expected_results())
+        testdata.cleanup()
 
-
-
+    def __t4_week_in_progress_with_games_in_progress(self):
+        testdata = WeekInProgressGamesInProgress()
+        self.__test_get_week_results(testdata.year,testdata.week_number,testdata.get_expected_results())
+        testdata.cleanup()
 
     def __randomize_results_order(self):
         indexes = range(len(self.__week_results))
@@ -503,11 +554,24 @@ class TestUpdate(unittest.TestCase):
 
     def __test_get_week_results(self,year,week_number,expected_results):
         u = Update()
+        #results = u.get_week_results(year,week_number,update=True)
         results = u.get_week_results(year,week_number)
         #self.__debug_print_results(results,title="Results")
         #self.__debug_print_results(expected_results,title="Expected Results")
         #self.__verify_results(results,expected_results)
         self.__verify_results_ignore_tied_order(results,expected_results)
+
+    def __test_get_week_results_empty_cache(self,year,week_number,expected_results):
+        memcache.flush_all()
+        self.__test_get_week_results(year,week_number,expected_results)
+
+    def __test_get_week_results_populated_cache(self,year,week_number,expected_results):
+        self.__load_week_results_into_cache(year,week_number)
+        self.__test_get_week_results(year,week_number,expected_results)
+
+    def __load_week_results_into_cache(self,year,week_number):
+        u = Update()
+        ignore_return_data = u.get_week_results(year,week_number,update=True)
 
     def __verify_results(self,results,expected_results):
         self.assertEqual(len(results),len(expected_results))
@@ -528,6 +592,7 @@ class TestUpdate(unittest.TestCase):
 
         first_place_wins = results[0].wins
         first_place_losses = results[0].losses
+        first_place_projected_wins = results[0].projected_wins
 
         for i in range(len(results)):
             result = results[i]
@@ -540,10 +605,14 @@ class TestUpdate(unittest.TestCase):
             # future correct code:  winner is in 1st place, others tied for 1st in 2nd place
             if result.wins == first_place_wins and result.losses == first_place_losses:
                 self.assertEqual(result.rank,1)
-                self.assertEqual(result.projected_rank,1)
             else:
                 self.assertEqual(result.rank,expected.rank)
+
+            if result.projected_wins == first_place_projected_wins:
+                self.assertEqual(result.projected_rank,1)
+            else:
                 self.assertEqual(result.projected_rank,expected.projected_rank)
+            # end of code to change
 
             self.assertEqual(result.player_id,expected.player_id)
             self.assertEqual(result.player_name,expected.player_name)

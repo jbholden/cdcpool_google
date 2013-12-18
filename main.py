@@ -33,6 +33,8 @@ from pages.test_page import *
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
 
+# app.yaml configuration link:  https://developers.google.com/appengine/docs/python/config/appconfig
+
 class MainHandler(webapp2.RequestHandler):
 
     def get(self):

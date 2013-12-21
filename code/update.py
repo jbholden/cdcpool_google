@@ -36,6 +36,7 @@ class Update:
     def update_overall_results(self,year):
         pass
 
+
     def get_week_results(self,year,week_number,update=False):
         key = "week_results_%d_%d" % (year,week_number)
         results = memcache.get(key)
@@ -68,12 +69,16 @@ class Update:
 
         results = self.assign_rank(results)
         results = self.assign_projected_rank(results)
+        results = self.__sort_by_rank(results)
 
         return results
 
 
     def get_overall_results(self,year):
         pass
+
+    def __sort_by_rank(self,results):
+        return sorted(results,key=lambda result:result.rank)
 
     def assign_rank(self,results,winner=None):
         # sort by losses first so that people with more losses get a lower rank

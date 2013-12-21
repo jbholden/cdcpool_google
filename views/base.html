@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <link href="/stylesheets/title_bar.css" rel="stylesheet" type="text/css" media="all">
+        {% block head_content %}{% endblock %}
+    </head>
+    <body>
+        <table class="title-bar">
+            <tr>
+                <td id="pool-title">CDC Football Pool {{year}}</td>
+                <td id="page-title">{% block page_title %}{% endblock %}</td>
+            </tr>
+        </table>
+        <div class="title-bar-div"></div>
+        {% block link_bar %}{% endblock %}
+        <br>
+        {% block content %}{% endblock %}
+    </body>
+</html>
+    

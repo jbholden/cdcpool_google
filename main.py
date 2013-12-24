@@ -30,6 +30,7 @@ from load.stats_page import *
 from load.load_all_page import *
 from code.update import *
 from pages.test_page import *
+from create.create_week import *
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
 
@@ -60,6 +61,7 @@ app = webapp2.WSGIApplication([
     ('/a/load_teams', LoadTeamsPage),
     ('/a/load_games', LoadGamesPage),
     ('/a/load_weeks', LoadWeeksPage),
-    ('/a/load_picks', LoadPicksPage)
+    ('/a/load_picks', LoadPicksPage),
+    ('/a/create_week', CreateWeekPage),
     #('/a/stats', DatabaseStats)
 ], debug=True)

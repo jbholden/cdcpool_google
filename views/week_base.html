@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block link_bar %} 
+    <table>
+        <td><a id="link-bar-overall-link" href="/{{year}}/results">OVERALL</a></td>
+        <td id="link-bar-label">
+            <a id="link-bar-week-link" href="/{{year}}/week/{{week_number}}/results">WEEK</a>
+            {% for wk_num in weeks_in_year %}
+                {% if wk_num == week_number %}
+                    <a id="link-bar-week-number-highlight" href="/{{year}}/week/{{wk_num}}/results">{{wk_num}}</a>
+                {% else %}
+                    <a id="link-bar-week-number-link" href="/{{year}}/week/{{wk_num}}/results">{{wk_num}}</a>
+                {% endif %}
+            {% endfor %}
+        </td>
+        <td id="player-profile"><a id="player-profile-link" href="/{{year}}/players">Players</a></td>
+    </table>
+{% endblock %}

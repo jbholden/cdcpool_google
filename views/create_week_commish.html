@@ -1,15 +1,11 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 
-<html>
- <head>
-  <title>CDCPOOL - Create Week</title>
-  <link href="/stylesheets/picks.css" rel="stylesheet" type="text/css" media="all">
- </head>
- <body>
+{% block content %}
   <form action="create_week" method="post">
    <h1>Week Logistics</h1>
    Enter Week Number:
    <select name="week_number">
+    <option selected="selected" value="0">select week</option>
     <option value="1">Week 1</option>
     <option value="2">Week 2</option>
     <option value="3">Week 3</option>
@@ -33,15 +29,21 @@
      <td>1</td>
      <td>
       <select name="game_1_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_1_favorite" value="team1">
+      Visitor favored:<input type="radio" name="game_1_favorite" value="team1">
      </td>
      <td>
       <select name="game_1_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_1_favorite" value="team2">
+      Home favored:<input type="radio" name="game_1_favorite" value="team2">
      </td>
      <td><input type="text" name="game_1_spread" size="5"></td>
     </tr>
@@ -49,15 +51,21 @@
      <td>2</td>
      <td>
       <select name="game_2_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_2_favorite" value="team1">
+      Visitor favored:<input type="radio" name="game_2_favorite" value="team1">
      </td>
      <td>
       <select name="game_2_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_2_favorite" value="team2">
+      Home favored:<input type="radio" name="game_2_favorite" value="team2">
      </td>
      <td><input type="text" name="game_2_spread" size="5"></td>
     </tr>
@@ -65,15 +73,21 @@
      <td>3</td>
      <td>
       <select name="game_3_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_3_favorite" value="team1">
+      Visitor favored:<input type="radio" name="game_3_favorite" value="team1">
      </td>
      <td>
       <select name="game_3_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_3_favorite" value="team2">
+      Home favored:<input type="radio" name="game_3_favorite" value="team2">
      </td>
      <td><input type="text" name="game_3_spread" size="5"></td>
     </tr>
@@ -81,15 +95,21 @@
      <td>4</td>
      <td>
       <select name="game_4_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_4_favorite" value="team1">
+      Visitor favored:<input type="radio" name="game_4_favorite" value="team1">
      </td>
      <td>
       <select name="game_4_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_4_favorite" value="team2">
+      Home favored:<input type="radio" name="game_4_favorite" value="team2">
      </td>
      <td><input type="text" name="game_4_spread" size="5"></td>
     </tr>
@@ -97,15 +117,21 @@
      <td>5</td>
      <td>
       <select name="game_5_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_5_favorite" value="team1">
+      Visitor favored:<input type="radio" name="game_5_favorite" value="team1">
      </td>
      <td>
       <select name="game_5_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_5_favorite" value="team2">
+      Home favored:<input type="radio" name="game_5_favorite" value="team2">
      </td>
      <td><input type="text" name="game_5_spread" size="5"></td>
     </tr>
@@ -113,15 +139,21 @@
      <td>6</td>
      <td>
       <select name="game_6_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_6_favorite" value="team1">
+      Visitor favored:<input type="radio" name="game_6_favorite" value="team1">
      </td>
      <td>
       <select name="game_6_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_6_favorite" value="team2">
+      Home favored:<input type="radio" name="game_6_favorite" value="team2">
      </td>
      <td><input type="text" name="game_6_spread" size="5"></td>
     </tr>
@@ -129,15 +161,21 @@
      <td>7</td>
      <td>
       <select name="game_7_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_7_favorite" value="team1">
+      Visitor favored:<input type="radio" name="game_7_favorite" value="team1">
      </td>
      <td>
       <select name="game_7_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_7_favorite" value="team2">
+      Home favored:<input type="radio" name="game_7_favorite" value="team2">
      </td>
      <td><input type="text" name="game_7_spread" size="5"></td>
     </tr>
@@ -145,15 +183,21 @@
      <td>8</td>
      <td>
       <select name="game_8_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_8_favorite" value="team1">
+      Visitor favored:<input type="radio" name="game_8_favorite" value="team1">
      </td>
      <td>
       <select name="game_8_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_8_favorite" value="team2">
+      Home favored:<input type="radio" name="game_8_favorite" value="team2">
      </td>
      <td><input type="text" name="game_8_spread" size="5"></td>
     </tr>
@@ -161,15 +205,21 @@
      <td>9</td>
      <td>
       <select name="game_9_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_9_favorite" value="team1">
+      Visitor favored:<input type="radio" name="game_9_favorite" value="team1">
      </td>
      <td>
       <select name="game_9_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_9_favorite" value="team2">
+      Home favored:<input type="radio" name="game_9_favorite" value="team2">
      </td>
      <td><input type="text" name="game_9_spread" size="5"></td>
     </tr>
@@ -177,19 +227,27 @@
      <td>10</td>
      <td>
       <select name="game_10_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_10_favorite" value="team1">
+      Visitor favored:<input type="radio" name="game_10_favorite" value="team1">
      </td>
      <td>
       <select name="game_10_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       <option value="TMP">Temporary list, need to populate from DB</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_10_favorite" value="team2">
+      Home favored:<input type="radio" name="game_10_favorite" value="team2">
      </td>
      <td><input type="text" name="game_10_spread" size="5"></td>
     </tr>
    </table>
    <input type="submit" value="Submit Picks">
   </form>
- </body>
+
+{% endblock %}
+

@@ -1,6 +1,7 @@
 import webapp2
 import unittest
 from pages.handler import *
+from google.appengine.ext import db
 
 ######################################################################################
 # This is what a commissioner uses to create a new set of weekly picks.
@@ -13,6 +14,7 @@ from pages.handler import *
 #    - Each game has a team1 and a team2.
 #    - Each game has a favorite.
 #    - Each game has a point spread with 1/2 point offset (IOW, divide by 0.5, result should be odd number).
+#    - No team is repeated.
 #    - Week number should be selected.
 #    - Year should be >= current year.
 #    - Target week should not already exist.
@@ -20,38 +22,14 @@ from pages.handler import *
 
 class CreateWeekPage(Handler):
 
-  def list_of_teams(self):
-    list_teams = (
-        'Boston College',
-        'Clemson',
-        'Duke',
-        'Florida State',
-        'Georgia Tech',
-        'Maryland',
-        'Miami-Florida',
-        'North Carolina',
-        'NC State',
-        'Pittsburgh',
-        'Syracuse',
-        'Virginia',
-        'Virginia Tech',
-        'Wake Forest',
-        'Alabama',
-        'Arkansas',
-        'Auburn',
-        'Florida',
-        'Georgia',
-        'Kentucky',
-        'LSU',
-        'Mississippi',
-        'Mississippi State',
-        'Missouri',
-        'South Carolina',
-        'Tennessee',
-        'Texas A&M',
-        'Vanderbilt',
-    )
-    return list_teams
+  def get_list_of_teams(self):
+    teams_query = db.GqlQuery('select * from Team')
+    teams = list(teams_query)
+    list_team_names = []
+    for team in teams:
+      list_team_names.append(team.name)
+    list_team_names.sort()
+    return list_team_names
 
   def code(self):
     c  = '<html><head>'
@@ -64,7 +42,7 @@ class CreateWeekPage(Handler):
     self.response.write(self.code())
 
   def get(self):
-    teams = self.list_of_teams()
+    teams = self.get_list_of_teams()
     self.render("create_week_commish.html", teams=teams)
     return
 

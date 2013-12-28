@@ -87,12 +87,14 @@ class TestUpdate(unittest.TestCase):
         self.__t4_week_in_progress_with_games_in_progress()
 
     def __t1_week_not_started(self):
-        testdata = WeekNotStarted()
+        testdata = WeekNotStarted(leave_objects_in_datastore=False)
+        testdata.setup()
         self.__test_get_week_results(testdata.year,testdata.week_number,testdata.get_expected_results())
         testdata.cleanup()
 
     def __t1_week_not_started_with_defaulters(self):
-        testdata = WeekNotStartedWithDefaulters()
+        testdata = WeekNotStartedWithDefaulters(leave_objects_in_datastore=False)
+        testdata.setup()
         self.__test_get_week_results(testdata.year,testdata.week_number,testdata.get_expected_results())
         testdata.cleanup()
 
@@ -484,12 +486,14 @@ class TestUpdate(unittest.TestCase):
             self.__run_assign_projected_rank_test(projected_winner="player6",num_tests=1)
 
     def __t4_week_in_progress(self):
-        testdata = WeekInProgress()
+        testdata = WeekInProgress(leave_objects_in_datastore=False)
+        testdata.setup()
         self.__test_get_week_results(testdata.year,testdata.week_number,testdata.get_expected_results())
         testdata.cleanup()
 
     def __t4_week_in_progress_with_games_in_progress(self):
-        testdata = WeekInProgressGamesInProgress()
+        testdata = WeekInProgressGamesInProgress(leave_objects_in_datastore=False)
+        testdata.setup()
         self.__test_get_week_results(testdata.year,testdata.week_number,testdata.get_expected_results())
         testdata.cleanup()
 

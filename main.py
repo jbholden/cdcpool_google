@@ -30,6 +30,7 @@ from load.stats_page import *
 from load.load_all_page import *
 from code.update import *
 from pages.test_page import *
+from pages.visual_test_page import *
 from pages.week_results_json import *
 from pages.week_results import *
 from google.appengine.api import taskqueue
@@ -51,6 +52,9 @@ app = webapp2.WSGIApplication([
     ('/([0-9]+)/week/([0-9]+)/results/json', WeekResultsJson),
     ('/([0-9]+)/week/([0-9]+)/results', WeekResults),
     ('/a/tests', MainTestPage),
+    ('/a/visual_tests/setup', VisualSetupPage),
+    ('/a/visual_tests/cleanup', VisualCleanupPage),
+    ('/a/visual_tests', VisualTestPage),
     ('/a/delete', DeleteDatabase),
     ('/a/delete_players', DeletePlayers),
     ('/a/delete_teams', DeleteTeams),

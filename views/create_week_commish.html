@@ -1,31 +1,38 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 
-<html>
- <head>
-  <title>CDCPOOL - Create Week</title>
-  <link href="/stylesheets/picks.css" rel="stylesheet" type="text/css" media="all">
- </head>
- <body>
+{% block content %}
   <form action="create_week" method="post">
    <h1>Week Logistics</h1>
-   Enter Week Number:
-   <select name="week_number">
-    <option value="1">Week 1</option>
-    <option value="2">Week 2</option>
-    <option value="3">Week 3</option>
-    <option value="4">Week 4</option>
-    <option value="5">Week 5</option>
-    <option value="6">Week 6</option>
-    <option value="7">Week 7</option>
-    <option value="8">Week 8</option>
-    <option value="9">Week 9</option>
-    <option value="10">Week 10</option>
-    <option value="11">Week 11</option>
-    <option value="12">Week 12</option>
-    <option value="13">Week 13</option>
-   </select>
-   Enter Year:
-   <input type="text" name="season_year" size="4">
+   <table border="1">
+     <tr>
+       <td>
+         Enter Week Number:
+         <select name="week_number">
+          {% if form_dict['week_number'] is defined %}
+          <option value="0">select week</option>
+          {% else %}
+          <option selected="selected" value="0">select week</option>
+          {% endif %}
+          {% for i in range(1,14) %}
+          {% if form_dict['week_number'] is sameas i %}
+          <option selected="selected" value="{{i}}">Week {{i}}</option>
+          {% else %}
+          <option value="{{i}}">Week {{i}}</option>
+          {% endif %}
+          {% endfor %}
+         </select>
+       </td>
+       <td>
+         Enter Year:
+         {% if form_dict['season_year'] is defined %}
+         <input type="text" name="season_year" size="4" value="{{form_dict['season_year']}}">
+         {% else %}
+         <input type="text" name="season_year" size="4">
+         {% endif %}
+       </td>
+       <td class="form_error">{{form_dict['err_week_year_line']}}</td>
+     </tr>
+   </table>
    <h1>Choose Games, Favorites, Spreads</h1>
    <table border="1">
     <tr><th>Game #</th><th>Visitor</th><th>Home</th><th>Spread</th></tr>
@@ -33,163 +40,454 @@
      <td>1</td>
      <td>
       <select name="game_1_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_1_team1'] is defined %}
+       <option value="{{form_dict['game_1_team1']}}">{{form_dict['game_1_team1']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_1_favorite" value="team1">
+      {% if form_dict['game_1_favorite'] is sameas(1) %}
+      Visitor favored:<input type="radio" name="game_1_favorite" value="1" checked="checked">
+      {% else %}
+      Visitor favored:<input type="radio" name="game_1_favorite" value="1">
+      {% endif %}
      </td>
      <td>
       <select name="game_1_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_1_team2'] is defined %}
+       <option value="{{form_dict['game_1_team2']}}">{{form_dict['game_1_team2']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_1_favorite" value="team2">
+      {% if form_dict['game_1_favorite'] is sameas(2) %}
+      Home favored:<input type="radio" name="game_1_favorite" value="2" checked="checked">
+      {% else %}
+      Home favored:<input type="radio" name="game_1_favorite" value="2">
+      {% endif %}
      </td>
+     {% if form_dict['game_1_spread'] is defined %}
+     <td><input type="text" name="game_1_spread" size="5" value="{{form_dict['game_1_spread']}}"></td>
+     {% else %}
      <td><input type="text" name="game_1_spread" size="5"></td>
+     {% endif %}
+     <td class="form_error">{{form_dict['err_game_1_line']}}</td>
     </tr>
     <tr>
      <td>2</td>
      <td>
       <select name="game_2_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_2_team1'] is defined %}
+       <option value="{{form_dict['game_2_team1']}}">{{form_dict['game_2_team1']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_2_favorite" value="team1">
+      {% if form_dict['game_2_favorite'] is sameas(1) %}
+      Visitor favored:<input type="radio" name="game_2_favorite" value="1" checked="checked">
+      {% else %}
+      Visitor favored:<input type="radio" name="game_2_favorite" value="1">
+      {% endif %}
      </td>
      <td>
       <select name="game_2_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_2_team2'] is defined %}
+       <option value="{{form_dict['game_2_team2']}}">{{form_dict['game_2_team2']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_2_favorite" value="team2">
+      {% if form_dict['game_2_favorite'] is sameas(2) %}
+      Home favored:<input type="radio" name="game_2_favorite" value="2">
+      {% else %}
+      Home favored:<input type="radio" name="game_2_favorite" value="2">
+      {% endif %}
      </td>
+     {% if form_dict['game_2_spread'] is defined %}
+     <td><input type="text" name="game_2_spread" size="5" value="{{form_dict['game_2_spread']}}"></td>
+     {% else %}
      <td><input type="text" name="game_2_spread" size="5"></td>
+     {% endif %}
+     <td class="form_error">{{form_dict['err_game_2_line']}}</td>
     </tr>
     <tr>
      <td>3</td>
      <td>
       <select name="game_3_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_3_team1'] is defined %}
+       <option value="{{form_dict['game_3_team1']}}">{{form_dict['game_3_team1']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_3_favorite" value="team1">
+      {% if form_dict['game_3_favorite'] is sameas(1) %}
+      Visitor favored:<input type="radio" name="game_3_favorite" value="1" checked="checked">
+      {% else %}
+      Visitor favored:<input type="radio" name="game_3_favorite" value="1">
+      {% endif %}
      </td>
      <td>
       <select name="game_3_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_3_team2'] is defined %}
+       <option value="{{form_dict['game_3_team2']}}">{{form_dict['game_3_team2']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_3_favorite" value="team2">
+      {% if form_dict['game_3_favorite'] is sameas(2) %}
+      Home favored:<input type="radio" name="game_3_favorite" value="2" checked="checked">
+      {% else %}
+      Home favored:<input type="radio" name="game_3_favorite" value="2">
+      {% endif %}
      </td>
+     {% if form_dict['game_3_spread'] is defined %}
+     <td><input type="text" name="game_3_spread" size="5" value="{{form_dict['game_3_spread']}}"></td>
+     {% else %}
      <td><input type="text" name="game_3_spread" size="5"></td>
+     {% endif %}
+     <td class="form_error">{{form_dict['err_game_3_line']}}</td>
     </tr>
     <tr>
      <td>4</td>
      <td>
       <select name="game_4_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_4_team1'] is defined %}
+       <option value="{{form_dict['game_4_team1']}}">{{form_dict['game_4_team1']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_4_favorite" value="team1">
+      {% if form_dict['game_4_favorite'] is sameas(1) %}
+      Visitor favored:<input type="radio" name="game_4_favorite" value="1" checked="checked">
+      {% else %}
+      Visitor favored:<input type="radio" name="game_4_favorite" value="1">
+      {% endif %}
      </td>
      <td>
       <select name="game_4_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_4_team2'] is defined %}
+       <option value="{{form_dict['game_4_team2']}}">{{form_dict['game_4_team2']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_4_favorite" value="team2">
+      {% if form_dict['game_4_favorite'] is sameas(2) %}
+      Home favored:<input type="radio" name="game_4_favorite" value="2" checked="checked">
+      {% else %}
+      Home favored:<input type="radio" name="game_4_favorite" value="2">
+      {% endif %}
      </td>
+     {% if form_dict['game_4_spread'] is defined %}
+     <td><input type="text" name="game_4_spread" size="5" value="{{form_dict['game_4_spread']}}"></td>
+     {% else %}
      <td><input type="text" name="game_4_spread" size="5"></td>
+     {% endif %}
+     <td class="form_error">{{form_dict['err_game_4_line']}}</td>
     </tr>
     <tr>
      <td>5</td>
      <td>
       <select name="game_5_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_5_team1'] is defined %}
+       <option value="{{form_dict['game_5_team1']}}">{{form_dict['game_5_team1']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_5_favorite" value="team1">
+      {% if form_dict['game_5_favorite'] is sameas(1) %}
+      Visitor favored:<input type="radio" name="game_5_favorite" value="1" checked="checked">
+      {% else %}
+      Visitor favored:<input type="radio" name="game_5_favorite" value="1">
+      {% endif %}
      </td>
      <td>
       <select name="game_5_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_5_team2'] is defined %}
+       <option value="{{form_dict['game_5_team2']}}">{{form_dict['game_5_team2']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_5_favorite" value="team2">
+      {% if form_dict['game_5_favorite'] is sameas(2) %}
+      Home favored:<input type="radio" name="game_5_favorite" value="2" checked="checked">
+      {% else %}
+      Home favored:<input type="radio" name="game_5_favorite" value="2">
+      {% endif %}
      </td>
+     {% if form_dict['game_5_spread'] is defined %}
+     <td><input type="text" name="game_5_spread" size="5" value="{{form_dict['game_5_spread']}}"></td>
+     {% else %}
      <td><input type="text" name="game_5_spread" size="5"></td>
+     {% endif %}
+     <td class="form_error">{{form_dict['err_game_5_line']}}</td>
     </tr>
     <tr>
      <td>6</td>
      <td>
       <select name="game_6_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_6_team1'] is defined %}
+       <option value="{{form_dict['game_6_team1']}}">{{form_dict['game_6_team1']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_6_favorite" value="team1">
+      {% if form_dict['game_6_favorite'] is sameas(1) %}
+      Visitor favored:<input type="radio" name="game_6_favorite" value="1" checked="checked">
+      {% else %}
+      Visitor favored:<input type="radio" name="game_6_favorite" value="1">
+      {% endif %}
      </td>
      <td>
       <select name="game_6_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_6_team2'] is defined %}
+       <option value="{{form_dict['game_6_team2']}}">{{form_dict['game_6_team2']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_6_favorite" value="team2">
+      {% if form_dict['game_6_favorite'] is sameas(2) %}
+      Home favored:<input type="radio" name="game_6_favorite" value="2" checked="checked">
+      {% else %}
+      Home favored:<input type="radio" name="game_6_favorite" value="2">
+      {% endif %}
      </td>
+     {% if form_dict['game_6_spread'] is defined %}
+     <td><input type="text" name="game_6_spread" size="5" value="{{form_dict['game_6_spread']}}"></td>
+     {% else %}
      <td><input type="text" name="game_6_spread" size="5"></td>
+     {% endif %}
+     <td class="form_error">{{form_dict['err_game_6_line']}}</td>
     </tr>
     <tr>
      <td>7</td>
      <td>
       <select name="game_7_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_7_team1'] is defined %}
+       <option value="{{form_dict['game_7_team1']}}">{{form_dict['game_7_team1']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_7_favorite" value="team1">
+      {% if form_dict['game_7_favorite'] is sameas(1) %}
+      Visitor favored:<input type="radio" name="game_7_favorite" value="1" checked="checked">
+      {% else %}
+      Visitor favored:<input type="radio" name="game_7_favorite" value="1">
+      {% endif %}
      </td>
      <td>
       <select name="game_7_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_7_team2'] is defined %}
+       <option value="{{form_dict['game_7_team2']}}">{{form_dict['game_7_team2']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_7_favorite" value="team2">
+      {% if form_dict['game_7_favorite'] is sameas(2) %}
+      Home favored:<input type="radio" name="game_7_favorite" value="2" checked="checked">
+      {% else %}
+      Home favored:<input type="radio" name="game_7_favorite" value="2">
+      {% endif %}
      </td>
+     {% if form_dict['game_7_spread'] is defined %}
+     <td><input type="text" name="game_7_spread" size="5" value="{{form_dict['game_7_spread']}}"></td>
+     {% else %}
      <td><input type="text" name="game_7_spread" size="5"></td>
+     {% endif %}
+     <td class="form_error">{{form_dict['err_game_7_line']}}</td>
     </tr>
     <tr>
      <td>8</td>
      <td>
       <select name="game_8_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_8_team1'] is defined %}
+       <option value="{{form_dict['game_8_team1']}}">{{form_dict['game_8_team1']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_8_favorite" value="team1">
+      {% if form_dict['game_8_favorite'] is sameas(1) %}
+      Visitor favored:<input type="radio" name="game_8_favorite" value="1" checked="checked">
+      {% else %}
+      Visitor favored:<input type="radio" name="game_8_favorite" value="1">
+      {% endif %}
      </td>
      <td>
       <select name="game_8_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_8_team2'] is defined %}
+       <option value="{{form_dict['game_8_team2']}}">{{form_dict['game_8_team2']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_8_favorite" value="team2">
+      {% if form_dict['game_8_favorite'] is sameas(2) %}
+      Home favored:<input type="radio" name="game_8_favorite" value="2" checked="checked">
+      {% else %}
+      Home favored:<input type="radio" name="game_8_favorite" value="2">
+      {% endif %}
      </td>
+     {% if form_dict['game_8_spread'] is defined %}
+     <td><input type="text" name="game_8_spread" size="5" value="{{form_dict['game_8_spread']}}"></td>
+     {% else %}
      <td><input type="text" name="game_8_spread" size="5"></td>
+     {% endif %}
+     <td class="form_error">{{form_dict['err_game_8_line']}}</td>
     </tr>
     <tr>
      <td>9</td>
      <td>
       <select name="game_9_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_9_team1'] is defined %}
+       <option value="{{form_dict['game_9_team1']}}">{{form_dict['game_9_team1']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_9_favorite" value="team1">
+      {% if form_dict['game_9_favorite'] is sameas(1) %}
+      Visitor favored:<input type="radio" name="game_9_favorite" value="1" checked="checked">
+      {% else %}
+      Visitor favored:<input type="radio" name="game_9_favorite" value="1">
+      {% endif %}
      </td>
      <td>
       <select name="game_9_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_9_team2'] is defined %}
+       <option value="{{form_dict['game_9_team2']}}">{{form_dict['game_9_team2']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_9_favorite" value="team2">
+      {% if form_dict['game_9_favorite'] is sameas(2) %}
+      Home favored:<input type="radio" name="game_9_favorite" value="2" checked="checked">
+      {% else %}
+      Home favored:<input type="radio" name="game_9_favorite" value="2">
+      {% endif %}
      </td>
+     {% if form_dict['game_9_spread'] is defined %}
+     <td><input type="text" name="game_9_spread" size="5" value="{{form_dict['game_9_spread']}}"></td>
+     {% else %}
      <td><input type="text" name="game_9_spread" size="5"></td>
+     {% endif %}
+     <td class="form_error">{{form_dict['err_game_9_line']}}</td>
     </tr>
     <tr>
      <td>10</td>
      <td>
       <select name="game_10_team1">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_10_team1'] is defined %}
+       <option value="{{form_dict['game_10_team1']}}">{{form_dict['game_10_team1']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_10_favorite" value="team1">
+      {% if form_dict['game_10_favorite'] is sameas(1) %}
+      Visitor favored:<input type="radio" name="game_10_favorite" value="1" checked="checked">
+      {% else %}
+      Visitor favored:<input type="radio" name="game_10_favorite" value="1">
+      {% endif %}
      </td>
      <td>
       <select name="game_10_team2">
-       <option value="TBD">TBD-Populate list from Team DB</option>
+       {% if form_dict['game_10_team2'] is defined %}
+       <option value="{{form_dict['game_10_team2']}}">{{form_dict['game_10_team2']}}</option>
+       {% else %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% endif %}
+       <option value="SELECT ONE">SELECT ONE</option>
+       {% for the_team in teams %}
+       <option value="{{the_team}}">{{the_team}}</option>
+       {% endfor %}
       </select>
-      Favorite:<input type="radio" name="game_10_favorite" value="team2">
+      {% if form_dict['game_10_favorite'] is sameas(2) %}
+      Home favored:<input type="radio" name="game_10_favorite" value="2" checked="checked">
+      {% else %}
+      Home favored:<input type="radio" name="game_10_favorite" value="2">
+      {% endif %}
      </td>
+     {% if form_dict['game_10_spread'] is defined %}
+     <td><input type="text" name="game_10_spread" size="5" value="{{form_dict['game_10_spread']}}"></td>
+     {% else %}
      <td><input type="text" name="game_10_spread" size="5"></td>
+     {% endif %}
+     <td class="form_error">{{form_dict['err_game_10_line']}}</td>
     </tr>
    </table>
    <input type="submit" value="Submit Picks">
   </form>
- </body>
+
+{% endblock %}
+

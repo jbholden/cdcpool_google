@@ -84,7 +84,7 @@ class Database:
             weeks_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year and number=:week',year=year,week=week_number)
             assert weeks_query != None
             weeks = list(weeks_query)
-            assert len(weeks) == 1
+            assert len(weeks) == 1,"Found %d weeks for %d week %d" % (len(weeks),year,week_number)
             week = weeks[0]
             memcache.set(key,week)
         return week

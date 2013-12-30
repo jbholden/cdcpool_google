@@ -2,37 +2,73 @@ from google.appengine.ext import db
 from code.database import *
 from code.week_results import *
 from code.week_data import *
+from code.update import *
 from models.weeks import *
 from models.games import *
 from models.players import *
 from models.picks import *
+from models.saved_keys import *
 
 class ResultTestData:
 
-    def __init__(self,year,week_number):
+    def __init__(self,year,week_number,data_name='ResultTestData',leave_objects_in_datastore=False):
         self.year = year
         self.week_number = week_number
+        self.data_name = data_name
+        self.leave_objects_in_datastore=True
+        self.__saved_keys = []
 
     def __del__(self):
-        self.cleanup()
+        if not(self.leave_objects_in_datastore):
+            self.cleanup()
 
     def setup(self):
         self.__saved_keys = []
         self.results = []
         self.games = dict()
         self.picks = []
-        memcache.flush_all()
         self.__load_teams()
         self.setup_database()
         self.__load_week_data()
+        if self.leave_objects_in_datastore:
+            self.save_keys_to_database()
 
     def setup_database(self):
         pass
 
+    def save_keys_to_database(self):
+        s = SavedKeys()
+        s.name = self.data_name
+        s.key_list = [ str(key) for key in self.__saved_keys ]
+        s.put()
+
+
+    def delete_keys_from_database(self):
+        query = SavedKeys.all()
+        if not(query):
+            return
+        for q in query:
+            if q.name == self.data_name:
+                for key in q.key_list:
+                    db.delete(db.Key(key))
+                db.delete(q)
+
+    def cleanup_database(self):
+        self.delete_keys_from_database()
+        self.cleanup()
+
     def cleanup(self):
-        for key in self.__saved_keys:
-            db.delete(key)
-        self.__saved_keys = []
+        if self.__saved_keys:
+            for key in self.__saved_keys:
+                db.delete(key)
+            self.__saved_keys = []
+
+        database = Database()
+        weeks_and_years = database.load_weeks_and_years(update=True)
+
+        u = Update()
+        u.delete_week_results_from_memcache(self.year,self.week_number)
+
 
     def get_expected_results(self):
         return self.results
@@ -89,7 +125,8 @@ class ResultTestData:
 
     def __load_week_data(self):
         database = Database()
-        self.weekdata = database.load_week_data(self.year,self.week_number)
+        weeks_and_years = database.load_weeks_and_years(update=True)
+        self.weekdata = database.load_week_data(self.year,self.week_number,update=True)  
 
     def __load_teams(self):
         database = Database()

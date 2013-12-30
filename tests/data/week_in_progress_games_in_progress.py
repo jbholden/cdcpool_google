@@ -3,9 +3,8 @@ from google.appengine.api import memcache
 
 class WeekInProgressGamesInProgress(ResultTestData):
 
-    def __init__(self):
-        ResultTestData.__init__(self,year=1978,week_number=8)
-        self.setup()
+    def __init__(self,leave_objects_in_datastore=False):
+        ResultTestData.__init__(self,year=1978,week_number=7,data_name="WeekInProgressGamesInProgress",leave_objects_in_datastore=leave_objects_in_datastore)
 
     def setup_database(self):
         player_names = [ "Brent", "Byron", "Alice", "Joan", "Bill", "David", "Amy", "Annie", "Kevin", "John" ]

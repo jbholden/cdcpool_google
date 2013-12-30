@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>cdcpool tests</title>
+        <link href="/stylesheets/visual_test.css" rel="stylesheet" type="text/css" media="all">
+        <script src="/javascript/jquery-1.10.2.min.js"></script>
+        <script>
+            function post_complete(type,category,test_number,status) {
+                if (status == "success") {
+                    message = type + " success";
+                    color = "#339900";
+                } else {
+                    message = type + " error: " + status;
+                    color = "red";
+                }
+                change_status(category,test_number,message,color);
+            }
+            function change_status(category,test_number,message,color) {
+                $("#status_" + category + "_" + test_number).attr("style","color:" + color + ";");
+                $("#status_" + category + "_" + test_number).html(message);
+            }
+            function call_setup(category,test_number) {
+                change_status(category,test_number,"running setup...","#339900");
+                var posting = $.post("/a/visual_tests/setup",{ category:category, test_number:test_number });
+
+                posting.done(function(data,status) {
+                    post_complete("setup",category,test_number,status);
+                });
+
+                posting.fail(function(jqxhr,status,error_message) {
+                    post_complete("setup",category,test_number,error_message);
+                });
+                
+            }
+            function call_cleanup(category,test_number) {
+                change_status(category,test_number,"running cleanup...","red");
+                var posting = $.post("/a/visual_tests/cleanup",{category:category, test_number:test_number });
+
+                posting.done(function(data,status) {
+                    post_complete("cleanup",category,test_number,status);
+                });
+
+                posting.fail(function(jqxhr,status,error_message) {
+                    post_complete("cleanup",category,test_number,error_message);
+                });
+
+            }
+            function call_all_setups_in_category(category,test_numbers) {
+                for (var i=0; i < test_numbers.length; i++) {
+                    call_setup(category,test_numbers[i]);
+                } 
+            }
+            function toggle_details(category,test_number) {
+                $("#detail_" + category + "_" + test_number).toggle();
+            }
+        </script>
+    </head>
+    <body>
+        <div class="title">Visual Tests</div>
+        <hr>
+        <br>
+        <div id="instructions">The following are a list of tests that require manual visual inspection<div>
+        <br>
+        <div id="warning">WARNING</div>
+        <div id="warning-text">when clicking the setup button, ensure that the call completes before taking other actions, otherwise the database may get into a bad state</div>
+        <br>
+        {% for category in category_names %}
+            <div id="category">{{category}}</div>
+            <br>
+            <table>
+            <thead>
+                    <td>link</td>
+                    <td>details</td>
+                    <td>description</td>
+                    <td></td>
+                    <td></td>
+                    <td>status</td>
+            </thead>
+            {% for test in data[category] %}
+            <tr>
+                <td id="view-link"><a href="{{test.link}}" target="_blank">view</a></td>
+                {% if test.verify %}
+                    <td><a id="test-details" href="javascript:void" onclick="toggle_details({{test.category}},{{test.number}})">details</a></td>
+                {% else %}
+                    <td></td>
+                {% endif %}
+                <td id="test-description">{{test.description}}</td>
+                {% if test.setup %}
+                    <td><input class="setup" type="button" value="setup" onclick="javascript:call_setup({{test.category}},{{test.number}})"></td>
+                {% else %}
+                    <td></td>
+                {% endif %}
+                {% if test.cleanup %}
+                    <td><input class="cleanup" type="button" value="cleanup" onclick="javascript:call_cleanup({{test.category}},{{test.number}})"></td>
+                {% else %}
+                    <td></td>
+                {% endif %}
+                <td id="post-status"><span id="status_{{test.category}}_{{test.number}}"></span></td>
+            </tr>
+            <tr id="detail_{{test.category}}_{{test.number}}" style="display:none;"><td></td><td></td><td id="detail-content" colspan=3>
+                {% for instruction in test.verify %}
+                    <li>{{instruction}}</li>
+                {% endfor %}
+            </td>
+            </tr>
+            <tr><td id="table-line" colspan="6"></td></tr>
+            {% endfor %}
+        </table>
+        <br><br>
+    {% endfor %}
+    </body>
+</html>

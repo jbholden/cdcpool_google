@@ -45,6 +45,16 @@ class Update:
             memcache.set(key,results)
         return results
 
+    def delete_week_results_from_memcache(self,year,week_number):
+        key = "week_results_%d_%d" % (year,week_number)
+        memcache.delete(key)
+
+    def get_week_state(self,year,week_number):
+        database = Database()
+        week_data = database.load_week_data(year,week_number)
+        calc = CalculateResults(week_data)
+        return calc.get_summary_state_of_all_games()
+
     def __calculate_week_results(self,year,week_number):
         database = Database()
         week_data = database.load_week_data(year,week_number)

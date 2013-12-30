@@ -9,6 +9,11 @@ body {
     color : blue;
     font-size: 14pt;
 }
+#test-title {
+    color : blue;
+    font-size: 10pt;
+   font-weight: 500;
+}
 
 #test-name {
     color : black;

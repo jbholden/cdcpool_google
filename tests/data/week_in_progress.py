@@ -1,14 +1,10 @@
 from result_test_data import *
 from google.appengine.api import memcache
 
-# TODO:  week in progress no games in progress
-# TODO:  week in progress games in progress
-
 class WeekInProgress(ResultTestData):
 
-    def __init__(self):
-        ResultTestData.__init__(self,year=1978,week_number=8)
-        self.setup()
+    def __init__(self,leave_objects_in_datastore=False):
+        ResultTestData.__init__(self,year=1978,week_number=8,data_name="WeekInProgress",leave_objects_in_datastore=leave_objects_in_datastore)
 
     def setup_database(self):
         player_names = [ "Brent", "Byron", "Alice", "Joan", "Bill", "David", "Amy", "Annie", "Kevin", "John" ]
@@ -35,7 +31,6 @@ class WeekInProgress(ResultTestData):
         self.__setup_3_wins("Annie",winners)
         self.__setup_1_win("Kevin",winners)
         self.__setup_missing_picks("John")
-
 
     def get_expected_results(self):
         self.add_result(rank=1,projected_rank=1,player_name='Brent',wins=6,losses=0,win_pct=1.000,projected_wins=10,possible_wins=10)

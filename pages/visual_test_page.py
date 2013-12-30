@@ -28,8 +28,7 @@ class VisualTestPage(Handler):
             d.number = index
             d.description = obj.description
             d.link = obj.link
-            d.verify = []
-            #d.verify = obj.verify
+            d.verify = obj.verify
 
             if hasattr(test_class,"setup"):
                 d.setup = True

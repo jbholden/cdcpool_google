@@ -51,6 +51,9 @@
                     call_setup(category,test_numbers[i]);
                 } 
             }
+            function toggle_details(category,test_number) {
+                $("#detail_" + category + "_" + test_number).toggle();
+            }
         </script>
     </head>
     <body>
@@ -68,6 +71,7 @@
             <table>
             <thead>
                     <td>link</td>
+                    <td>details</td>
                     <td>description</td>
                     <td></td>
                     <td></td>
@@ -76,6 +80,11 @@
             {% for test in data[category] %}
             <tr>
                 <td id="view-link"><a href="{{test.link}}" target="_blank">view</a></td>
+                {% if test.verify %}
+                    <td><a id="test-details" href="javascript:void" onclick="toggle_details({{test.category}},{{test.number}})">details</a></td>
+                {% else %}
+                    <td></td>
+                {% endif %}
                 <td id="test-description">{{test.description}}</td>
                 {% if test.setup %}
                     <td><input class="setup" type="button" value="setup" onclick="javascript:call_setup({{test.category}},{{test.number}})"></td>
@@ -89,13 +98,13 @@
                 {% endif %}
                 <td id="post-status"><span id="status_{{test.category}}_{{test.number}}"></span></td>
             </tr>
-            <tr><td></td><td colspan=3>
+            <tr id="detail_{{test.category}}_{{test.number}}" style="display:none;"><td></td><td></td><td id="detail-content" colspan=3>
                 {% for instruction in test.verify %}
                     <li>{{instruction}}</li>
                 {% endfor %}
             </td>
             </tr>
-            <tr><td id="table-line" colspan="5"></td></tr>
+            <tr><td id="table-line" colspan="6"></td></tr>
             {% endfor %}
         </table>
         <br><br>

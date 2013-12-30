@@ -8,6 +8,10 @@ from week_data import *
 
 class Database:
 
+    def is_week_valid(self,week,year,update=False):
+        weeks_and_years = self.load_weeks_and_years(update)
+        return (year in weeks_and_years) and (week in weeks_and_years[year])
+
     def load_week_data(self,year,week_number,update=False):
         data = WeekData()
         data.week = self.__get_week_in_database(year,week_number,update)

@@ -14,9 +14,8 @@ class FinalWeekResultsTest(VisualTest):
     def __verify_instructions(self):
         v = []
         v.append('Ensure sorting works for each column')
-        v.append('When sorting by projected wins ensure the rank changes to the projected rank')
-        v.append('When sorting by possible wins ensure the rank changes to the possible rank')
-        v.append('All other sorts should have rank by wins')
+        v.append('Ensure the rank is correct')
+        v.append('The page should say "final results"')
         return v
 
 
@@ -37,10 +36,11 @@ class WeekInProgressResultsTest(VisualTest):
 
     def __verify_instructions(self):
         v = []
+        v.append('There should be a projected and possible wins columns')
         v.append('Ensure sorting works for each column')
-        v.append('When sorting by projected wins ensure the rank changes to the projected rank')
-        v.append('When sorting by possible wins ensure the rank changes to the possible rank')
-        v.append('All other sorts should have rank by wins')
+        v.append('The projected and possible wins should be the same since no games are in progress')
+        v.append('The rank should be the same for each sort by column')
+        v.append('The page should say "in progress"')
         return v
 
 class WeekInProgressGamesInProgressResultsTest(VisualTest):
@@ -59,7 +59,12 @@ class WeekInProgressGamesInProgressResultsTest(VisualTest):
         testdata.cleanup_database()
 
     def __verify_instructions(self):
-        return []
+        v = []
+        v.append('There should be a projected and possible wins columns')
+        v.append('Ensure sorting works for each column')
+        v.append('Verify the rank changes to projected rank when sorting by projected column')
+        v.append('The page should say "in progress"')
+        return v
 
 
 class NotStartedWeekResultsTest(VisualTest):
@@ -78,7 +83,12 @@ class NotStartedWeekResultsTest(VisualTest):
         testdata.cleanup_database()
 
     def __verify_instructions(self):
-        return []
+        v = []
+        v.append('There should be a possible wins column')
+        v.append('Ensure sorting works for each column')
+        v.append('Everyone should be tied for 1st place')
+        v.append('The page should say "not started"')
+        return v
 
 class NotStartedDefaultersWeekResultsTest(VisualTest):
 
@@ -96,4 +106,8 @@ class NotStartedDefaultersWeekResultsTest(VisualTest):
         testdata.cleanup_database()
 
     def __verify_instructions(self):
-        return []
+        v = []
+        v.append('There should be a possible wins column')
+        v.append('Ensure sorting works for each column')
+        v.append('The people in last place (defaulters) should be 0-10 and ranked lower')
+        return v

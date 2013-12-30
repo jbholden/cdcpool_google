@@ -28,8 +28,16 @@ class WeekResults(Handler):
 
         u = Update()
         results = u.get_week_results(year,week_number)
+        week_state = u.get_week_state(year,week_number)
 
-        self.__render_file = "week_final_results.html"
+        if week_state == "final":
+            self.__render_file = "week_final_results.html"
+        elif week_state == "in_progress":
+            self.__render_file = "week_in_progress_results.html"
+        elif week_state == "not_started":
+            self.__render_file = "week_not_started_results.html"
+        else:
+            raise AssertionError,"Invalid week state %s" % (week_state)
 
         params = dict()
         params['year'] = year
@@ -43,7 +51,15 @@ class WeekResults(Handler):
         params['sorted_by_players'] = self.__sort_by_players(results)
         params['sorted_by_players_reversed'] = self.__sort_by_players_reversed(results)
 
-        # TODO:  error if bad week/year
+        if week_state == "in_progress":
+            params['sorted_by_projected_wins'] = self.__sort_by_projected_wins(results)
+            params['sorted_by_projected_wins_reversed'] = self.__sort_by_projected_wins_reversed(results)
+            params['sorted_by_possible_wins'] = self.__sort_by_possible_wins(results)
+            params['sorted_by_possible_wins_reversed'] = self.__sort_by_possible_wins_reversed(results)
+        elif week_state == "not_started":
+            params['sorted_by_possible_wins'] = self.__sort_by_possible_wins(results)
+            params['sorted_by_possible_wins_reversed'] = self.__sort_by_possible_wins_reversed(results)
+
         self.render("week_results.html",**params)
 
     def __initial_content(self,results):
@@ -108,6 +124,34 @@ class WeekResults(Handler):
         html_str = self.__escape_string(content)
         return self.__compress_html(html_str)
 
+    def __sort_by_projected_wins(self,results):
+        sorted_by_wins = sorted(results,key=lambda result:result.projected_rank)
+        highlight = self.__highlight_column('projected_wins')
+        content = self.render_str(self.__render_file,results=sorted_by_wins,use_projected_rank=True,**highlight)
+        html_str = self.__escape_string(content)
+        return self.__compress_html(html_str)
+
+    def __sort_by_projected_wins_reversed(self,results):
+        sorted_by_wins = sorted(results,key=lambda result:result.projected_rank,reverse=True)
+        highlight = self.__highlight_column('projected_wins')
+        content = self.render_str(self.__render_file,results=sorted_by_wins,use_projected_rank=True,**highlight)
+        html_str = self.__escape_string(content)
+        return self.__compress_html(html_str)
+
+    def __sort_by_possible_wins(self,results):
+        sorted_by_wins = sorted(results,key=lambda result:result.possible_wins,reverse=True)
+        highlight = self.__highlight_column('possible_wins')
+        content = self.render_str(self.__render_file,results=sorted_by_wins,**highlight)
+        html_str = self.__escape_string(content)
+        return self.__compress_html(html_str)
+
+    def __sort_by_possible_wins_reversed(self,results):
+        sorted_by_wins = sorted(results,key=lambda result:result.possible_wins)
+        highlight = self.__highlight_column('possible_wins')
+        content = self.render_str(self.__render_file,results=sorted_by_wins,**highlight)
+        html_str = self.__escape_string(content)
+        return self.__compress_html(html_str)
+
     def __highlight_no_columns(self):
         return self.__highlight_column(None)
 
@@ -123,6 +167,16 @@ class WeekResults(Handler):
             d['losses_id'] = "highlight-content"
         else:
             d['losses_id'] = "content"
+
+        if name == "projected_wins":
+            d['projected_id'] = "highlight-content"
+        else:
+            d['projected_id'] = "content"
+
+        if name == "possible_wins":
+            d['possible_id'] = "highlight-content"
+        else:
+            d['possible_id'] = "content"
 
         return d
 

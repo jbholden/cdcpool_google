@@ -9,6 +9,11 @@ body {
     color : blue;
     font-size: 14pt;
 }
+#test-title {
+    color : blue;
+    font-size: 10pt;
+   font-weight: 500;
+}
 
 #test-name {
     color : black;
@@ -50,65 +55,4 @@ body {
 .summary-total {
     color : black;
     font-size: 10pt;
-}
-#instructions {
-    color : gray;
-    font-size: 10pt;
-}
-#warning {
-    color : red;
-    font-size: 10pt;
-}
-#test-title {
-    color : blue;
-    font-size: 10pt;
-   font-weight: 500;
-}
-#test-description {
-    color : black;
-    font-size: 10pt;
-   font-weight: 100;
-}
-#post-status {
-   padding: 0px 4px;
-   width: 10em;
-   font-weight: 500;
-}
-thead {
-   color : white;
-   background-color : gray;
-   padding: 0px 8px;
-   font-size: 8pt;
-   text-align: center;
-}
-#table-line {
-   border-bottom: 1px solid lightgray;
-   padding: 0 0 0 0;
-}
-input
-{
-    font-size:10px;
-    font-family: Helvetica;
-    font-weight: 100;
-    color:black;
-    background-color:lightgray;
-    border-style:none;
-}
-input.setup:hover
-{
-    font-size:10px;
-    font-family: Helvetica;
-    font-weight: 100;
-    color:#FFFF00;
-    background-color:#339900;
-    border-style:none;
-}
-input.cleanup:hover
-{
-    font-size:10px;
-    font-family: Helvetica;
-    font-weight: 100;
-    color:#FFFF00;
-    background-color:red;
-    border-style:none;
 }

@@ -19,7 +19,7 @@ class TestUpdate(unittest.TestCase):
 
     #@staticmethod
     #def run_subset():
-        #return  [ 'test_t4_get_week_results_week_in_progress' ]
+        #return  [ "test_t5_get_week_state" ]
 
     def test_get_week_results_empty_cache(self):
         self.__test_get_week_results_empty_cache(2013,1,TestData.week_results_2013_week1())
@@ -85,6 +85,11 @@ class TestUpdate(unittest.TestCase):
     def test_t4_get_week_results_week_in_progress(self):
         self.__t4_week_in_progress()
         self.__t4_week_in_progress_with_games_in_progress()
+
+    def test_t5_get_week_state(self):
+        self.__t5_week_not_started()
+        self.__t5_week_in_progress()
+        self.__t5_week_final()
 
     def __t1_week_not_started(self):
         testdata = WeekNotStarted(leave_objects_in_datastore=False)
@@ -496,6 +501,31 @@ class TestUpdate(unittest.TestCase):
         testdata.setup()
         self.__test_get_week_results(testdata.year,testdata.week_number,testdata.get_expected_results())
         testdata.cleanup()
+
+    def __t5_week_not_started(self):
+        testdata = WeekNotStarted(leave_objects_in_datastore=False)
+        testdata.setup()
+
+        u = Update()
+        state = u.get_week_state(testdata.year,testdata.week_number)
+        self.assertEqual(state,"not_started")
+
+        testdata.cleanup()
+
+    def __t5_week_in_progress(self):
+        testdata = WeekInProgress(leave_objects_in_datastore=False)
+        testdata.setup()
+
+        u = Update()
+        state = u.get_week_state(testdata.year,testdata.week_number)
+        self.assertEqual(state,"in_progress")
+
+        testdata.cleanup()
+
+    def __t5_week_final(self):
+        u = Update()
+        state = u.get_week_state(2013,1)
+        self.assertEqual(state,"final")
 
     def __randomize_results_order(self):
         indexes = range(len(self.__week_results))

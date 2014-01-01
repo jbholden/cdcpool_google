@@ -3,14 +3,51 @@ from google.appengine.api import memcache
 import logging
 import time
 from week_data import *
+from models.games import *
+from models.weeks import *
 
 # TODO:  test load teams, load players
 
 class Database:
 
+    # Use when creating new pick sheet, writes DB (Game and Week tables) and updates memcache
+    def put_games_week_in_database(self,games,week):
+        gamekeys = list()
+        for index in games:
+            g = Game()
+            g.number = games[index]['number']
+            g.team1 = games[index]['team1']
+            g.team2 = games[index]['team2']
+            g.favored = games[index]['favored']
+            g.spread = games[index]['spread']
+            g.state = games[index]['state']
+            gamekeys.append(g.put())
+
+        w = Week(year=week['year'],number=week['number'])
+        w.winner = None
+        w.games = gamekeys
+        weekkey = w.put()
+
+        #update memcache
+        week_entry = self.__get_week_in_database(week['year'],week['number'],update=True)
+        self.__get_week_games_in_database(week_entry,update=True)
+        self.load_weeks_and_years(update=True)
+
     def is_week_valid(self,week,year,update=False):
         weeks_and_years = self.load_weeks_and_years(update)
         return (year in weeks_and_years) and (week in weeks_and_years[year])
+
+    def get_next_year_week_for_create_week(self,update=False):
+        # returns tuple that is (year, week)
+        weeks_and_years = self.load_weeks_and_years(update)
+        sorted_years = sorted(weeks_and_years.keys())
+        latest_year = int(sorted_years[-1])
+        sorted_weeks = sorted(weeks_and_years[latest_year])
+        latest_week = int(sorted_weeks[-1])
+        if latest_week == 13:
+          return (str(latest_year + 1), '1')
+        else:
+          return (str(latest_year), str(latest_week + 1))
 
     def load_week_data(self,year,week_number,update=False):
         data = WeekData()
@@ -19,7 +56,7 @@ class Database:
         data.player_picks = self.__get_player_week_picks_in_database(data.week,update)
         data.picks = self.__get_week_picks_in_database(data.week,update)
         data.players = self.load_players(data.week.year,update)
-        data.teams = self.load_teams(update)
+        data.teams = self.load_teams("teams",update)
         return data
 
     def get_week_numbers(self,year,update=False):
@@ -50,14 +87,20 @@ class Database:
         return players
 
 
-    def load_teams(self,update=False):
-        key = "teams"
+    # BLR - Added key argument...should be either "teams" or "teamkeys". The former returns
+    #       a dict indexed on datastore key with values team name. The latter returns a dict
+    #       indexed on team name with values datastore key.
+    def load_teams(self,key,update=False):
+        #key = "teams"
         teams = memcache.get(key)
         if update or not(teams):
             teams_query = db.GqlQuery('select * from Team')
             assert teams_query != None
             results = list(teams_query)
-            teams = { str(team.key()):team for team in results }
+            if key == "teams":
+              teams = { str(team.key()):team for team in results }
+            elif key == "teamkeys":
+              teams = { team.name:str(team.key()) for team in results }
             memcache.set(key,teams)
         return teams
 

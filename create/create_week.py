@@ -4,9 +4,9 @@ import logging
 from pages.handler import *
 from google.appengine.ext import db
 from code.database import *
-from load.loadgames import *
-from load.loadweeks import *
-#import pdb
+from models.games import *
+from models.weeks import *
+import pdb
 
 ######################################################################################
 # This is what a commissioner uses to create a new set of weekly picks.
@@ -24,15 +24,24 @@ from load.loadweeks import *
 #    - Year should be >= current year.
 #    - Target week should not already exist.
 ######################################################################################
+# A few words about form_dict, a dictionary that is used to aggregate form data.
+#  o The idea is to do something like this:
+#    - form_dict['game_1']['team1'] = self.request.get('game_1_team1')
+#    - form_dict['logistics']['season_year'] = self.request.get('season_year')
+#    - form_dict['game_10']['errors'][0] = '<team> is a duplicate'
+#    - form_dict['logistics']['errors'][1] = 'Specified week/year already exists'
+#  o form_dict takes the form:
+#    - form_dict[<form_line>][<form_sel_name>] is a value
+#    - form_dict[<form_line>]['errors'] is a list
+######################################################################################
 
 class CreateWeekPage(Handler):
 
-  def get_sorted_teams(self):
-    db = Database()
-    team_dictionary = db.load_teams()
+  def get_teams(self):
+    d = Database()
+    team_dictionary = d.load_teams(key="teams")
     team_objects = team_dictionary.values()
     team_names = [team.name for team in team_objects]
-    team_names.sort()
     return team_names
 
   def code(self):
@@ -44,125 +53,121 @@ class CreateWeekPage(Handler):
 
   def post(self):
     form_error = False
-    #logging.info("Init form_error")
     form_dict = dict()
 
     team_string = ['visitor', 'home']
     selected_teams = dict()
 
     for game_number in range(1,11):
-      for team_number in range(1,3):
-        specifier = 'game_' + str(game_number) + '_team' + str(team_number)
-        form_dict[specifier] = self.request.get(specifier)
-        form_dict_key = 'err_' + specifier
-        if form_dict[specifier] == 'SELECT ONE':
+      form_line = 'game_' + str(game_number)
+      form_dict[form_line] = dict()
+      form_dict[form_line]['errors'] = list()
+      for form_sel_name in ['team1', 'team2']:
+        form_field_name = form_line + '_' + form_sel_name
+        form_dict[form_line][form_sel_name] = self.request.get(form_field_name)
+        if form_dict[form_line][form_sel_name] == 'SELECT ONE':
           # CHECK Each game has a team1 and a team2.
           form_error = True
-          #logging.info("Team not selected, form_error = True, " + specifier)
-          form_dict[form_dict_key] = 'Must select ' + team_string[(int(specifier[-1:]) - 1)] + ' team'
-        elif form_dict[specifier] in selected_teams:
+          form_dict[form_line]['errors'].append('Must select ' + team_string[(int(form_sel_name[-1:]) - 1)] + ' team')
+        elif form_dict[form_line][form_sel_name] in selected_teams:
           # CHECK No team is repeated.
           form_error = True
-          #logging.info("Team repeated, form_error = True, " + specifier)
-          form_dict[form_dict_key] = form_dict[specifier] + ' is a duplicate'
+          form_dict[form_line]['errors'].append(form_dict[form_line][form_sel_name] + ' is a duplicate')
         else:
-          selected_teams[form_dict[specifier]] = 1
+          selected_teams[form_dict[form_line][form_sel_name]] = 1
 
-      specifier = 'game_' + str(game_number) + '_favorite'
+      form_sel_name = 'favorite'
+      form_field_name = form_line + '_' + form_sel_name
       try:
-        form_dict[specifier] = int(self.request.get(specifier))
+        form_dict[form_line][form_sel_name] = int(self.request.get(form_field_name))
       except:
-        form_dict[specifier] = 0
-      if (form_dict[specifier] < 1) or (form_dict[specifier] > 2):
+        form_dict[form_line][form_sel_name] = 0
+      if (form_dict[form_line][form_sel_name] < 1) or (form_dict[form_line][form_sel_name] > 2):
         # CHECK Each game has a favorite.
         form_error = True
-        #logging.info("No favorite, form_error = True, " + specifier)
-        form_dict.pop(specifier, None)
-        form_dict_key = 'err_' + specifier
-        form_dict[form_dict_key] = 'Favorite not selected'
+        del form_dict[form_line][form_sel_name]
+        form_dict[form_line]['errors'].append('Favorite not selected')
 
-      specifier = 'game_' + str(game_number) + '_spread'
-      form_dict[specifier] = self.request.get(specifier)
+      form_sel_name = 'spread'
+      form_field_name = form_line + '_' + form_sel_name
+      form_dict[form_line][form_sel_name] = self.request.get(form_field_name)
       try:
-        f = float(form_dict[specifier])
+        f = float(form_dict[form_line][form_sel_name])
       except:
         f = 0.0
-      if ((int((f * 10) / 5) % 2) == 0):
+      if ((int((f * 10) / 5) % 2) == 0) or (f < 0.0):
         # CHECK Each game has a point spread with 1/2 point offset (IOW, divide by 0.5, result should be odd number).
         form_error = True
-        #logging.info("Bad spread, form_error = True, " + specifier)
-        form_dict_key = 'err_' + specifier
-        form_dict[form_dict_key] = 'Need 1/2 point spread'
+        form_dict[form_line]['errors'].append('Need positive 1/2 point spread')
 
-    form_dict['week_number'] = int(self.request.get('week_number'))
-    if ((form_dict['week_number'] < 1) or (form_dict['week_number'] > 13)):
+    form_dict['logistics'] = dict()
+    form_dict['logistics']['errors'] = list()
+    form_dict['logistics']['week_number'] = int(self.request.get('week_number'))
+    if ((form_dict['logistics']['week_number'] < 1) or (form_dict['logistics']['week_number'] > 13)):
       # CHECK Week number should be selected.
       form_error = True
-      #logging.info("Bad week, form_error = True")
-      form_dict['err_week_number'] = 'Must select valid Week Number'
+      form_dict['logistics']['errors'].append('Must select valid Week Number')
 
     try:
-      form_dict['season_year'] = int(self.request.get('season_year'))
+      form_dict['logistics']['season_year'] = int(self.request.get('season_year'))
     except:
-      form_dict['season_year'] = 0
-    if (form_dict['season_year'] < 2013):
+      form_dict['logistics']['season_year'] = 0
+    if (form_dict['logistics']['season_year'] < 2013):
       # CHECK Year should be >= current year.
       form_error = True
-      #logging.info("Bad year, form_error = True")
-      form_dict.pop('season_year', None)
-      form_dict['err_season_year'] = 'Specified year must be 2013 or higher'
+      del form_dict['logistics']['season_year']
+      form_dict['logistics']['errors'].append('Specified year must be 2013 or higher')
 
-    db = Database()
-    if form_dict.get('season_year') and form_dict.get('week_number') and db.is_week_valid(form_dict['week_number'], form_dict['season_year']):
+    d = Database()
+    if form_dict['logistics'].get('season_year') and form_dict['logistics'].get('week_number') and d.is_week_valid(form_dict['logistics']['week_number'], form_dict['logistics']['season_year']):
       # CHECK Target week should not already exist.
       form_error = True
-      form_dict['err_season_week'] = 'Specified week/year already exists'
+      form_dict['logistics']['errors'].append('Specified week/year already exists')
 
     #pdb.set_trace()
 
     if (form_error):
-      teams = self.get_sorted_teams()
-      form_dict['err_week_year_line'] = ';'.join(form_dict.get(i) for i in ['err_week_number', 'err_season_year', 'err_season_week'] if form_dict.get(i))
-      if not form_dict['err_week_year_line']: form_dict.pop('err_week_year_line', None)
-      error_items = ['team1', 'team2', 'favorite', 'spread']
-      for g in range(1,11):
-        error_line = 'err_game_' + str(g) + '_line'
-        error_list = [('err_game_' + str(g) + '_' + item) for item in error_items]
-        form_dict[error_line] = ';'.join(form_dict.get(i) for i in error_list if form_dict.get(i))
-        if not form_dict[error_line]: form_dict.pop(error_line, None)
-
+      teams = self.get_teams()
+      teams.sort()
+      # re-render using existing form_dict
       self.render("create_week_commish.html", teams=teams, form_dict=form_dict)
-    else:
-      # TODO placeholder, this is where you would load database with new week picks.
-      lg = LoadGames()
-      game = dict()
-      for i in range(1,11):
-        leader = 'game_' + str(i) + '_'
-        game['number'] = i
-        game['team1'] = form_dict[leader + 'team1']
-        game['team2'] = form_dict[leader + 'team2']
-        game['favored'] = 'team' + str(form_dict[leader + 'favorite'])
-        game['spread'] = float(form_dict[leader + 'spread'])
-        game['team1_score'] = None
-        game['team2_score'] = None
-        game['state'] = 'not_started'
-        # TODO Figure out how to determine recno
-        #game['recno'] = 1000 + i
-        #lg.add_game(game)
 
-      lw = LoadWeeks()
+    else:
+      teamkeys = d.load_teams(key="teamkeys")
+      #pdb.set_trace()
+      games = dict()
+      for i in range(1,11):
+        gindex = str(i)
+        games[gindex] = dict()
+        form_line = 'game_' + str(i)
+        games[gindex]['number'] = i
+        games[gindex]['team1'] = teamkeys[form_dict[form_line]['team1']]
+        games[gindex]['team2'] = teamkeys[form_dict[form_line]['team2']]
+        games[gindex]['favored'] = 'team' + str(form_dict[form_line]['favorite'])
+        games[gindex]['spread'] = float(form_dict[form_line]['spread'])
+        games[gindex]['state'] = 'not_started'
+
       week = dict()
-      week['number'] = form_dict['week_number']
-      week['year'] = form_dict['season_year']
-      # TODO Figure out how to determine recno
-      #week['recno'] = 1000 + i
-      #lw.add_week(week)
+      week['year'] = form_dict['logistics']['season_year']
+      week['number'] = form_dict['logistics']['week_number']
+      week['winner'] = None
+
+      d.put_games_week_in_database(games,week)
 
       self.response.write(self.code())
 
   def get(self):
-    teams = self.get_sorted_teams()
-    form_dict = dict()
+    teams = self.get_teams()
+    teams.sort()
+
+    # Initialize form_dict (required for tests in html/jinja)
+    form_dict_indexes = ['game_' + str(i) for i in range(1,11)]
+    form_dict_indexes.append('logistics')
+    form_dict = dict((index,dict([('errors',list())])) for index in form_dict_indexes)
+
+    d = Database()
+    (form_dict['logistics']['season_year'], form_dict['logistics']['week_number']) = d.get_next_year_week_for_create_week()
+    form_dict['logistics']['week_number'] = int(form_dict['logistics']['week_number'])
     self.render("create_week_commish.html", teams=teams, form_dict=form_dict)
     return
 

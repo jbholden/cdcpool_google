@@ -79,20 +79,39 @@
                         <tr>
                             <td id="team-content">{{result.team1}}</td>
                             <td id="score-content">{{result.team1_score}}</td>
-                            {% if result.game_state == "in_progress" and result.game_quarter != "" and result.game_time_left != "" %}
-                                <td id="game-quarter">{{result.game_quarter}}</td>
-                            {% else %}
-                                <td></td>
-                            {% endif %}
+                            <td id="{{top_status_id[loop.index0]}}">{{top_status[loop.index0]}}</td>
                         </tr>
                         <tr>
                             <td id="team-content">{{result.team2}}</td>
                             <td id="score-content">{{result.team2_score}}</td>
-                            <td>TODO</td>
+                            <td id="{{bottom_status_id[loop.index0]}}">{{bottom_status[loop.index0]}}</td>
                         </tr>
                     </table>
                 </td>
-                <td></td>
+                <td class="result-row">
+                    <table>
+                        <tr>
+                            <td id="spread-label">Favored</td>
+                            <td id="spread-team">{{result.favored}}</td>
+                            <td id="spread-value">{{result.favored_spread}}</td>
+                        </tr>
+                        <tr>
+                            {% if result.game_state == "final" %}
+                                <td id="spread-label">Result</td>
+                                <td id="spread-team">{{result.winning_team}}.0</td>
+                                <td id="spread-value">{{result.game_spread}}.0</td>
+                            {% elif result.game_state == "in_progress" %}
+                                <td id="spread-label">Ahead</td>
+                                <td id="spread-team">{{result.winning_team}}.0</td>
+                                <td id="spread-value">{{result.game_spread}}.0</td>
+                            {% else %}
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            {% endif %}
+                        </tr>
+                    </table> 
+                </td>
             </tr>
             <tr><td id="table-line" colspan="4"></td></tr>
         {% endfor %}

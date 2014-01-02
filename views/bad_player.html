@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block head_content %}
+    <link href="/stylesheets/error.css" rel="stylesheet" type="text/css" media="all">
+{% endblock %}
+
+{% block content %}
+    {% if error == "bad_id" %}
+        <div>Cannot find player {{player_id}} in the database.</div>
+    {% endif %}
+    {% if error == "bad_year" %}
+        <div>Player {{player_id}} is not participating in the {{year}} pool.</div>
+    {% endif %}
+{% endblock %}

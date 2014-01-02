@@ -39,6 +39,7 @@ class TestCalculator(unittest.TestCase):
         self.__t2_game_none()
         self.__t2_team1_winner()
         self.__t2_team2_winner()
+        self.__t2_winner_missing()
 
 
     def test_t3_is_team1_winning_pool(self):
@@ -393,6 +394,15 @@ class TestCalculator(unittest.TestCase):
         brent_key = self.week1.get_player_key("Brent H.")
         team = self.calc.get_team_name_player_picked_to_win(brent_key,game_key)
         self.assertEqual(team,"LSU")
+
+    def __t2_winner_missing(self):
+        player_key = self.week1.get_player_key("Brent H.")
+        game_key = self.__get_a_valid_game_key()
+
+        self.__make_winner_missing(player_key,game_key)
+        team = self.calc.get_team_name_player_picked_to_win(player_key,game_key)
+        self.assertEqual(team,"")
+        self.__restore_picks(player_key)
 
     def __t3_bad_game_favored_value(self):
         g = Game()

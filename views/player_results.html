@@ -1,0 +1,101 @@
+{% extends "week_base.html" %}
+
+{% block title %}Week {{week_number}} Player {{summary.player_name}} Results{% endblock %}
+{% block page_title %}{{summary.player_name}} Results{% endblock %}
+
+{% block head_content %}
+    <link href="/stylesheets/player_results.css" rel="stylesheet" type="text/css" media="all">
+{% endblock %}
+
+{% block content %}
+    <br>
+    {% if summary.week_state == "final" %}
+        <table>
+            <tr>
+                <td id="table-line" colspan="6"></td>
+            </tr>
+            <tr class="summary-content">
+                <td id="summary-label">Wins</td>
+                <td id="summary-value">{{summary.wins}}</td>
+                <td id="summary-label">Losses</td>
+                <td id="summary-value">{{summary.losses}}</td>
+                <td id="summary-label">Win Pct</td>
+                <td id="summary-value">{{summary.win_pct}}</td>
+            </tr>
+            <tr>
+                <td id="table-line" colspan="6"></td>
+            </tr>
+        </table>
+    {% else %}
+        <table>
+            <tr>
+                <td id="table-line" colspan="10"></td>
+            </tr>
+            <tr class="summary-content">
+                <td id="summary-label">Wins</td>
+                <td id="summary-value">{{summary.wins}}</td>
+                <td id="summary-label">Losses</td>
+                <td id="summary-value">{{summary.losses}}</td>
+                <td id="summary-label">Win Pct</td>
+                <td id="summary-value">{{summary.win_pct}}</td>
+                <td id="summary-label">Projected Wins</td>
+                <td id="summary-value">{{summary.projected_wins}}</td>
+                <td id="summary-label">Possible Wins</td>
+                <td id="summary-value">{{summary.possible_wins}}</td>
+            </tr>
+            <tr>
+                <td id="table-line" colspan="10"></td>
+            </tr>
+        </table>
+    {% endif %}
+    <br>
+    <a id="game-link" href="/{{year}}/week/{{week_number}}/games">update game scores</a>
+    <br>
+    <table>
+        <thead class="results-header">
+            <td id="pick-header">Player Pick</td>
+            <td id="result-header">Result</td>
+            <td id="game-header">Game</td>
+            <td id="spread-header">Spread</td>
+        </thead>
+        {% for result in results %}
+            <tr>
+                <td class="result-row" id="pick-content">{{result.player_pick}}</td> 
+                <td class="result-row">
+                    {% if result.result == "win" %}
+                        <div id="win-result-content">{{result.result}}</div>
+                    {% elif result.result == "loss" %}
+                        <div id="loss-result-content">{{result.result}}</div>
+                    {% elif result.result == "ahead" %}
+                        <div id="ahead-result-content">{{result.result}}</div>
+                    {% elif result.result == "behind" %}
+                        <div id="behind-result-content">{{result.result}}</div>
+                    {% else %}
+                        <div id="result-content">{{result.result}}</div>
+                    {% endif %}
+                </td>
+                <td class="result-row">
+                    <table>
+                        <tr>
+                            <td id="team-content">{{result.team1}}</td>
+                            <td id="score-content">{{result.team1_score}}</td>
+                            {% if result.game_state == "in_progress" and result.game_quarter != "" and result.game_time_left != "" %}
+                                <td id="game-quarter">{{result.game_quarter}}</td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td id="team-content">{{result.team2}}</td>
+                            <td id="score-content">{{result.team2_score}}</td>
+                            <td>TODO</td>
+                        </tr>
+                    </table>
+                </td>
+                <td></td>
+            </tr>
+            <tr><td id="table-line" colspan="4"></td></tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

@@ -4,7 +4,7 @@ import logging
 import unittest
 import urllib2
 import socket
-from pages.week_results import *
+from pages.week_results_page import *
 from code.database import *
 from code.update import *
 from google.appengine.api import urlfetch

@@ -98,11 +98,11 @@
                         <tr>
                             {% if result.game_state == "final" %}
                                 <td id="spread-label">Result</td>
-                                <td id="spread-team">{{result.winning_team}}.0</td>
+                                <td id="spread-team">{{result.winning_team}}</td>
                                 <td id="spread-value">{{result.game_spread}}.0</td>
                             {% elif result.game_state == "in_progress" %}
                                 <td id="spread-label">Ahead</td>
-                                <td id="spread-team">{{result.winning_team}}.0</td>
+                                <td id="spread-team">{{result.winning_team}}</td>
                                 <td id="spread-value">{{result.game_spread}}.0</td>
                             {% else %}
                                 <td></td>

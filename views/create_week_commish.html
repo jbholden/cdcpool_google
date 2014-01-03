@@ -89,8 +89,9 @@
      {% if form_dict["game_%d"|format(game)]['errors'][0] is defined %}
      <td class="form_error">{{';'.join(form_dict["game_%d"|format(game)]['errors'])}}</td>
      {% endif %}
+     <td>Kickoff: <input type="datetime-local" name="game_{{game}}_kickoff"></td>
     </tr>
-    <tr><td class="table-line" colspan="6"></td></tr>
+    <tr><td class="table-line" colspan="7"></td></tr>
     {% endfor %}
    </table>
    <input type="submit" value="Create Pick Sheet">

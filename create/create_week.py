@@ -1,6 +1,7 @@
 import webapp2
 import unittest
 import logging
+#import utils.timezone as tz
 from pages.handler import *
 from google.appengine.ext import db
 from code.database import *
@@ -99,6 +100,10 @@ class CreateWeekPage(Handler):
         # CHECK Each game has a point spread with 1/2 point offset (IOW, divide by 0.5, result should be odd number).
         form_error = True
         form_dict[form_line]['errors'].append('Need positive 1/2 point spread')
+
+      form_sel_name = 'kickoff'
+      form_field_name = form_line + '_' + form_sel_name
+      form_dict[form_line][form_sel_name] = self.request.get(form_field_name)
 
     form_dict['logistics'] = dict()
     form_dict['logistics']['errors'] = list()

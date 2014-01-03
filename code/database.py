@@ -21,6 +21,7 @@ class Database:
             g.favored = games[index]['favored']
             g.spread = games[index]['spread']
             g.state = games[index]['state']
+            g.date = games[index]['date']
             gamekeys.append(g.put())
 
         w = Week(year=week['year'],number=week['number'])

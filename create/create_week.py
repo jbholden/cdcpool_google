@@ -1,7 +1,9 @@
 import webapp2
 import unittest
+import re
 import logging
-#import utils.timezone as tz
+import utils.timezone as tz
+from datetime import *
 from pages.handler import *
 from google.appengine.ext import db
 from code.database import *
@@ -101,9 +103,14 @@ class CreateWeekPage(Handler):
         form_error = True
         form_dict[form_line]['errors'].append('Need positive 1/2 point spread')
 
+      KICKOFF_DATETIME_RE = re.compile(r"^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})$")
       form_sel_name = 'kickoff'
       form_field_name = form_line + '_' + form_sel_name
       form_dict[form_line][form_sel_name] = self.request.get(form_field_name)
+      m = KICKOFF_DATETIME_RE.match(form_dict[form_line][form_sel_name])
+      if not m:
+        form_error = True
+        form_dict[form_line]['errors'].append('Kickoff Date/Time fmt yyyy-mm-dd hh:mm')
 
     form_dict['logistics'] = dict()
     form_dict['logistics']['errors'] = list()
@@ -151,6 +158,8 @@ class CreateWeekPage(Handler):
         games[gindex]['favored'] = 'team' + str(form_dict[form_line]['favorite'])
         games[gindex]['spread'] = float(form_dict[form_line]['spread'])
         games[gindex]['state'] = 'not_started'
+        m = KICKOFF_DATETIME_RE.match(form_dict[form_line]['kickoff'])
+        games[gindex]['date'] = datetime(int(m.group(1)),int(m.group(2)),int(m.group(3)),int(m.group(4)),int(m.group(5)),tzinfo=tz.Eastern) #TODO need user TZ
 
       week = dict()
       week['year'] = form_dict['logistics']['season_year']
@@ -173,6 +182,15 @@ class CreateWeekPage(Handler):
     d = Database()
     (form_dict['logistics']['season_year'], form_dict['logistics']['week_number']) = d.get_next_year_week_for_create_week()
     form_dict['logistics']['week_number'] = int(form_dict['logistics']['week_number'])
+
+    # Initialize 'kickoff' datetime for each game by Assuming that the commissioner is creating the pick sheet
+    # the week that the games are played, so default kickoff date is the subsequent Saturday after today's date.
+    today = date.today()
+    days_before_saturday = (5 - today.weekday()) % 7
+    saturday = today + (days_before_saturday * timedelta(days=1))
+    for i in range(1,11):
+      form_dict['game_'+str(i)]['kickoff'] = saturday.strftime("%Y-%m-%dT13:00")
+
     self.render("create_week_commish.html", teams=teams, form_dict=form_dict)
     return
 

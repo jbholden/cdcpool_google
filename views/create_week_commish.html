@@ -38,7 +38,7 @@
    </table>
    <h1>Choose Games, Favorites, Spreads</h1>
    <table>
-    <tr><th>Game #</th><th>Visitor</th><th>Home</th><th>Spread</th></tr>
+     <tr><th>Game #</th><th>Visitor</th><th></th><th>Home</th><th></th><th>Spread</th><th>Kickoff Date/Time</th></tr>
     {% for game in range(1,11) %}
     <tr>
      <td>{{game}}</td>
@@ -86,11 +86,16 @@
      {% else %}
      <td><input type="text" name="game_{{game}}_spread" size="5"></td>
      {% endif %}
+     {% if form_dict["game_%d"|format(game)]['kickoff'] is defined %}
+     <td><input type="datetime-local" name="game_{{game}}_kickoff" value="{{form_dict["game_%d"|format(game)]['kickoff']}}"></td>
+     {% else %}
+     <td><input type="datetime-local" name="game_{{game}}_kickoff"></td>
+     {% endif %}
      {% if form_dict["game_%d"|format(game)]['errors'][0] is defined %}
      <td class="form_error">{{';'.join(form_dict["game_%d"|format(game)]['errors'])}}</td>
      {% endif %}
     </tr>
-    <tr><td class="table-line" colspan="6"></td></tr>
+    <tr><td class="table-line" colspan="7"></td></tr>
     {% endfor %}
    </table>
    <input type="submit" value="Create Pick Sheet">

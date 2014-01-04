@@ -5,7 +5,7 @@ from code.database import *
 from handler import *
 import string
 import re
-import utils.timezone as tz
+import pytz.gae as pytz
 
 # TODO:  define base player results and fill in blocks with another html
 # TODO: tests
@@ -115,17 +115,11 @@ class PlayerResultsPage(Handler):
         try:
             return self.__timezone
         except AttributeError:
-            return tz.Eastern
+            return pytz.pytz.timezone('US/Eastern')
 
-    def set_timezone_for_testing(self,timezone):
-        if timezone == "Eastern":
-            self.__timezone = tz.Eastern
-        elif timezone == "Central":
-            self.__timezone = tz.Central
-        elif timezone == "Mountain":
-            self.__timezone = tz.Mountain
-        elif timezone == "Pacific":
-            self.__timezone = tz.Pacific
+
+    def set_timezone_for_testing(self,timezone_name):
+        self.__timezone = pytz.pytz.timezone(timezone_name)
 
 
     def get(self,year_param,week_number_param,player_id_param):

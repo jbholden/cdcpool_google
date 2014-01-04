@@ -9,6 +9,7 @@ from google.appengine.ext import db
 from code.database import *
 from models.games import *
 from models.weeks import *
+from pytz.gae import pytz
 import pdb
 
 ######################################################################################
@@ -55,6 +56,7 @@ class CreateWeekPage(Handler):
     return c
 
   def post(self):
+    mytz = pytz.timezone('US/Eastern')
     form_error = False
     form_dict = dict()
 
@@ -159,7 +161,7 @@ class CreateWeekPage(Handler):
         games[gindex]['spread'] = float(form_dict[form_line]['spread'])
         games[gindex]['state'] = 'not_started'
         m = KICKOFF_DATETIME_RE.match(form_dict[form_line]['kickoff'])
-        games[gindex]['date'] = datetime(int(m.group(1)),int(m.group(2)),int(m.group(3)),int(m.group(4)),int(m.group(5)),tzinfo=tz.Eastern) #TODO need user TZ
+        games[gindex]['date'] = mytz.localize(datetime(int(m.group(1)),int(m.group(2)),int(m.group(3)),int(m.group(4)),int(m.group(5)))) #TODO need user TZ
 
       week = dict()
       week['year'] = form_dict['logistics']['season_year']

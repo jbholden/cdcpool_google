@@ -56,7 +56,6 @@ class CreateWeekPage(Handler):
     return c
 
   def post(self):
-    mytz = pytz.timezone('US/Eastern')
     form_error = False
     form_dict = dict()
 
@@ -147,6 +146,7 @@ class CreateWeekPage(Handler):
       self.render("create_week_commish.html", teams=teams, form_dict=form_dict)
 
     else:
+      mytz = pytz.timezone('US/Eastern') #TODO need user TZ
       teamkeys = d.load_teams(key="teamkeys")
       #pdb.set_trace()
       games = dict()
@@ -161,7 +161,7 @@ class CreateWeekPage(Handler):
         games[gindex]['spread'] = float(form_dict[form_line]['spread'])
         games[gindex]['state'] = 'not_started'
         m = KICKOFF_DATETIME_RE.match(form_dict[form_line]['kickoff'])
-        games[gindex]['date'] = mytz.localize(datetime(int(m.group(1)),int(m.group(2)),int(m.group(3)),int(m.group(4)),int(m.group(5)))) #TODO need user TZ
+        games[gindex]['date'] = mytz.localize(datetime(int(m.group(1)),int(m.group(2)),int(m.group(3)),int(m.group(4)),int(m.group(5)))).astimezone(pytz.utc) #TODO need user TZ
 
       week = dict()
       week['year'] = form_dict['logistics']['season_year']

@@ -42,6 +42,8 @@ class Database:
         # returns tuple that is (year, week)
         weeks_and_years = self.load_weeks_and_years(update)
         sorted_years = sorted(weeks_and_years.keys())
+        if len(sorted_years) == 0:
+          return ('2014','1')
         latest_year = int(sorted_years[-1])
         sorted_weeks = sorted(weeks_and_years[latest_year])
         latest_week = int(sorted_weeks[-1])

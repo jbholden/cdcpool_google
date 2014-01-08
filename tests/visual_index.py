@@ -17,4 +17,7 @@ tests['Week Results'] = [ FinalWeekResultsTest,
 
 tests['Overall Results'] = []
 
-tests['Player Results'] = [ NotStartedPlayerResultsTest ]
+tests['Player Results'] = [ FinalPlayerResultsTest,
+                            NotStartedPlayerResultsTest,
+                            NotStartedPlayerResultsDefaulterTest,
+                            InProgressPlayerResultsTest ]

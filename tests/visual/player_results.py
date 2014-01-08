@@ -1,5 +1,20 @@
 from visual import *
 from tests.data.player_results.week_not_started import *
+from tests.data.player_results.week_not_started_defaulter import *
+from tests.data.player_results.week_in_progress import *
+
+class FinalPlayerResultsTest(VisualTest):
+
+    def __init__(self):
+        self.description = "Week Final Test"
+        self.link = "/2013/week/1/results"
+        self.verify =  self.__verify_instructions()
+
+    def __verify_instructions(self):
+        v = []
+        v.append('**IMPORTANT**')
+        v.append('you need to navigate to the player results page by clicking the player name')
+        return v
 
 class NotStartedPlayerResultsTest(VisualTest):
 
@@ -30,4 +45,47 @@ class NotStartedPlayerResultsTest(VisualTest):
         v.append('Game 9 (San Diego vs. Baylor):  7/24/2012 3:24 PM EDT')
         v.append('Game 9 (Virginia vs. Florida State):  No game start time')
         v.append('Game 10 (Kent State vs. Texas-El Paso):  No game start time')
+        return v
+
+class NotStartedPlayerResultsDefaulterTest(VisualTest):
+
+    def __init__(self):
+        self.description = "Week Not Started Defaulter Test"
+        self.link = "/1979/week/2/results"
+        self.verify =  self.__verify_instructions()
+
+    def setup(self):
+        testdata = PlayerResultsWeekNotStartedDefaulter(leave_objects_in_datastore=True)
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = PlayerResultsWeekNotStartedDefaulter()
+        testdata.cleanup_database()
+
+    def __verify_instructions(self):
+        v = []
+        v.append('**IMPORTANT**')
+        v.append('you need to navigate to the player results page by clicking the player name')
+        v.append('all games should be counted as a loss')
+        return v
+
+class InProgressPlayerResultsTest(VisualTest):
+
+    def __init__(self):
+        self.description = "Week In Progress Test"
+        self.link = "/1979/week/3/results"
+        self.verify =  self.__verify_instructions()
+
+    def setup(self):
+        testdata = PlayerResultsWeekInProgress(leave_objects_in_datastore=True)
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = PlayerResultsWeekInProgress()
+        testdata.cleanup_database()
+
+    def __verify_instructions(self):
+        v = []
+        v.append('**IMPORTANT**')
+        v.append('you need to navigate to the player results page by clicking the player name')
         return v

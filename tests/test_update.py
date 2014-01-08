@@ -11,10 +11,13 @@ import random
 from tests.data.test_data import *
 from tests.data.player_results.test_player_data import *
 from tests.data.player_results.week_not_started import *
+from tests.data.player_results.week_not_started_defaulter import *
+from tests.data.player_results.week_in_progress import *
 from tests.data.week_not_started import *
 from tests.data.week_not_started_with_defaulters import *
 from tests.data.week_in_progress import *
 from tests.data.week_in_progress_games_in_progress import *
+from pytz.gae import pytz
 
 
 class TestUpdate(unittest.TestCase):
@@ -144,7 +147,8 @@ class TestUpdate(unittest.TestCase):
 
     def test_t9_get_player_results(self):
         self.__t9_week_not_started()
-        # TODO
+        self.__t9_week_not_started_defaulter()
+        self.__t9_week_in_progress()
 
     def __t1_week_not_started(self):
         testdata = WeekNotStarted(leave_objects_in_datastore=False)
@@ -710,6 +714,18 @@ class TestUpdate(unittest.TestCase):
         self.__test_get_player_results(testdata.year,testdata.week_number,testdata.get_expected_results())
         testdata.cleanup()
 
+    def __t9_week_not_started_defaulter(self):
+        testdata = PlayerResultsWeekNotStartedDefaulter(leave_objects_in_datastore=False)
+        testdata.setup()
+        self.__test_get_player_results(testdata.year,testdata.week_number,testdata.get_expected_results())
+        testdata.cleanup()
+
+    def __t9_week_in_progress(self):
+        testdata = PlayerResultsWeekInProgress(leave_objects_in_datastore=False)
+        testdata.setup()
+        self.__test_get_player_results(testdata.year,testdata.week_number,testdata.get_expected_results())
+        testdata.cleanup()
+
     def __load_week_results_into_cache(self,year,week_number):
         u = Update()
         ignore_return_data = u.get_week_results(year,week_number,update=True)
@@ -779,7 +795,12 @@ class TestUpdate(unittest.TestCase):
             self.assertEqual(result.game_spread,expected.game_spread)
             self.assertEqual(result.game_quarter,expected.game_quarter)
             self.assertEqual(result.game_time_left,expected.game_time_left)
-            self.assertEqual(result.game_date,expected.game_date)
+
+            if result.game_date:
+                game_date_utc = pytz.utc.localize(result.game_date)
+            else:
+                game_date_utc = None
+            self.assertEqual(game_date_utc,expected.game_date)
 
     def __find_expected_player_result(self,team1,team2,expected):
         for result in expected:

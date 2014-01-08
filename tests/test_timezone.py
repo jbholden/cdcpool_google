@@ -1,5 +1,5 @@
 import unittest
-import pytz.gae as pytz
+from pytz.gae import pytz
 import datetime
 from utils.utils import *
 
@@ -11,10 +11,10 @@ class TestTimezone(unittest.TestCase):
         # + web page code gets the date (initially naive), converts it to UTC, and assigns to the datastore
         date_from_webpage = datetime.datetime(2010,2,24,19,30)
 
-        eastern = pytz.pytz.timezone('US/Eastern')
+        eastern = pytz.timezone('US/Eastern')
         date_in_eastern = eastern.localize(date_from_webpage)
 
-        date_in_utc = date_in_eastern.astimezone(pytz.pytz.utc)
+        date_in_utc = date_in_eastern.astimezone(pytz.utc)
         # assign date_in_utc to datastore object date property
 
         # do some verification to see if this makes sense
@@ -32,21 +32,21 @@ class TestTimezone(unittest.TestCase):
 
 
     def test_pytz_timezone_names_list(self):
-        self.assertGreater(len(pytz.pytz.all_timezones),0)
-        self.assertIn('US/Eastern',pytz.pytz.all_timezones)
-        self.assertIn('US/Central',pytz.pytz.all_timezones)
-        self.assertIn('US/Mountain',pytz.pytz.all_timezones)
-        self.assertIn('US/Pacific',pytz.pytz.all_timezones)
-        self.assertIn('Europe/London',pytz.pytz.all_timezones)
+        self.assertGreater(len(pytz.all_timezones),0)
+        self.assertIn('US/Eastern',pytz.all_timezones)
+        self.assertIn('US/Central',pytz.all_timezones)
+        self.assertIn('US/Mountain',pytz.all_timezones)
+        self.assertIn('US/Pacific',pytz.all_timezones)
+        self.assertIn('Europe/London',pytz.all_timezones)
 
 
     def test_standard_time_conversions(self):
-        utc = pytz.pytz.utc
-        eastern = pytz.pytz.timezone('US/Eastern')
-        central = pytz.pytz.timezone('US/Central')
-        mountain = pytz.pytz.timezone('US/Mountain')
-        pacific = pytz.pytz.timezone('US/Pacific')
-        london = pytz.pytz.timezone('Europe/London')
+        utc = pytz.utc
+        eastern = pytz.timezone('US/Eastern')
+        central = pytz.timezone('US/Central')
+        mountain = pytz.timezone('US/Mountain')
+        pacific = pytz.timezone('US/Pacific')
+        london = pytz.timezone('Europe/London')
 
         # assign date to 2/24/2010 7:30 PM eastern
         test_date_naive = datetime.datetime(2010,2,24,19,30)
@@ -70,12 +70,12 @@ class TestTimezone(unittest.TestCase):
 
 
     def test_daylight_time_conversions(self):
-        utc = pytz.pytz.utc
-        eastern = pytz.pytz.timezone('US/Eastern')
-        central = pytz.pytz.timezone('US/Central')
-        mountain = pytz.pytz.timezone('US/Mountain')
-        pacific = pytz.pytz.timezone('US/Pacific')
-        london = pytz.pytz.timezone('Europe/London')
+        utc = pytz.utc
+        eastern = pytz.timezone('US/Eastern')
+        central = pytz.timezone('US/Central')
+        mountain = pytz.timezone('US/Mountain')
+        pacific = pytz.timezone('US/Pacific')
+        london = pytz.timezone('Europe/London')
 
         # assign date to 3/10/2014 7:30 PM eastern
         test_date_naive = datetime.datetime(2014,3,10,19,30)

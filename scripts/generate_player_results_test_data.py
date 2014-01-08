@@ -138,10 +138,9 @@ class TestDataImport:
     def __get_player_pick(self,sheet,row,player_column,game):
         team1_row = row
         team2_row = row + 1
-        team1_pick = unicode(sheet.cell(team1_row,player_column).value)  # brent change
-        team2_pick = unicode(sheet.cell(team2_row,player_column).value)  # brent change
-        team1_picked = team1_pick != ""
-        team2_picked = team2_pick != ""
+        CELL_EMPTY = 0
+        team1_picked = sheet.cell_type(team1_row,player_column) != CELL_EMPTY
+        team2_picked = sheet.cell_type(team2_row,player_column) != CELL_EMPTY
 
         if team1_picked:
             return game.team1

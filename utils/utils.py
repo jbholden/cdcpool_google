@@ -2,7 +2,7 @@
 
 import os
 import hmac
-import pytz.gae as pytz
+from pytz.gae import pytz
 
 secret = "cdcpool_abc1234"
 
@@ -18,7 +18,7 @@ def check_secure_val(secure_val):
         return val
 
 def get_datetime_in_utc(datetime_value,initial_timezone):
-    pytz_timezone = pytz.pytz.timezone(initial_timezone)
+    pytz_timezone = pytz.timezone(initial_timezone)
     date_in_timezone = pytz_timezone.localize(datetime_value)
-    date_in_utc = date_in_timezone.astimezone(pytz.pytz.utc)
+    date_in_utc = date_in_timezone.astimezone(pytz.utc)
     return date_in_utc

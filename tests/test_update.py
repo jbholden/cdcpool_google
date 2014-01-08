@@ -9,7 +9,8 @@ import unittest
 import copy
 import random
 from tests.data.test_data import *
-from tests.data.test_player_data import *
+from tests.data.player_results.test_player_data import *
+from tests.data.player_results.week_not_started import *
 from tests.data.week_not_started import *
 from tests.data.week_not_started_with_defaulters import *
 from tests.data.week_in_progress import *
@@ -20,8 +21,16 @@ class TestUpdate(unittest.TestCase):
 
     @staticmethod
     def run_subset():
-        return  [ "test_t7_get_player_results_empty_cache" ]
-        #return  [ "test_t6_get_player_results_summary" ]
+        return [ 'test_t9_get_player_results' ]
+        #return [ 'test_get_week_results_empty_cache','test_get_week_results_populated_cache' ]
+        #return [ 'test_t1_get_week_results_week_not_started',
+        #        'test_t2_assign_rank',
+        #        'test_t3_assign_projected_rank',
+        #        'test_t4_get_week_results_week_in_progress',
+        #        'test_t5_get_week_state' ]
+        #return [ 'test_t6_get_player_results_summary',
+                 #'test_t7_get_player_results_empty_cache',
+                 #'test_t8_get_player_results_populated_cache' ]
 
     def test_get_week_results_empty_cache(self):
         self.__test_get_week_results_empty_cache(2013,1,TestData.week_results_2013_week1())
@@ -109,16 +118,33 @@ class TestUpdate(unittest.TestCase):
         self.__test_get_player_results_empty_cache(2013,3,PlayerTestData.player_results_2013_week3())
         self.__test_get_player_results_empty_cache(2013,4,PlayerTestData.player_results_2013_week4())
         self.__test_get_player_results_empty_cache(2013,5,PlayerTestData.player_results_2013_week5())
-        #self.__test_get_player_results_empty_cache(2013,6,PlayerTestData.player_results_2013_week6())
+        self.__test_get_player_results_empty_cache(2013,6,PlayerTestData.player_results_2013_week6())
         self.__test_get_player_results_empty_cache(2013,7,PlayerTestData.player_results_2013_week7())
         self.__test_get_player_results_empty_cache(2013,8,PlayerTestData.player_results_2013_week8())
-        #self.__test_get_player_results_empty_cache(2013,9,PlayerTestData.player_results_2013_week9())
-        #self.__test_get_player_results_empty_cache(2013,10,PlayerTestData.player_results_2013_week10())
-        #self.__test_get_player_results_empty_cache(2013,11,PlayerTestData.player_results_2013_week11())
-        #self.__test_get_player_results_empty_cache(2013,12,PlayerTestData.player_results_2013_week12())
-        #self.__test_get_player_results_empty_cache(2013,13,PlayerTestData.player_results_2013_week13())
+        self.__test_get_player_results_empty_cache(2013,9,PlayerTestData.player_results_2013_week9())
+        self.__test_get_player_results_empty_cache(2013,10,PlayerTestData.player_results_2013_week10())
+        self.__test_get_player_results_empty_cache(2013,11,PlayerTestData.player_results_2013_week11())
+        self.__test_get_player_results_empty_cache(2013,12,PlayerTestData.player_results_2013_week12())
+        self.__test_get_player_results_empty_cache(2013,13,PlayerTestData.player_results_2013_week13())
 
+    def test_t8_get_player_results_populated_cache(self):
+        self.__test_get_player_results_populated_cache(2013,1,PlayerTestData.player_results_2013_week1())
+        self.__test_get_player_results_populated_cache(2013,2,PlayerTestData.player_results_2013_week2())
+        self.__test_get_player_results_populated_cache(2013,3,PlayerTestData.player_results_2013_week3())
+        self.__test_get_player_results_populated_cache(2013,4,PlayerTestData.player_results_2013_week4())
+        self.__test_get_player_results_populated_cache(2013,5,PlayerTestData.player_results_2013_week5())
+        self.__test_get_player_results_populated_cache(2013,6,PlayerTestData.player_results_2013_week6())
+        self.__test_get_player_results_populated_cache(2013,7,PlayerTestData.player_results_2013_week7())
+        self.__test_get_player_results_populated_cache(2013,8,PlayerTestData.player_results_2013_week8())
+        self.__test_get_player_results_populated_cache(2013,9,PlayerTestData.player_results_2013_week9())
+        self.__test_get_player_results_populated_cache(2013,10,PlayerTestData.player_results_2013_week10())
+        self.__test_get_player_results_populated_cache(2013,11,PlayerTestData.player_results_2013_week11())
+        self.__test_get_player_results_populated_cache(2013,12,PlayerTestData.player_results_2013_week12())
+        self.__test_get_player_results_populated_cache(2013,13,PlayerTestData.player_results_2013_week13())
 
+    def test_t9_get_player_results(self):
+        self.__t9_week_not_started()
+        # TODO
 
     def __t1_week_not_started(self):
         testdata = WeekNotStarted(leave_objects_in_datastore=False)
@@ -674,9 +700,27 @@ class TestUpdate(unittest.TestCase):
         memcache.flush_all()
         self.__test_get_player_results(year,week_number,expected_results)
 
+    def __test_get_player_results_populated_cache(self,year,week_number,expected_results):
+        self.__load_player_results_into_cache(year,week_number)
+        self.__test_get_player_results(year,week_number,expected_results)
+
+    def __t9_week_not_started(self):
+        testdata = PlayerResultsWeekNotStarted(leave_objects_in_datastore=False)
+        testdata.setup()
+        self.__test_get_player_results(testdata.year,testdata.week_number,testdata.get_expected_results())
+        testdata.cleanup()
+
     def __load_week_results_into_cache(self,year,week_number):
         u = Update()
         ignore_return_data = u.get_week_results(year,week_number,update=True)
+
+    def __load_player_results_into_cache(self,year,week_number):
+        d = Database()
+        players = d.load_players(year) 
+        u = Update()
+        for player_key in players:
+            player_id = players[player_key].key().id()
+            ignore_return_data = u.get_player_results(player_id,year,week_number,update=True)
 
     def __test_get_player_results_summary(self,year,week_number,expected_week_state,expected):
         d = Database()
@@ -742,7 +786,7 @@ class TestUpdate(unittest.TestCase):
             match = team1 == result.team1 and team2 == result.team2
             if match:
                 return result
-        raise AssertionError,"Could not find a matching game in the expected results"
+        raise AssertionError,"Could not find a matching game in the expected results (%s vs. %s)" % (team1,team2)
 
     def __verify_results(self,results,expected_results):
         self.assertEqual(len(results),len(expected_results))

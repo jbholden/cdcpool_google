@@ -5,7 +5,7 @@ from code.database import *
 from handler import *
 import string
 import re
-import pytz.gae as pytz
+from pytz.gae import pytz
 
 # TODO:  define base player results and fill in blocks with another html
 # TODO: tests
@@ -65,8 +65,9 @@ class PlayerResultsPage(Handler):
             top_id = "status-empty"
             bottom_id = "status-empty"
         else:
-            local_game_date = result.game_date.astimezone(self.__get_local_timezone())
-            weekday_month_day = "%a %b %d"
+            utc_date = pytz.utc.localize(result.game_date)
+            local_game_date = utc_date.astimezone(self.__get_local_timezone())
+            weekday_month_day = "%a %m/%d"
             hour_minutes_ampm_timezone = "%I:%M %p %Z"
             top_status = local_game_date.strftime(weekday_month_day)
             bottom_status = local_game_date.strftime(hour_minutes_ampm_timezone)
@@ -112,14 +113,15 @@ class PlayerResultsPage(Handler):
 
     def __get_local_timezone(self):
         # TODO:  change this code to player's preferred timezone
+        # TODO:  test view page with a different timezone
         try:
             return self.__timezone
         except AttributeError:
-            return pytz.pytz.timezone('US/Eastern')
+            return pytz.timezone('US/Eastern')
 
 
     def set_timezone_for_testing(self,timezone_name):
-        self.__timezone = pytz.pytz.timezone(timezone_name)
+        self.__timezone = pytz.timezone(timezone_name)
 
 
     def get(self,year_param,week_number_param,player_id_param):

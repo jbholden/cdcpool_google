@@ -86,7 +86,7 @@ class TestDataImport:
             if self.__player_default(sheet,col):
                 player_points = 0.0
             elif week == 9 and player_name == "Carter, Chris":
-                player_points = 5.0    # fix bug reading the excel sheet
+                player_points = 6.0    # fix bug reading the excel sheet
             else:
                 player_points = str(sheet.cell(points_row,col).value)
             points[player_name] = int(float(player_points))

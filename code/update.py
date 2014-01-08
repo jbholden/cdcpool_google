@@ -58,6 +58,10 @@ class Update:
         key = "week_results_%d_%d" % (year,week_number)
         memcache.delete(key)
 
+    def delete_player_results_from_memcache(self,player_id,year,week_number):
+        key = "player_results_%d_%d_%d" % (player_id,year,week_number)
+        memcache.delete(key)
+
     def get_week_state(self,year,week_number):
         database = Database()
         week_data = database.load_week_data(year,week_number)
@@ -145,22 +149,27 @@ class Update:
         result.result = calc.get_game_result_string(player_key,game_key)
         result.team1 = week_data.get_team1_name(game_key)
         result.team2 = week_data.get_team2_name(game_key)
-        result.team1_score = game.team1_score
-        result.team2_score = game.team2_score
         result.game_state = game.state
         result.favored = calc.get_favored_team_name(game_key)
         result.favored_spread = game.spread
         result.game_date = game.date
 
         if game.state == "final":
+            result.team1_score = game.team1_score
+            result.team2_score = game.team2_score
             result.winning_team = calc.get_game_winner_team_name(game_key)
             result.game_spread = calc.get_game_score_spread(game_key)
         elif game.state == "in_progress":
+            result.team1_score = game.team1_score
+            result.team2_score = game.team2_score
             result.winning_team = calc.get_team_name_winning_game(game_key)
             result.game_spread = calc.get_game_score_spread(game_key)
             result.game_quarter = game.quarter
             result.game_time_left = game.time_left
-        elif game.state != "not_started":
+        elif game.state == "not_started":
+            result.team1_score = ''
+            result.team2_score = ''
+        else:
             raise AssertionError,"Game state %s is not valid" % (game.state)
 
         return result

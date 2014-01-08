@@ -5,16 +5,7 @@ from handler import *
 import string
 import re
 
-# Tests:
-# + test that page is up
-# + test bad year and bad week number
-# + test week final
-# + test week in progress
-# + test week not started
-# + test sorting? 
-# + page views
-
-class WeekResults(Handler):
+class WeekResultsPage(Handler):
 
     def get(self,year_param,week_number_param):
         year = int(year_param)

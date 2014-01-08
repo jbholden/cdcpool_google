@@ -9,17 +9,31 @@ import unittest
 import copy
 import random
 from tests.data.test_data import *
+from tests.data.player_results.test_player_data import *
+from tests.data.player_results.week_not_started import *
+from tests.data.player_results.week_not_started_defaulter import *
+from tests.data.player_results.week_in_progress import *
 from tests.data.week_not_started import *
 from tests.data.week_not_started_with_defaulters import *
 from tests.data.week_in_progress import *
 from tests.data.week_in_progress_games_in_progress import *
+from pytz.gae import pytz
 
 
 class TestUpdate(unittest.TestCase):
 
-    #@staticmethod
-    #def run_subset():
-        #return  [ "test_t5_get_week_state" ]
+    @staticmethod
+    def run_subset():
+        return [ 'test_t9_get_player_results' ]
+        #return [ 'test_get_week_results_empty_cache','test_get_week_results_populated_cache' ]
+        #return [ 'test_t1_get_week_results_week_not_started',
+        #        'test_t2_assign_rank',
+        #        'test_t3_assign_projected_rank',
+        #        'test_t4_get_week_results_week_in_progress',
+        #        'test_t5_get_week_state' ]
+        #return [ 'test_t6_get_player_results_summary',
+                 #'test_t7_get_player_results_empty_cache',
+                 #'test_t8_get_player_results_populated_cache' ]
 
     def test_get_week_results_empty_cache(self):
         self.__test_get_week_results_empty_cache(2013,1,TestData.week_results_2013_week1())
@@ -90,6 +104,51 @@ class TestUpdate(unittest.TestCase):
         self.__t5_week_not_started()
         self.__t5_week_in_progress()
         self.__t5_week_final()
+
+    def test_t6_get_player_results_summary(self):
+        self.__t6_test_summary()
+        self.__t6_test_summary_week_not_started()
+        self.__t6_test_summary_week_not_started_with_defaulters()
+        self.__t6_test_summary_week_in_progress()
+        self.__t6_test_summary_week_in_progress_with_games_in_progress()
+        # TODO tests
+        # test player results
+        # test bad arguments
+
+    def test_t7_get_player_results_empty_cache(self):
+        self.__test_get_player_results_empty_cache(2013,1,PlayerTestData.player_results_2013_week1())
+        self.__test_get_player_results_empty_cache(2013,2,PlayerTestData.player_results_2013_week2())
+        self.__test_get_player_results_empty_cache(2013,3,PlayerTestData.player_results_2013_week3())
+        self.__test_get_player_results_empty_cache(2013,4,PlayerTestData.player_results_2013_week4())
+        self.__test_get_player_results_empty_cache(2013,5,PlayerTestData.player_results_2013_week5())
+        self.__test_get_player_results_empty_cache(2013,6,PlayerTestData.player_results_2013_week6())
+        self.__test_get_player_results_empty_cache(2013,7,PlayerTestData.player_results_2013_week7())
+        self.__test_get_player_results_empty_cache(2013,8,PlayerTestData.player_results_2013_week8())
+        self.__test_get_player_results_empty_cache(2013,9,PlayerTestData.player_results_2013_week9())
+        self.__test_get_player_results_empty_cache(2013,10,PlayerTestData.player_results_2013_week10())
+        self.__test_get_player_results_empty_cache(2013,11,PlayerTestData.player_results_2013_week11())
+        self.__test_get_player_results_empty_cache(2013,12,PlayerTestData.player_results_2013_week12())
+        self.__test_get_player_results_empty_cache(2013,13,PlayerTestData.player_results_2013_week13())
+
+    def test_t8_get_player_results_populated_cache(self):
+        self.__test_get_player_results_populated_cache(2013,1,PlayerTestData.player_results_2013_week1())
+        self.__test_get_player_results_populated_cache(2013,2,PlayerTestData.player_results_2013_week2())
+        self.__test_get_player_results_populated_cache(2013,3,PlayerTestData.player_results_2013_week3())
+        self.__test_get_player_results_populated_cache(2013,4,PlayerTestData.player_results_2013_week4())
+        self.__test_get_player_results_populated_cache(2013,5,PlayerTestData.player_results_2013_week5())
+        self.__test_get_player_results_populated_cache(2013,6,PlayerTestData.player_results_2013_week6())
+        self.__test_get_player_results_populated_cache(2013,7,PlayerTestData.player_results_2013_week7())
+        self.__test_get_player_results_populated_cache(2013,8,PlayerTestData.player_results_2013_week8())
+        self.__test_get_player_results_populated_cache(2013,9,PlayerTestData.player_results_2013_week9())
+        self.__test_get_player_results_populated_cache(2013,10,PlayerTestData.player_results_2013_week10())
+        self.__test_get_player_results_populated_cache(2013,11,PlayerTestData.player_results_2013_week11())
+        self.__test_get_player_results_populated_cache(2013,12,PlayerTestData.player_results_2013_week12())
+        self.__test_get_player_results_populated_cache(2013,13,PlayerTestData.player_results_2013_week13())
+
+    def test_t9_get_player_results(self):
+        self.__t9_week_not_started()
+        self.__t9_week_not_started_defaulter()
+        self.__t9_week_in_progress()
 
     def __t1_week_not_started(self):
         testdata = WeekNotStarted(leave_objects_in_datastore=False)
@@ -527,6 +586,45 @@ class TestUpdate(unittest.TestCase):
         state = u.get_week_state(2013,1)
         self.assertEqual(state,"final")
 
+    def __t6_test_summary(self):
+        self.__test_get_player_results_summary(2013,1,'final',TestData.week_results_2013_week1())
+        self.__test_get_player_results_summary(2013,2,'final',TestData.week_results_2013_week2())
+        self.__test_get_player_results_summary(2013,3,'final',TestData.week_results_2013_week3())
+        self.__test_get_player_results_summary(2013,4,'final',TestData.week_results_2013_week4())
+        self.__test_get_player_results_summary(2013,5,'final',TestData.week_results_2013_week5())
+        self.__test_get_player_results_summary(2013,6,'final',TestData.week_results_2013_week6())
+        self.__test_get_player_results_summary(2013,7,'final',TestData.week_results_2013_week7())
+        self.__test_get_player_results_summary(2013,8,'final',TestData.week_results_2013_week8())
+        self.__test_get_player_results_summary(2013,9,'final',TestData.week_results_2013_week9())
+        self.__test_get_player_results_summary(2013,10,'final',TestData.week_results_2013_week10())
+        self.__test_get_player_results_summary(2013,11,'final',TestData.week_results_2013_week11())
+        self.__test_get_player_results_summary(2013,12,'final',TestData.week_results_2013_week12())
+        self.__test_get_player_results_summary(2013,13,'final',TestData.week_results_2013_week13())
+
+    def __t6_test_summary_week_not_started(self):
+        testdata = WeekNotStarted(leave_objects_in_datastore=False)
+        testdata.setup()
+        self.__test_get_player_results_summary(testdata.year,testdata.week_number,'not_started',testdata.get_expected_results())
+        testdata.cleanup()
+
+    def __t6_test_summary_week_not_started_with_defaulters(self):
+        testdata = WeekNotStartedWithDefaulters(leave_objects_in_datastore=False)
+        testdata.setup()
+        self.__test_get_player_results_summary(testdata.year,testdata.week_number,'not_started',testdata.get_expected_results())
+        testdata.cleanup()
+
+    def __t6_test_summary_week_in_progress(self):
+        testdata = WeekInProgress(leave_objects_in_datastore=False)
+        testdata.setup()
+        self.__test_get_player_results_summary(testdata.year,testdata.week_number,'in_progress',testdata.get_expected_results())
+        testdata.cleanup()
+
+    def __t6_test_summary_week_in_progress_with_games_in_progress(self):
+        testdata = WeekInProgressGamesInProgress(leave_objects_in_datastore=False)
+        testdata.setup()
+        self.__test_get_player_results_summary(testdata.year,testdata.week_number,'in_progress',testdata.get_expected_results())
+        testdata.cleanup()
+
     def __randomize_results_order(self):
         indexes = range(len(self.__week_results))
         random.shuffle(indexes)
@@ -588,7 +686,6 @@ class TestUpdate(unittest.TestCase):
 
     def __test_get_week_results(self,year,week_number,expected_results):
         u = Update()
-        #results = u.get_week_results(year,week_number,update=True)
         results = u.get_week_results(year,week_number)
         #self.__debug_print_results(results,title="Results")
         #self.__debug_print_results(expected_results,title="Expected Results")
@@ -603,9 +700,114 @@ class TestUpdate(unittest.TestCase):
         self.__load_week_results_into_cache(year,week_number)
         self.__test_get_week_results(year,week_number,expected_results)
 
+    def __test_get_player_results_empty_cache(self,year,week_number,expected_results):
+        memcache.flush_all()
+        self.__test_get_player_results(year,week_number,expected_results)
+
+    def __test_get_player_results_populated_cache(self,year,week_number,expected_results):
+        self.__load_player_results_into_cache(year,week_number)
+        self.__test_get_player_results(year,week_number,expected_results)
+
+    def __t9_week_not_started(self):
+        testdata = PlayerResultsWeekNotStarted(leave_objects_in_datastore=False)
+        testdata.setup()
+        self.__test_get_player_results(testdata.year,testdata.week_number,testdata.get_expected_results())
+        testdata.cleanup()
+
+    def __t9_week_not_started_defaulter(self):
+        testdata = PlayerResultsWeekNotStartedDefaulter(leave_objects_in_datastore=False)
+        testdata.setup()
+        self.__test_get_player_results(testdata.year,testdata.week_number,testdata.get_expected_results())
+        testdata.cleanup()
+
+    def __t9_week_in_progress(self):
+        testdata = PlayerResultsWeekInProgress(leave_objects_in_datastore=False)
+        testdata.setup()
+        self.__test_get_player_results(testdata.year,testdata.week_number,testdata.get_expected_results())
+        testdata.cleanup()
+
     def __load_week_results_into_cache(self,year,week_number):
         u = Update()
         ignore_return_data = u.get_week_results(year,week_number,update=True)
+
+    def __load_player_results_into_cache(self,year,week_number):
+        d = Database()
+        players = d.load_players(year) 
+        u = Update()
+        for player_key in players:
+            player_id = players[player_key].key().id()
+            ignore_return_data = u.get_player_results(player_id,year,week_number,update=True)
+
+    def __test_get_player_results_summary(self,year,week_number,expected_week_state,expected):
+        d = Database()
+        u = Update()
+        players = d.load_players(year) 
+        #self.__debug_setup_summary()
+        for player_key in players:
+            player_id = players[player_key].key().id()
+            player_name = players[player_key].name
+            player_expected = self.__find_result(player_name,expected)
+            summary,results = u.get_player_results(player_id,year,week_number)
+            self.__verify_player_summary(summary,expected_week_state,player_expected)
+            #self.__debug_save_summary(player_name,summary)
+        #self.__debug_print_player_results_summary()
+
+    def __test_get_player_results(self,year,week_number,expected):
+        d = Database()
+        u = Update()
+        players = d.load_players(year) 
+        for player_key in players:
+            player_id = players[player_key].key().id()
+            player_name = players[player_key].name
+            player_expected = expected[player_name]
+            summary,results = u.get_player_results(player_id,year,week_number)
+            self.__verify_player_results(results,player_expected)
+
+    def __find_result(self,player_name,results):
+        for result in results:
+            if player_name == result.player_name:
+                return result
+        raise AssertionError,"Could not find player %s" % (player_name)
+
+    def __verify_player_summary(self,summary,expected_week_state,expected):
+        self.assertEqual(summary.player_id,expected.player_id)
+        self.assertEqual(summary.player_name,expected.player_name)
+        self.assertEqual(summary.wins,expected.wins)
+        self.assertEqual(summary.losses,expected.losses)
+        self.assertEqual(summary.win_pct,expected.win_pct)
+        self.assertEqual(summary.possible_wins,expected.possible_wins)
+        self.assertEqual(summary.projected_wins,expected.projected_wins)
+        self.assertEqual(summary.week_state,expected_week_state)
+
+    def __verify_player_results(self,results,expected_results):
+        for result in results:
+            expected = self.__find_expected_player_result(result.team1,result.team2,expected_results)
+            self.assertEqual(result.player_pick,expected.player_pick)
+            self.assertEqual(result.result,expected.result)
+            self.assertEqual(result.team1,expected.team1)
+            self.assertEqual(result.team2,expected.team2)
+            self.assertEqual(result.team1_score,expected.team1_score)
+            self.assertEqual(result.team2_score,expected.team2_score)
+            self.assertEqual(result.game_state,expected.game_state)
+            self.assertEqual(result.favored,expected.favored)
+            self.assertEqual(result.favored_spread,expected.favored_spread)
+            self.assertEqual(result.winning_team,expected.winning_team)
+            self.assertEqual(result.game_spread,expected.game_spread)
+            self.assertEqual(result.game_quarter,expected.game_quarter)
+            self.assertEqual(result.game_time_left,expected.game_time_left)
+
+            if result.game_date:
+                game_date_utc = pytz.utc.localize(result.game_date)
+            else:
+                game_date_utc = None
+            self.assertEqual(game_date_utc,expected.game_date)
+
+    def __find_expected_player_result(self,team1,team2,expected):
+        for result in expected:
+            match = team1 == result.team1 and team2 == result.team2
+            if match:
+                return result
+        raise AssertionError,"Could not find a matching game in the expected results (%s vs. %s)" % (team1,team2)
 
     def __verify_results(self,results,expected_results):
         self.assertEqual(len(results),len(expected_results))
@@ -681,6 +883,23 @@ class TestUpdate(unittest.TestCase):
         print "----  -----------------  ---------------  ----  ------  ---------  --------"
         for result in results:
             print "%4s  %17s  %15s  %4s  %6s  %9s  %8s" % (result.rank,result.player_id,result.player_name,result.wins,result.losses,result.projected_wins,result.possible_wins)
+        print ""
+
+    def __debug_setup_summary(self):
+        self.__summaries = []
+
+    def __debug_save_summary(self,player_name,summary):
+        self.__summaries.append((player_name,summary))
+
+
+    def __debug_print_player_results_summary(self):
+        print "-----------------------------------------------------------------------------------"
+        print "Player Results Summary (week state: %s)" % (self.__summaries[0][1].week_state)
+        print "-----------------------------------------------------------------------------------"
+        print "Id                 Name             Wins  Losses  Projected  Possible"
+        print "-----------------  ---------------  ----  ------  ---------  --------"
+        for player_name,summary in self.__summaries:
+            print "%17s  %15s  %4s  %6s  %9s  %8s" % (summary.player_id,player_name,summary.wins,summary.losses,summary.possible_wins,summary.projected_wins)
         print ""
 
 

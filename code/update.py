@@ -2,7 +2,8 @@ from google.appengine.ext import db
 from google.appengine.api import memcache
 from database import *
 from calculator import *
-from week_results import *
+from code.week_results import *
+from code.player_results import *
 
 class Update:
 
@@ -36,6 +37,14 @@ class Update:
     def update_overall_results(self,year):
         pass
 
+    def update_player_results(self,year,week_number):
+        # TODO:  tests
+        database = Database()
+        players = database.load_players(year)
+        for player_key in players:
+            player_id = players[player_key].key().id()
+            summary,results = self.get_player_results(player_id,year,week_number,update=True)
+
 
     def get_week_results(self,year,week_number,update=False):
         key = "week_results_%d_%d" % (year,week_number)
@@ -49,11 +58,25 @@ class Update:
         key = "week_results_%d_%d" % (year,week_number)
         memcache.delete(key)
 
+    def delete_player_results_from_memcache(self,player_id,year,week_number):
+        key = "player_results_%d_%d_%d" % (player_id,year,week_number)
+        memcache.delete(key)
+
     def get_week_state(self,year,week_number):
         database = Database()
         week_data = database.load_week_data(year,week_number)
         calc = CalculateResults(week_data)
         return calc.get_summary_state_of_all_games()
+
+    def get_player_results(self,player_id,year,week_number,update=False):
+        key = "player_results_%d_%d_%d" % (player_id,year,week_number)
+        player_results = memcache.get(key)
+        if update or not(player_results):
+            player_results = self.__calculate_player_results(player_id,year,week_number)
+            memcache.set(key,player_results)
+        summary = player_results[0]  # redundant but makes code clearer
+        results = player_results[1]  # redundant but makes code clearer
+        return summary,results
 
     def __calculate_week_results(self,year,week_number):
         database = Database()
@@ -82,6 +105,74 @@ class Update:
         results = self.__sort_by_rank(results)
 
         return results
+
+
+    def __calculate_player_results(self,player_id,year,week_number):
+        player_key = str(db.Key.from_path('Player',player_id))
+
+        database = Database()
+        week_data = database.load_week_data(year,week_number)
+
+        calc = CalculateResults(week_data)
+        summary = self.__calculate_player_summary(player_id,player_key,calc,week_data)
+        game_results = self.__calculate_player_game_results_sorted_by_game_number(player_key,calc,week_data)
+
+        return summary,game_results
+
+
+    def __calculate_player_summary(self,player_id,player_key,calc,week_data):
+        summary = PlayerSummary()
+        summary.player_id = player_id
+        summary.player_name = week_data.get_player(player_key).name
+        summary.wins = calc.get_number_of_wins(player_key)
+        summary.losses = calc.get_number_of_losses(player_key)
+        summary.win_pct = calc.get_win_percent_string(player_key)
+        summary.possible_wins = calc.get_number_of_possible_wins(player_key)
+        summary.projected_wins = calc.get_number_of_projected_wins(player_key)
+        summary.week_state = calc.get_summary_state_of_all_games()
+        return summary
+
+
+    def __calculate_player_game_results_sorted_by_game_number(self,player_key,calc,week_data):
+        number_of_games = len(week_data.games)
+        game_results = [None]*number_of_games
+        for game_key in week_data.games:
+            game = week_data.get_game(game_key)
+            result = self.__calculate_player_game_result(player_key,game_key,game,calc,week_data)
+            game_results[game.number-1] = result
+        return game_results
+
+
+    def __calculate_player_game_result(self,player_key,game_key,game,calc,week_data):
+        result = PlayerResult()
+        result.player_pick = calc.get_team_name_player_picked_to_win(player_key,game_key)
+        result.result = calc.get_game_result_string(player_key,game_key)
+        result.team1 = week_data.get_team1_name(game_key)
+        result.team2 = week_data.get_team2_name(game_key)
+        result.game_state = game.state
+        result.favored = calc.get_favored_team_name(game_key)
+        result.favored_spread = game.spread
+        result.game_date = game.date
+
+        if game.state == "final":
+            result.team1_score = game.team1_score
+            result.team2_score = game.team2_score
+            result.winning_team = calc.get_game_winner_team_name(game_key)
+            result.game_spread = calc.get_game_score_spread(game_key)
+        elif game.state == "in_progress":
+            result.team1_score = game.team1_score
+            result.team2_score = game.team2_score
+            result.winning_team = calc.get_team_name_winning_game(game_key)
+            result.game_spread = calc.get_game_score_spread(game_key)
+            result.game_quarter = game.quarter
+            result.game_time_left = game.time_left
+        elif game.state == "not_started":
+            result.team1_score = ''
+            result.team2_score = ''
+        else:
+            raise AssertionError,"Game state %s is not valid" % (game.state)
+
+        return result
 
 
     def get_overall_results(self,year):

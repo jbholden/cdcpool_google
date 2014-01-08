@@ -2,12 +2,14 @@ from test_calculator import *
 from test_week_data import *
 from test_update import *
 from test_week_results import *
+from test_player_results import *
 from database.test_weeks import *
 from database.test_players import *
 from database.test_teams import *
 from database.test_games import *
 from database.test_picks import *
 from database.test_load_week import *
+from test_timezone import *
 
 # Instructions.
 # 1. create a test using the unittest class
@@ -22,4 +24,6 @@ test_classes = [('test players in datastore',TestPlayers),
                 ('test week data class',TestWeekData),
                 ('test the calculator class',TestCalculator),
                 ('test the update class',TestUpdate),
-                ('test the week results page',TestWeekResults) ]
+                ('test the week results page',TestWeekResults),
+                ('test the player results page',TestPlayerResults),
+                ('test the pytz timezone module',TestTimezone) ]

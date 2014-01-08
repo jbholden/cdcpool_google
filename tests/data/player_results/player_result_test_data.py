@@ -10,9 +10,10 @@ from models.players import *
 from models.picks import *
 from models.saved_keys import *
 
-class ResultTestData:
 
-    def __init__(self,year,week_number,data_name='ResultTestData',leave_objects_in_datastore=False):
+class PlayerResultTestData:
+
+    def __init__(self,year,week_number,data_name='PlayerResultTestData',leave_objects_in_datastore=False):
         self.year = year
         self.week_number = week_number
         self.data_name = data_name
@@ -25,12 +26,13 @@ class ResultTestData:
 
     def setup(self):
         self.__saved_keys = []
-        self.results = []
+        self.player_results = dict()
         self.games = dict()
         self.picks = []
         self.__load_teams()
         self.setup_database()
         self.__load_week_data()
+        self.setup_expected_results()
         if self.leave_objects_in_datastore:
             self.save_keys_to_database()
 
@@ -58,21 +60,28 @@ class ResultTestData:
         self.delete_keys_from_database()
         self.cleanup()
 
+
     def cleanup(self):
+        database = Database()
+        players = database.load_players(self.year)
+        player_ids = [ player.key().id() for player in players.values()]
+
         if self.__saved_keys:
             for key in self.__saved_keys:
                 db.delete(key)
             self.__saved_keys = []
 
-        database = Database()
         weeks_and_years = database.load_weeks_and_years(update=True)
 
         u = Update()
-        u.delete_week_results_from_memcache(self.year,self.week_number)
+        for player_id in player_ids:
+            u.delete_player_results_from_memcache(player_id,self.year,self.week_number)
 
+    def setup_expected_results(self):
+        pass
 
     def get_expected_results(self):
-        return self.results
+        return self.player_results
 
     def setup_players(self,player_names):
         players = dict()
@@ -105,25 +114,37 @@ class ResultTestData:
         self.__saved_keys.append(pick_key)
         self.picks.append(pick_key)
 
-    def add_result(self,rank=None,projected_rank=None,player_name=None,wins=None,losses=None,win_pct=None,projected_wins=None,possible_wins=None,winner=None):
-        result = WeekResults()
-        result.rank = rank
-        result.projected_rank = projected_rank
-        result.player_id = self.__get_player_id(player_name)
-        result.player_name = player_name
-        result.wins = wins
-        result.losses = losses
-        result.win_pct = "%0.3f" % (win_pct)
-        result.projected_wins = projected_wins
-        result.possible_wins = possible_wins
+    def find_team_key(self,team_name):
+        for team_key in self.teams:
+            team = self.teams[team_key]
+            if team.name == team_name:
+                return team_key
+        raise AssertionError,"Could not find a team named %s" % (team_name)
 
-        result.winner = None
-        if winner != None:
-            result.winner = self.weekdata.get_player_key(winner)
+
+    def add_result(self,player_name=None,player_pick=None,result=None,team1=None,team2=None,team1_score=None,team2_score=None,game_state=None,favored=None,favored_spread=None,winning_team=None,game_spread=None,game_quarter=None,game_time_left=None,game_date=None,game_number=None,team1_tiebreak=None,team2_tiebreak=None):
+        player_result = PlayerResult()
+        player_result.player_pick = player_pick
+        player_result.result = result
+        player_result.team1 = team1
+        player_result.team2 = team2
+        player_result.team1_score = team1_score
+        player_result.team2_score = team2_score
+        player_result.game_state = game_state
+        player_result.favored = favored
+        player_result.favored_spread = favored_spread
+        player_result.winning_team = winning_team
+        player_result.game_spread = game_spread
+        player_result.game_quarter = game_quarter
+        player_result.game_time_left = game_time_left
+        player_result.game_date = game_date
+
+        if player_name not in self.player_results:
+            self.player_results[player_name] = [ player_result ]
         else:
-            result.winner = None
-        self.results.append(result)
+            self.player_results[player_name].append(player_result)
 
+        # unsued currently:  game_number,team1_tiebreak,team2_tiebreak
 
     def __load_week_data(self):
         database = Database()

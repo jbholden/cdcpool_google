@@ -33,7 +33,9 @@ from pages.test_page import *
 from create.create_week import *
 from pages.visual_test_page import *
 from pages.week_results_json import *
-from pages.week_results import *
+from pages.player_results_json import *
+from pages.week_results_page import *
+from pages.player_results_page import *
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
 
@@ -50,8 +52,10 @@ class MainHandler(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
+    ('/([0-9]+)/week/([0-9]+)/player/([0-9]+)/results/json', PlayerResultsJson),
+    ('/([0-9]+)/week/([0-9]+)/player/([0-9]+)/results', PlayerResultsPage),
     ('/([0-9]+)/week/([0-9]+)/results/json', WeekResultsJson),
-    ('/([0-9]+)/week/([0-9]+)/results', WeekResults),
+    ('/([0-9]+)/week/([0-9]+)/results', WeekResultsPage),
     ('/a/tests', MainTestPage),
     ('/a/visual_tests/setup', VisualSetupPage),
     ('/a/visual_tests/cleanup', VisualCleanupPage),

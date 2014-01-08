@@ -37,6 +37,11 @@ class WeekNotStarted(ResultTestData):
         self.add_result(rank=1,projected_rank=1,player_name='John',wins=0,losses=0,win_pct=0.000,projected_wins=10,possible_wins=10)
         return self.results
 
+    def get_expected_player_results(self,player_name):
+        player_names = [ "Brent", "Byron", "Alice", "Joan", "Bill", "David", "Amy", "Annie", "Kevin", "John" ]
+        self.add_player_result()
+        pass
+
 
     def __not_started_game(self,number):
         team1_key = self.team_keys[0]

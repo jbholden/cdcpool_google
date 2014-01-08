@@ -27,12 +27,17 @@ class CalculateResults:
         return pick.winner
 
     def get_team_name_player_picked_to_win(self,player_key,game_key):
+        assert self.__game_key_valid(game_key),"Game key is not valid"
+
+        if self.player_did_not_pick(player_key,game_key):
+            return ""
+
         winner = self.get_team_player_picked_to_win(player_key,game_key)
         if winner == "team1":
             return self.__data.get_team1_name(game_key)
         elif winner == "team2":
             return self.__data.get_team2_name(game_key)
-        raise AssertionError,"Error determining winner name"
+        raise AssertionError,"Error determining winner name (winner=%s)" % (winner)
 
     def is_team1_winning_pool(self,game_key):
         game = self.__data.get_game(game_key)
@@ -415,8 +420,7 @@ class CalculateResults:
         return None
 
     def __game_key_valid(self,game_key):
-        game = self.__data.get_game(game_key)
-        return game != None
+        return self.__data.games.get(game_key) != None
 
     def __player_key_valid(self,player_key):
         player = self.__data.get_player(player_key)

@@ -50,51 +50,51 @@ class TestPlayerResults(unittest.TestCase):
 
     def __t1_game_not_started_status_date_est(self):
         testdata = GameStatusTestData()
-        testdata.date = get_datetime_in_utc(datetime.datetime(2010,2,24,19,30),'US/Eastern')
+        testdata.date = self.get_naive_utc_date(datetime.datetime(2010,2,24,19,30),'US/Eastern')
         testdata.state = "not_started"
         testdata.timezone = "US/Eastern"
         testdata.top_id = "game-time"
-        testdata.top_status = "Wed Feb 24"
+        testdata.top_status = "Wed 02/24"
         testdata.bottom_id = "game-time"
         testdata.bottom_status = "07:30 PM EST"
         self.__test_game_status(testdata)
 
     def __t1_game_not_started_status_date_edt(self):
         testdata = GameStatusTestData()
-        testdata.date = get_datetime_in_utc(datetime.datetime(2014,8,24,19,30),'US/Eastern')
+        testdata.date = self.get_naive_utc_date(datetime.datetime(2014,8,24,19,30),'US/Eastern')
         testdata.state = "not_started"
         testdata.timezone = "US/Eastern"
         testdata.top_id = "game-time"
-        testdata.top_status = "Sun Aug 24"
+        testdata.top_status = "Sun 08/24"
         testdata.bottom_id = "game-time"
         testdata.bottom_status = "07:30 PM EDT"
         self.__test_game_status(testdata)
 
     def __t1_game_not_started_status_date_pst(self):
         testdata = GameStatusTestData()
-        testdata.date = get_datetime_in_utc(datetime.datetime(2010,2,24,19,30),'US/Eastern')
+        testdata.date = self.get_naive_utc_date(datetime.datetime(2010,2,24,19,30),'US/Eastern')
         testdata.state = "not_started"
         testdata.timezone = "US/Pacific"
         testdata.top_id = "game-time"
-        testdata.top_status = "Wed Feb 24"
+        testdata.top_status = "Wed 02/24"
         testdata.bottom_id = "game-time"
         testdata.bottom_status = "04:30 PM PST"
         self.__test_game_status(testdata)
 
     def __t1_game_not_started_status_date_pdt(self):
         testdata = GameStatusTestData()
-        testdata.date = get_datetime_in_utc(datetime.datetime(2014,8,24,19,30),'US/Eastern')
+        testdata.date = self.get_naive_utc_date(datetime.datetime(2014,8,24,19,30),'US/Eastern')
         testdata.state = "not_started"
         testdata.timezone = "US/Pacific"
         testdata.top_id = "game-time"
-        testdata.top_status = "Sun Aug 24"
+        testdata.top_status = "Sun 08/24"
         testdata.bottom_id = "game-time"
         testdata.bottom_status = "04:30 PM PDT"
         self.__test_game_status(testdata)
 
     def __t1_game_in_progress_quarter_time(self):
         testdata = GameStatusTestData()
-        testdata.date = get_datetime_in_utc(datetime.datetime(2014,8,24,19,30),'US/Eastern')
+        testdata.date = self.get_naive_utc_date(datetime.datetime(2014,8,24,19,30),'US/Eastern')
         testdata.state = "in_progress"
         testdata.timezone = "US/Eastern"
         testdata.time_left = "15:00"
@@ -107,7 +107,7 @@ class TestPlayerResults(unittest.TestCase):
 
     def __t1_game_in_progress_quarter(self):
         testdata = GameStatusTestData()
-        testdata.date = get_datetime_in_utc(datetime.datetime(2014,8,24,19,30),'US/Eastern')
+        testdata.date = self.get_naive_utc_date(datetime.datetime(2014,8,24,19,30),'US/Eastern')
         testdata.state = "in_progress"
         testdata.timezone = "US/Eastern"
         testdata.time_left = ""
@@ -120,7 +120,7 @@ class TestPlayerResults(unittest.TestCase):
 
     def __t1_game_in_progress_time(self):
         testdata = GameStatusTestData()
-        testdata.date = get_datetime_in_utc(datetime.datetime(2014,8,24,19,30),'US/Eastern')
+        testdata.date = self.get_naive_utc_date(datetime.datetime(2014,8,24,19,30),'US/Eastern')
         testdata.state = "in_progress"
         testdata.timezone = "US/Eastern"
         testdata.time_left = "3:25"
@@ -133,7 +133,7 @@ class TestPlayerResults(unittest.TestCase):
 
     def __t1_game_in_progress(self):
         testdata = GameStatusTestData()
-        testdata.date = get_datetime_in_utc(datetime.datetime(2014,8,24,19,30),'US/Eastern')
+        testdata.date = self.get_naive_utc_date(datetime.datetime(2014,8,24,19,30),'US/Eastern')
         testdata.state = "in_progress"
         testdata.timezone = "US/Eastern"
         testdata.time_left = ""
@@ -146,7 +146,7 @@ class TestPlayerResults(unittest.TestCase):
 
     def __t1_game_final(self):
         testdata = GameStatusTestData()
-        testdata.date = get_datetime_in_utc(datetime.datetime(2014,8,24,19,30),'US/Eastern')
+        testdata.date = self.get_naive_utc_date(datetime.datetime(2014,8,24,19,30),'US/Eastern')
         testdata.state = "final"
         testdata.timezone = "US/Eastern"
         testdata.time_left = ""
@@ -156,6 +156,10 @@ class TestPlayerResults(unittest.TestCase):
         testdata.bottom_id = "game-final"
         testdata.bottom_status = "final"
         self.__test_game_status(testdata)
+
+    def get_naive_utc_date(self,local_date,timezone): 
+        utc_date = get_datetime_in_utc(local_date,timezone)
+        return datetime.datetime(utc_date.year,utc_date.month,utc_date.day,utc_date.hour,utc_date.minute)
 
     def __test_game_status(self,test_data):
         page = PlayerResultsPage()

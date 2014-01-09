@@ -22,18 +22,9 @@ from pytz.gae import pytz
 
 class TestUpdate(unittest.TestCase):
 
-    @staticmethod
-    def run_subset():
-        return [ 'test_t9_get_player_results' ]
-        #return [ 'test_get_week_results_empty_cache','test_get_week_results_populated_cache' ]
-        #return [ 'test_t1_get_week_results_week_not_started',
-        #        'test_t2_assign_rank',
-        #        'test_t3_assign_projected_rank',
-        #        'test_t4_get_week_results_week_in_progress',
-        #        'test_t5_get_week_state' ]
-        #return [ 'test_t6_get_player_results_summary',
-                 #'test_t7_get_player_results_empty_cache',
-                 #'test_t8_get_player_results_populated_cache' ]
+    #@staticmethod
+    #def run_subset():
+        #return [ 'test_t9_get_player_results' ]
 
     def test_get_week_results_empty_cache(self):
         self.__test_get_week_results_empty_cache(2013,1,TestData.week_results_2013_week1())

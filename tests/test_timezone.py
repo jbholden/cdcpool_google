@@ -2,6 +2,8 @@ import unittest
 from pytz.gae import pytz
 import datetime
 from utils.utils import *
+from google.appengine.ext import db
+from models.games import *
 
 class TestTimezone(unittest.TestCase):
 
@@ -96,4 +98,23 @@ class TestTimezone(unittest.TestCase):
         self.assertEqual(date_central,"06:30 PM CDT")
         self.assertEqual(date_mountain,"05:30 PM MDT")
         self.assertEqual(date_pacific,"04:30 PM PDT")
+
+
+    def test_prove_datastore_stores_dates_as_naive(self):
+        testdate = datetime.datetime(2014,2,24,6,2)  # 2/24/2014 6:02 PM
+        date_in_utc = get_datetime_in_utc(testdate,'US/Eastern')
+
+        game = Game(date=date_in_utc)
+        game_key = game.put()
+
+        database_game = db.get(game_key)
+        self.assertIsNotNone(database_game.date)
+        self.assertIsNone(database_game.date.tzinfo)   # tzinfo == None means datetime is naive
+        self.assertIsNotNone(database_game.created)
+        self.assertIsNone(database_game.created.tzinfo)
+        self.assertIsNotNone(database_game.modified)
+        self.assertIsNone(database_game.modified.tzinfo)
+
+        db.delete(game_key)
+
 

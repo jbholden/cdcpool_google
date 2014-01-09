@@ -132,7 +132,7 @@ class ResultTestData:
 
     def __load_teams(self):
         database = Database()
-        self.teams = database.load_teams()
+        self.teams = database.load_teams('teams')
         self.team_keys = self.teams.keys()
 
     def __get_player_id(self,player_name):

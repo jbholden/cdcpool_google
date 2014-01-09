@@ -133,7 +133,7 @@ class TestWeekLoad(unittest.TestCase):
 
     def __load_memcache_with_teams(self):
         d = Database()
-        ignore_return_value = d.load_teams(update=True)
+        ignore_return_value = d.load_teams('teams',update=True)
 
     def __load_memcache_with_players(self):
         d = Database()
@@ -246,7 +246,7 @@ class TestWeekLoad(unittest.TestCase):
 
     def __load_teams_test(self):
         d = Database()
-        teams = d.load_teams()
+        teams = d.load_teams('teams')
         self.assertIsNotNone(teams)
         self.assertGreater(len(teams),0)
         for team_key in teams:

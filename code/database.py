@@ -109,7 +109,7 @@ class Database:
 
         assert not(week_has_no_games),"Every week should have games except for a week 1 exception"
 
-        if self.__before_week_pick_deadline(week):
+        if self.__before_pick_deadline(week):
             return "enter_picks"
 
         week_state = self.__get_week_state(week,update)

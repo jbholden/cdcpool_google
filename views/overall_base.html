@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block link_bar %} 
+    <table>
+        <td id="link-bar-highlighted">OVERALL</td>
+        <td id="link-bar-label">
+            <a id="link-bar-week-link" href="/{{year}}/week/{{weeks_in_year[-1]}}/results">WEEK</a>
+            {% for wk_num in weeks_in_year %}
+                <a id="link-bar-week-number-link" href="/{{year}}/week/{{wk_num}}/results">{{wk_num}}</a>
+            {% endfor %}
+        </td>
+        <td id="player-profile"><a id="player-profile-link" href="/{{year}}/players">Players</a></td>
+    </table>
+{% endblock %}

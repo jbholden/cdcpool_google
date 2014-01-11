@@ -4,6 +4,7 @@ from database import *
 from calculator import *
 from code.week_results import *
 from code.player_results import *
+from code.overall_results import *
 
 # TODO:  create test to simulate start of a pool
 #        - players signed up for year
@@ -106,13 +107,13 @@ class Update:
         overall_results[player_id].overall += week_result.wins
         overall_results[player_id].projected += week_result.projected_wins
         overall_results[player_id].possible += week_result.possible_wins
-        overall_results[player_id].week_points += week_result.wins
+        overall_results[player_id].week_points += [ week_result.wins ]
 
         if last_week:
             overall_results[player_id].last_week_projected = week_result.projected_wins
             overall_results[player_id].last_week_possible = week_result.possible_wins
 
-    def __update_overall_results_unplayed_weeks(overall_results,last_week_number):
+    def __update_overall_results_unplayed_weeks(self,overall_results,last_week_number):
         number_of_weeks = 13
         number_of_points_per_week = 10
 
@@ -124,6 +125,17 @@ class Update:
             overall_results[player_id].projected += number_of_points_left
             overall_results[player_id].possible += number_of_points_left
 
+    def __update_overall_results_win_pct(self,overall_results,last_week_number):
+        number_of_points_per_week = 10
+        number_of_total_points_so_far = last_week_number * number_of_points_per_week
+
+        for player_id in overall_results:
+            if overall_results[player_id].overall == 0:
+                win_pct = 0.0
+            else:
+                win_pct = float(overall_results[player_id].overall) / float(number_of_total_points_so_far)
+
+            overall_results[player_id].win_pct = "%0.3f" % (win_pct)
 
     def __calculate_overall_results(self,year,update="none"):
         if update == "all":
@@ -149,7 +161,6 @@ class Update:
         else:
             raise AssertionError,"Invalid update value %s" % (update)
 
-
         database = Database()
         overall_results = self.__setup_overall_results(database,year,update=update_players)
 
@@ -164,6 +175,7 @@ class Update:
                 self.__update_overall_results(week_result.player_id,overall_results,week_result,last_week)
 
         self.__update_overall_results_unplayed_weeks(overall_results,last_week_number)
+        self.__update_overall_results_win_pct(overall_results,last_week_number)
 
         overall_results = self.__convert_overall_results_to_list(overall_results)
         overall_results = self.assign_overall_rank(overall_results)

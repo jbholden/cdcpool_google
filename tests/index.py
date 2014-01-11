@@ -9,6 +9,7 @@ from database.test_teams import *
 from database.test_games import *
 from database.test_picks import *
 from database.test_load_week import *
+from database.test_pool_state import *
 from test_timezone import *
 
 # Instructions.
@@ -21,6 +22,7 @@ test_classes = [('test players in datastore',TestPlayers),
                 ('test games in datastore',TestGames),
                 ('test picks in datastore',TestPicks),
                 ('test load week data',TestWeekLoad),
+                ('test pool state',TestPoolState),
                 ('test week data class',TestWeekData),
                 ('test the calculator class',TestCalculator),
                 ('test the update class',TestUpdate),

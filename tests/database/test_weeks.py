@@ -2,7 +2,7 @@ import unittest
 from google.appengine.ext import db
 import logging
 import datetime
-from weeks_in_database import *
+from code.database import *
 
 class TestWeeks(unittest.TestCase):
 
@@ -12,7 +12,7 @@ class TestWeeks(unittest.TestCase):
     def __init__(self,methodName='runTest',weeks_to_test=None):
         super(TestWeeks,self).__init__(methodName)
         if weeks_to_test == None:
-            self.weeks = WeeksInDatabase.get_all_weeks()
+            self.weeks = self.load_weeks_and_years(update=True)
         else:
             assert isinstance(weeks_to_test,dict)
             self.weeks = weeks_to_test

@@ -2,6 +2,7 @@ from visual import *
 from tests.data.player_results.week_not_started import *
 from tests.data.player_results.week_not_started_defaulter import *
 from tests.data.player_results.week_in_progress import *
+from utils.utils import *
 
 class FinalPlayerResultsTest(VisualTest):
 
@@ -88,4 +89,29 @@ class InProgressPlayerResultsTest(VisualTest):
         v = []
         v.append('**IMPORTANT**')
         v.append('you need to navigate to the player results page by clicking the player name')
+        return v
+
+class BeforePickDeadlinePlayersResultsTest(VisualTest):
+
+    def __init__(self):
+        self.description = "Before the Pick Deadline Test"
+        self.link = "/1979/week/1/results"
+        self.verify =  self.__verify_instructions()
+
+    def setup(self):
+        current_time = get_current_time_in_utc()
+        deadline = current_time + datetime.timedelta(days=1) 
+        testdata = PlayerResultsWeekNotStarted(leave_objects_in_datastore=True,lock_picks_time=deadline)
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = PlayerResultsWeekNotStarted()
+        testdata.cleanup_database()
+
+    def __verify_instructions(self):
+        v = []
+        v.append('**IMPORTANT**')
+        v.append('you need to navigate to the player results page by clicking the player name')
+        v.append('you should see an error message about being before the pick deadline')
+        v.append('the pick deadline has been set for 1 day in the future')
         return v

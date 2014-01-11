@@ -5,6 +5,11 @@ from calculator import *
 from code.week_results import *
 from code.player_results import *
 
+# TODO:  create test to simulate start of a pool
+#        - players signed up for year
+#        - week 1 created with games
+#        - no week 1 picks yet
+
 class Update:
 
     def update_years_and_week_numbers(self):
@@ -384,7 +389,7 @@ class Update:
                 player_result.rank = next_rank
                 overall = player_result.overall
             else:
-                player_result.overall = next_rank
+                player_result.rank = next_rank
 
             assigned_results.append(player_result)
 

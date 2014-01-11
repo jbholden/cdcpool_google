@@ -2,7 +2,10 @@ from google.appengine.ext import db
 from google.appengine.api import memcache
 import logging
 import time
+import datetime
+from utils.utils import *
 from week_data import *
+from calculator import *
 from models.games import *
 from models.weeks import *
 
@@ -34,9 +37,26 @@ class Database:
         self.__get_week_games_in_database(week_entry,update=True)
         self.load_weeks_and_years(update=True)
 
+    def is_year_valid(self,year,update=False):
+        weeks_and_years = self.load_weeks_and_years(update)
+        return year in weeks_and_years
+
     def is_week_valid(self,week,year,update=False):
         weeks_and_years = self.load_weeks_and_years(update)
         return (year in weeks_and_years) and (week in weeks_and_years[year])
+
+    def before_pick_deadline(self,year,week_number,update=False):
+        # TODO: tests
+        # visual tests:  user logged in, user logged out, before pick deadline
+        # bad year, bad week number
+        # cache test?
+        week = self.__get_week_in_database(year,week_number,update=update)
+        return self.__before_pick_deadline(week)
+
+    def get_pick_deadline(self,year,week_number,update=False):
+        # TODO:  tests
+        week = self.__get_week_in_database(year,week_number,update=update)
+        return week.lock_picks
 
     def get_next_year_week_for_create_week(self,update=False):
         # returns tuple that is (year, week)
@@ -69,6 +89,50 @@ class Database:
     def get_years(self,update=False):
         weeks_and_years = self.load_weeks_and_years(update)
         return sorted(weeks_and_years.keys())
+
+    # see:  https://github.com/jbholden/cdcpool_google/issues/20
+    def get_pool_state(self,year,update=False):
+        # TODO tests
+        if not(self.is_year_valid(year,update)):
+            return "invalid"
+
+        week_numbers = self.get_week_numbers(year)
+        last_week_number = week_numbers[-1]
+
+        week = self.__get_week_in_database(year,week_number=last_week_number,update=update)
+        week_has_no_games = week.games == None or len(week.games) == 0
+
+        only_week_one_exists = last_week_number == 1 and len(week_numbers) == 1
+
+        if only_week_one_exists and week_has_no_games:
+            return "not_started"
+
+        assert not(week_has_no_games),"Every week should have games except for a week 1 exception"
+
+        if self.__before_week_pick_deadline(week):
+            return "enter_picks"
+
+        week_state = self.__get_week_state(week,update)
+
+        if last_week_number == 13 and week_state == "final":
+            return "end_of_year"
+
+        if week_state == "not_started":
+            return "week_not_started"
+        elif week_state == "in_progress":
+            return "week_in_progress"
+        elif week_state == "final":
+            return "week_final"
+
+
+    def __get_week_state(self,week,update=False):
+        week_games = self.__get_week_games_in_database(week,update)
+
+        week_data = WeekData()
+        week_data.games = week_games
+        calc = CalculateResults(week_data)
+        return calc.get_summary_state_of_all_games()
+
 
     def load_weeks_and_years(self,update=False):
         key = "weeks_and_years"
@@ -193,3 +257,8 @@ class Database:
                 week_numbers_and_years[year].append(week_number)
 
         return week_numbers_and_years
+
+    def __before_pick_deadline(self,week):
+        if week.lock_picks == None:
+            return False
+        return get_current_time_in_utc() <= week.lock_picks

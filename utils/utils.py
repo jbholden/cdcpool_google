@@ -2,6 +2,7 @@
 
 import os
 import hmac
+import datetime
 from pytz.gae import pytz
 
 secret = "cdcpool_abc1234"
@@ -22,3 +23,6 @@ def get_datetime_in_utc(datetime_value,initial_timezone):
     date_in_timezone = pytz_timezone.localize(datetime_value)
     date_in_utc = date_in_timezone.astimezone(pytz.utc)
     return date_in_utc
+
+def get_current_time_in_utc():
+    return datetime.datetime.utcnow()

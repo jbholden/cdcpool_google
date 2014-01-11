@@ -2,7 +2,6 @@ import unittest
 from google.appengine.ext import db
 import logging
 import datetime
-from weeks_in_database import *
 
 # TODO:  handle teams changing conferences
 

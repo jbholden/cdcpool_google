@@ -65,8 +65,7 @@ class PlayerResultsPage(Handler):
             top_id = "status-empty"
             bottom_id = "status-empty"
         else:
-            utc_date = pytz.utc.localize(result.game_date)
-            local_game_date = utc_date.astimezone(self.__get_local_timezone())
+            local_game_date = self.__get_local_time(result.game_date)
             weekday_month_day = "%a %m/%d"
             hour_minutes_ampm_timezone = "%I:%M %p %Z"
             top_status = local_game_date.strftime(weekday_month_day)
@@ -74,6 +73,11 @@ class PlayerResultsPage(Handler):
             top_id = "game-time"
             bottom_id = "game-time"
         return top_status,bottom_status,top_id,bottom_id
+
+    def __get_local_time(self,naive_date):
+        utc_date = pytz.utc.localize(naive_date)
+        local_date = utc_date.astimezone(self.__get_local_timezone())
+        return local_date
 
     def __game_in_progress_status(self,result):
         quarter_missing = not(result.game_quarter) or result.game_quarter == ""
@@ -119,9 +123,24 @@ class PlayerResultsPage(Handler):
         except AttributeError:
             return pytz.timezone('US/Eastern')
 
-
     def set_timezone_for_testing(self,timezone_name):
         self.__timezone = pytz.timezone(timezone_name)
+
+    def __hide_player_results(self,player_key,year,week_number,database):
+        if self.__player_logged_in(player_key):
+            return False
+
+        return database.before_pick_deadline(year,week_number)
+
+
+    def __player_logged_in(self,player_id):
+        # TODO:  check login credentials
+        return False
+
+    def __format_pick_deadline(self,pick_deadline_utc):
+        pick_deadline = self.__get_local_time(pick_deadline_utc)
+        date_format = "%a %m/%d/%Y %I:%M %p %Z"
+        return pick_deadline.strftime(date_format)
 
 
     def get(self,year_param,week_number_param,player_id_param):
@@ -145,6 +164,13 @@ class PlayerResultsPage(Handler):
         if not(self.__is_player_in_year(player_key,year,database)):
             self.error(400)
             self.render("bad_player.html",year=year,player_id=player_id,error="bad_year");
+            return
+
+        if self.__hide_player_results(player_key,year,week_number,database):
+            pick_deadline_utc = database.get_pick_deadline(year,week_number)
+            pick_deadline = self.__format_pick_deadline(pick_deadline_utc)
+            self.error(400)
+            self.render("bad_player.html",year=year,error="before_pick_deadline",deadline=pick_deadline);
             return
 
         u = Update()

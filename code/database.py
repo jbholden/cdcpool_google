@@ -153,6 +153,9 @@ class Database:
             memcache.set(key,players)
         return players
 
+    def delete_players_from_memcache(self,year):
+        key = "players_%d" % (year)
+        memcache.delete(key)
 
     # BLR - Added key argument...should be either "teams" or "teamkeys". The former returns
     #       a dict indexed on datastore key with values team name. The latter returns a dict

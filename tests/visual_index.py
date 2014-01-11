@@ -21,4 +21,8 @@ tests['Player Results'] = [ FinalPlayerResultsTest,
                             NotStartedPlayerResultsTest,
                             NotStartedPlayerResultsDefaulterTest,
                             InProgressPlayerResultsTest,
-                            BeforePickDeadlinePlayersResultsTest ]
+                            BeforePickDeadlinePlayerResultsTest,
+                            AfterPickDeadlinePlayerResultsTest,
+                            BadYearPlayerResultsTest,
+                            BadWeekNumberPlayerResultsTest,
+                            BadPlayerPlayerResultsTest ]

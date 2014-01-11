@@ -77,6 +77,10 @@ class PlayerResultTestData:
         for player_id in player_ids:
             u.delete_player_results_from_memcache(player_id,self.year,self.week_number)
 
+        u.delete_week_results_from_memcache(self.year,self.week_number)
+        database.delete_players_from_memcache(self.year)
+
+
     def setup_expected_results(self):
         pass
 

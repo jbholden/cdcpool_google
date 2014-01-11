@@ -3,6 +3,8 @@ from tests.data.player_results.week_not_started import *
 from tests.data.player_results.week_not_started_defaulter import *
 from tests.data.player_results.week_in_progress import *
 from utils.utils import *
+from code.database import *
+import random
 
 class FinalPlayerResultsTest(VisualTest):
 
@@ -91,7 +93,7 @@ class InProgressPlayerResultsTest(VisualTest):
         v.append('you need to navigate to the player results page by clicking the player name')
         return v
 
-class BeforePickDeadlinePlayersResultsTest(VisualTest):
+class BeforePickDeadlinePlayerResultsTest(VisualTest):
 
     def __init__(self):
         self.description = "Before the Pick Deadline Test"
@@ -114,4 +116,80 @@ class BeforePickDeadlinePlayersResultsTest(VisualTest):
         v.append('you need to navigate to the player results page by clicking the player name')
         v.append('you should see an error message about being before the pick deadline')
         v.append('the pick deadline has been set for 1 day in the future')
+        return v
+
+class AfterPickDeadlinePlayerResultsTest(VisualTest):
+
+    def __init__(self):
+        self.description = "After the Pick Deadline Test"
+        self.link = "/1979/week/1/results"
+        self.verify =  self.__verify_instructions()
+
+    def setup(self):
+        deadline = get_current_time_in_utc()
+        testdata = PlayerResultsWeekNotStarted(leave_objects_in_datastore=True,lock_picks_time=deadline)
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = PlayerResultsWeekNotStarted()
+        testdata.cleanup_database()
+
+    def __verify_instructions(self):
+        v = []
+        v.append('**IMPORTANT**')
+        v.append('you need to navigate to the player results page by clicking the player name')
+        v.append('you should see the player results, not an error message')
+        return v
+
+
+class BadYearPlayerResultsTest(VisualTest):
+
+    def __init__(self):
+        self.description = "Bad Year Test"
+        self.link = "/1900/week/1/player/100/results"
+        self.verify =  self.__verify_instructions()
+
+    def __verify_instructions(self):
+        v = []
+        v.append('you should get an error page')
+        return v
+
+class BadWeekNumberPlayerResultsTest(VisualTest):
+
+    def __init__(self):
+        player_id = self.__get_a_valid_player_id(2013)
+        self.description = "Bad Week Number Test"
+        self.link = "/2013/week/14/player/%d/results" % (player_id)
+        self.verify =  self.__verify_instructions()
+
+    def __get_a_valid_player_id(self,year):
+        d = Database()
+        players = d.load_players(year)
+        player = players.values()[0]
+        return player.key().id()
+
+    def __verify_instructions(self):
+        v = []
+        v.append('you should get an error page')
+        return v
+
+class BadPlayerPlayerResultsTest(VisualTest):
+
+    def __init__(self):
+        self.description = "Bad Player Number Test"
+        self.link = "/2013/week/1/player/%d/results" % (self.__get_invalid_player_id(2013))
+        self.verify =  self.__verify_instructions()
+
+    def __get_invalid_player_id(self,year):
+        d = Database()
+        players = d.load_players(year)
+        player_ids = [ player.key().id() for player in players.values() ]
+        while True:
+            player_id = random.randint(0,len(player_ids)+1)
+            if player_id not in player_ids:
+                return player_id
+
+    def __verify_instructions(self):
+        v = []
+        v.append('you should get an error page')
         return v

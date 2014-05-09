@@ -21,11 +21,19 @@ class OverallResultsPage(Handler):
             self.render("bad_year.html",year=year)
             return
 
-        u = Update()
-        results = u.get_overall_results(year)
-
         d = Database()
         pool_state = d.get_pool_state(year)
+
+        if pool_state == "not_started":
+            players = d.load_players(year)
+            params = dict()
+            params['year'] = year
+            params['num_players'] = len(players)
+            self.render("overall_not_started.html",**params)
+            return
+
+        u = Update()
+        results = u.get_overall_results(year)
 
         weeks_in_year = database.get_week_numbers(year)
 

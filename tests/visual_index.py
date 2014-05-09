@@ -1,5 +1,6 @@
 from visual.week_results import *
 from visual.player_results import *
+from visual.overall_results import *
 
 # the tests dictionary are the tests that will be displayed on the visual tests page.
 # the key represents a test category
@@ -15,7 +16,8 @@ tests['Week Results'] = [ FinalWeekResultsTest,
                           WeekInProgressGamesInProgressResultsTest, 
                           NotStartedDefaultersWeekResultsTest ]
 
-tests['Overall Results'] = []
+tests['Overall Results'] = [ FinalResultsTest,
+                             NotStartedResultsTest ]
 
 tests['Player Results'] = [ FinalPlayerResultsTest,
                             NotStartedPlayerResultsTest,

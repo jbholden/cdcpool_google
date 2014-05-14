@@ -73,4 +73,23 @@ class OverallResultsTestData:
         week_key = week.put()
         self.__saved_keys.append(week_key)
         self.week = week_key
+        u = Update()
+        u.update_week_results(week.year,week.number)
+
+    def setup_players(self,player_names):
+        players = dict()
+        for name in player_names:
+            player_key = self.__create_player(name)
+            players[name] = player_key
+        self.players = players
+        u = Update()
+        u.update_players(self.year)
+
+    def __create_player(self,name):
+        p = Player(name=name,years=[self.year])
+        player_key = p.put()
+        self.__saved_keys.append(player_key)
+        return player_key
+
+
 

@@ -207,7 +207,7 @@ class Database:
         games = memcache.get(key)
         if update or not(games):
             games = { str(game_key):db.get(game_key) for game_key in week.games }
-            assert len(games) == 10
+            #assert len(games) == 10
             memcache.set(key,games)
         return games
 

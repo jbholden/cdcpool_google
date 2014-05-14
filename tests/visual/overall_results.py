@@ -1,5 +1,6 @@
 from visual import *
 from tests.data.overall_results.pool_not_started import *
+from tests.data.overall_results.pool_not_started_with_players import *
 
 class FinalResultsTest(VisualTest):
 
@@ -15,9 +16,21 @@ class FinalResultsTest(VisualTest):
         v.append('The page should say "final results"')
         return v
 
+class BadYearResultsTest(VisualTest):
+
+    def __init__(self):
+        self.description = "Year Does Not Exist Test"
+        self.link = "/1932/results"
+        self.verify =  self.__verify_instructions()
+
+    def __verify_instructions(self):
+        v = []
+        v.append('Should see an error message')
+        return v
+
 class NotStartedResultsTest(VisualTest):
     def __init__(self):
-        self.description = "Pool Not Started Test"
+        self.description = "Pool Not Started Test 1"
         self.link = "/1980/results"
         self.verify =  self.__verify_instructions()
 
@@ -31,5 +44,25 @@ class NotStartedResultsTest(VisualTest):
 
     def __verify_instructions(self):
         v = []
-        v.append('TBD')
+        v.append('Verify not started message')
+        return v
+
+class NotStartedWithPlayersResultsTest(VisualTest):
+    def __init__(self):
+        self.description = "Pool Not Started Test 2"
+        self.link = "/1981/results"
+        self.verify =  self.__verify_instructions()
+
+    def setup(self):
+        testdata = PoolNotStartedWithPlayers(leave_objects_in_datastore=True)
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = PoolNotStarted()
+        testdata.cleanup_database()
+
+    def __verify_instructions(self):
+        v = []
+        v.append('Verify not started message')
+        v.append('Verify number of players = 5')
         return v

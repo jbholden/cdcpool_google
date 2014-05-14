@@ -51,6 +51,10 @@ class Update:
             player_id = players[player_key].key().id()
             summary,results = self.get_player_results(player_id,year,week_number,update=True)
 
+    def update_players(self,year):
+        # TODO:  tests
+        database = Database()
+        players = database.load_players(year,update=True)
 
     def get_week_results(self,year,week_number,update=False):
         key = "week_results_%d_%d" % (year,week_number)
@@ -207,9 +211,10 @@ class Update:
 
             results.append(player_results)
 
-        results = self.assign_rank(results)
-        results = self.assign_projected_rank(results)
-        results = self.__sort_by_rank(results)
+        if len(results) > 0:
+            results = self.assign_rank(results)
+            results = self.assign_projected_rank(results)
+            results = self.__sort_by_rank(results)
 
         return results
 

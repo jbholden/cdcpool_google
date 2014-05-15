@@ -5,6 +5,7 @@ from calculator import *
 from code.week_results import *
 from code.player_results import *
 from code.overall_results import *
+import logging
 
 # TODO:  create test to simulate start of a pool
 #        - players signed up for year

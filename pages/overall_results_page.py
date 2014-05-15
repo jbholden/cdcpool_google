@@ -43,7 +43,10 @@ class OverallResultsPage(Handler):
         content_params['pool_state'] = pool_state
         content_params['results'] = results
 
-        self.__render_file = "overall_final_results.html"
+        if pool_state == "enter_picks":
+            self.__render_file = "overall_enter_picks_results.html"
+        else:
+            self.__render_file = "overall_final_results.html"
 
         params = dict()
         params['year'] = year

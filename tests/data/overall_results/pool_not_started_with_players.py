@@ -7,5 +7,5 @@ class PoolNotStartedWithPlayers(OverallResultsTestData):
 
     def setup_database(self):
         w = Week(year=self.year,number=1,games=[])
-        self.setup_week(w)
         self.setup_players(['Player1','Player2','Player3','Player4','Player5'])
+        self.setup_week(w)

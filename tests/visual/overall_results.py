@@ -1,6 +1,8 @@
 from visual import *
 from tests.data.overall_results.pool_not_started import *
 from tests.data.overall_results.pool_not_started_with_players import *
+from tests.data.overall_results.enter_picks import *
+from tests.data.overall_results.enter_picks_week1 import *
 
 class FinalResultsTest(VisualTest):
 
@@ -58,11 +60,53 @@ class NotStartedWithPlayersResultsTest(VisualTest):
         testdata.setup()
 
     def cleanup(self):
-        testdata = PoolNotStarted()
+        testdata = PoolNotStartedWithPlayers()
         testdata.cleanup_database()
 
     def __verify_instructions(self):
         v = []
         v.append('Verify not started message')
         v.append('Verify number of players = 5')
+        return v
+
+class EnterPicksResultsTest(VisualTest):
+    def __init__(self):
+        self.description = "Enter Picks Test 1"
+        self.link = "/1982/results"
+        self.verify =  self.__verify_instructions()
+
+    def setup(self):
+        testdata = EnterPicks(leave_objects_in_datastore=True)
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = EnterPicks()
+        testdata.cleanup_database()
+
+    def __verify_instructions(self):
+        v = []
+        v.append('Verify enter picks message')
+        v.append('Verify week 1 has results')
+        v.append('Verify week 2 results all 0')
+        return v
+
+class EnterPicksWeek1ResultsTest(VisualTest):
+    def __init__(self):
+        self.description = "Enter Picks Test 2"
+        self.link = "/1982/results"
+        self.verify =  self.__verify_instructions()
+
+    def setup(self):
+        testdata = EnterPicksWeek1(leave_objects_in_datastore=True)
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = EnterPicksWeek1()
+        testdata.cleanup_database()
+
+    def __verify_instructions(self):
+        v = []
+        v.append('Tests enter picks state for week 1')
+        v.append('Verify enter picks message')
+        v.append('Verify week 1 results all 0')
         return v

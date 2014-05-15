@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block head_content %}
+    <link href="/stylesheets/overall_not_started.css" rel="stylesheet" type="text/css" media="all">
+{% endblock %}
+
+{% block content %}
+<div id="year-not-started">The pool has not started.</div><br>
+<div id="signup-message">{{num_players}} players have signed up.  Signup <a href="signup">here</a>.</div>
+{% endblock %}

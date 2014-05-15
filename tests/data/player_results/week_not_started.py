@@ -4,8 +4,9 @@ from utils.utils import *
 
 class PlayerResultsWeekNotStarted(PlayerResultTestData):
 
-    def __init__(self,leave_objects_in_datastore=False):
+    def __init__(self,leave_objects_in_datastore=False,lock_picks_time=None):
         PlayerResultTestData.__init__(self,year=1979,week_number=1,data_name='PlayerWeekNotStarted',leave_objects_in_datastore=leave_objects_in_datastore)
+        self.__lock_picks_time = lock_picks_time
 
     def setup_database(self):
         self.setup_players(["Brent"])
@@ -24,7 +25,7 @@ class PlayerResultsWeekNotStarted(PlayerResultTestData):
         for game_number in self.__saved_games:
             self.setup_game(self.__saved_games[game_number])
 
-        self.setup_week()
+        self.setup_week(lock_picks=self.__lock_picks_time)
         self.__setup_picks()
 
     def __setup_picks(self):

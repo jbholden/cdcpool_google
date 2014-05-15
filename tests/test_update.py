@@ -2,6 +2,7 @@ from google.appengine.ext import db
 from google.appengine.api import memcache
 from code.update import *
 from code.week_results import *
+from code.overall_results import *
 from code.database import *
 import time
 import logging
@@ -24,6 +25,7 @@ class TestUpdate(unittest.TestCase):
 
     #@staticmethod
     #def run_subset():
+        #return [ 'test_t10_assign_overall_rank', 'test_t11_assign_overall_projected_rank' ]
         #return [ 'test_t9_get_player_results' ]
 
     def test_get_week_results_empty_cache(self):
@@ -140,6 +142,16 @@ class TestUpdate(unittest.TestCase):
         self.__t9_week_not_started()
         self.__t9_week_not_started_defaulter()
         self.__t9_week_in_progress()
+
+    def test_t10_assign_overall_rank(self):
+        self.__t10_overall_all_different()
+        self.__t10_overall_all_tied()
+        self.__t10_overall_mixed_values()
+
+    def test_t11_assign_overall_projected_rank(self):
+        self.__t11_projected_rank_all_different()
+        self.__t11_projected_rank_all_tied()
+        self.__t11_projected_rank_mixed_values()
 
     def __t1_week_not_started(self):
         testdata = WeekNotStarted(leave_objects_in_datastore=False)
@@ -626,9 +638,30 @@ class TestUpdate(unittest.TestCase):
 
         self.__week_results = random_results
 
+    def __randomize_overall_results_order(self):
+        indexes = range(len(self.__overall_results))
+        random.shuffle(indexes)
+
+        random_results = []
+        for i in indexes:
+            random_results.append(self.__overall_results[i])
+
+        self.__overall_results = random_results
+
+    def __add_overall_result(self,rank=None,projected_rank=None,expected_rank=None,overall=None,projected=None):
+        result = OverallResults()
+        result.rank = rank
+        result.projected_rank = projected_rank
+        result.player_name = str(expected_rank)
+        result.overall = overall
+        result.projected = projected
+        self.__overall_results.append(result)
+
+
     def __add_result(self,rank=None,projected_rank=None,expected_rank=None,player_key=None,wins=None,losses=None,projected_wins=None,possible_wins=None):
         result = WeekResults()
         result.rank = rank
+        result.projected_rank = projected_rank
         result.player_key = player_key
         result.player_name = str(expected_rank)
         result.wins = wins
@@ -675,6 +708,22 @@ class TestUpdate(unittest.TestCase):
                 assigned_results = u.assign_projected_rank(self.__week_results,projected_winner=projected_winner)
             self.__verify_projected_ranks(assigned_results)
 
+    def __run_assign_overall_rank_test(self,num_tests=10):
+        u = Update()
+        random.seed(777)
+        for i in range(num_tests):
+            self.__randomize_overall_results_order()
+            assigned_results = u.assign_overall_rank(self.__overall_results)
+            self.__verify_ranks(assigned_results)
+
+    def __run_assign_overall_projected_rank_test(self,num_tests=10):
+        u = Update()
+        random.seed(888)
+        for i in range(num_tests):
+            self.__randomize_overall_results_order()
+            assigned_results = u.assign_overall_projected_rank(self.__overall_results)
+            self.__verify_projected_ranks(assigned_results)
+
     def __test_get_week_results(self,year,week_number,expected_results):
         u = Update()
         results = u.get_week_results(year,week_number)
@@ -716,6 +765,91 @@ class TestUpdate(unittest.TestCase):
         testdata.setup()
         self.__test_get_player_results(testdata.year,testdata.week_number,testdata.get_expected_results())
         testdata.cleanup()
+
+    def __t10_overall_all_different(self):
+        self.__overall_results = []
+        self.__add_overall_result(rank=None,expected_rank=10,overall=0)
+        self.__add_overall_result(rank=None,expected_rank=9,overall=1)
+        self.__add_overall_result(rank=None,expected_rank=8,overall=2)
+        self.__add_overall_result(rank=None,expected_rank=7,overall=3)
+        self.__add_overall_result(rank=None,expected_rank=6,overall=4)
+        self.__add_overall_result(rank=None,expected_rank=5,overall=5)
+        self.__add_overall_result(rank=None,expected_rank=4,overall=6)
+        self.__add_overall_result(rank=None,expected_rank=3,overall=7)
+        self.__add_overall_result(rank=None,expected_rank=2,overall=9)
+        self.__add_overall_result(rank=None,expected_rank=1,overall=10)
+        self.__run_assign_overall_rank_test()
+
+    def __t10_overall_all_tied(self):
+        self.__overall_results = []
+        self.__add_overall_result(rank=None,expected_rank=1,overall=7)
+        self.__add_overall_result(rank=None,expected_rank=1,overall=7)
+        self.__add_overall_result(rank=None,expected_rank=1,overall=7)
+        self.__add_overall_result(rank=None,expected_rank=1,overall=7)
+        self.__add_overall_result(rank=None,expected_rank=1,overall=7)
+        self.__add_overall_result(rank=None,expected_rank=1,overall=7)
+        self.__add_overall_result(rank=None,expected_rank=1,overall=7)
+        self.__add_overall_result(rank=None,expected_rank=1,overall=7)
+        self.__add_overall_result(rank=None,expected_rank=1,overall=7)
+        self.__add_overall_result(rank=None,expected_rank=1,overall=7)
+        self.__run_assign_overall_rank_test()
+
+    def __t10_overall_mixed_values(self):
+        self.__overall_results = []
+        self.__add_overall_result(rank=None,expected_rank=1,overall=10)
+        self.__add_overall_result(rank=None,expected_rank=1,overall=10)
+        self.__add_overall_result(rank=None,expected_rank=3,overall=8)
+        self.__add_overall_result(rank=None,expected_rank=3,overall=8)
+        self.__add_overall_result(rank=None,expected_rank=5,overall=5)
+        self.__add_overall_result(rank=None,expected_rank=5,overall=5)
+        self.__add_overall_result(rank=None,expected_rank=7,overall=3)
+        self.__add_overall_result(rank=None,expected_rank=7,overall=3)
+        self.__add_overall_result(rank=None,expected_rank=9,overall=1)
+        self.__add_overall_result(rank=None,expected_rank=9,overall=1)
+        self.__run_assign_overall_rank_test()
+
+    def __t11_projected_rank_all_different(self):
+        self.__overall_results = []
+        self.__add_overall_result(rank=None,expected_rank=10,projected=0)
+        self.__add_overall_result(rank=None,expected_rank=9,projected=1)
+        self.__add_overall_result(rank=None,expected_rank=8,projected=2)
+        self.__add_overall_result(rank=None,expected_rank=7,projected=3)
+        self.__add_overall_result(rank=None,expected_rank=6,projected=4)
+        self.__add_overall_result(rank=None,expected_rank=5,projected=5)
+        self.__add_overall_result(rank=None,expected_rank=4,projected=6)
+        self.__add_overall_result(rank=None,expected_rank=3,projected=7)
+        self.__add_overall_result(rank=None,expected_rank=2,projected=9)
+        self.__add_overall_result(rank=None,expected_rank=1,projected=10)
+        self.__run_assign_overall_projected_rank_test()
+
+    def __t11_projected_rank_all_tied(self):
+        self.__overall_results = []
+        self.__add_overall_result(rank=None,expected_rank=1,projected=7)
+        self.__add_overall_result(rank=None,expected_rank=1,projected=7)
+        self.__add_overall_result(rank=None,expected_rank=1,projected=7)
+        self.__add_overall_result(rank=None,expected_rank=1,projected=7)
+        self.__add_overall_result(rank=None,expected_rank=1,projected=7)
+        self.__add_overall_result(rank=None,expected_rank=1,projected=7)
+        self.__add_overall_result(rank=None,expected_rank=1,projected=7)
+        self.__add_overall_result(rank=None,expected_rank=1,projected=7)
+        self.__add_overall_result(rank=None,expected_rank=1,projected=7)
+        self.__add_overall_result(rank=None,expected_rank=1,projected=7)
+        self.__run_assign_overall_projected_rank_test()
+
+    def __t11_projected_rank_mixed_values(self):
+        self.__overall_results = []
+        self.__add_overall_result(rank=None,expected_rank=1,projected=10)
+        self.__add_overall_result(rank=None,expected_rank=1,projected=10)
+        self.__add_overall_result(rank=None,expected_rank=3,projected=8)
+        self.__add_overall_result(rank=None,expected_rank=3,projected=8)
+        self.__add_overall_result(rank=None,expected_rank=5,projected=5)
+        self.__add_overall_result(rank=None,expected_rank=5,projected=5)
+        self.__add_overall_result(rank=None,expected_rank=7,projected=3)
+        self.__add_overall_result(rank=None,expected_rank=7,projected=3)
+        self.__add_overall_result(rank=None,expected_rank=9,projected=1)
+        self.__add_overall_result(rank=None,expected_rank=9,projected=1)
+        self.__run_assign_overall_projected_rank_test()
+
 
     def __load_week_results_into_cache(self,year,week_number):
         u = Update()

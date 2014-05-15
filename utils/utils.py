@@ -2,6 +2,9 @@
 
 import os
 import hmac
+import datetime
+import string
+import re
 from pytz.gae import pytz
 
 secret = "cdcpool_abc1234"
@@ -22,3 +25,13 @@ def get_datetime_in_utc(datetime_value,initial_timezone):
     date_in_timezone = pytz_timezone.localize(datetime_value)
     date_in_utc = date_in_timezone.astimezone(pytz.utc)
     return date_in_utc
+
+def get_current_time_in_utc():
+    return datetime.datetime.utcnow()
+
+def escape_string(s):
+    return string.replace(s,'"','\\\"')
+
+def compress_html(html):
+    s1 = string.replace(html,'\n','')
+    return re.sub(r'\s\s+',' ',s1)

@@ -77,6 +77,10 @@ class PlayerResultTestData:
         for player_id in player_ids:
             u.delete_player_results_from_memcache(player_id,self.year,self.week_number)
 
+        u.delete_week_results_from_memcache(self.year,self.week_number)
+        database.delete_players_from_memcache(self.year)
+
+
     def setup_expected_results(self):
         pass
 
@@ -95,8 +99,8 @@ class PlayerResultTestData:
         self.__saved_keys.append(game_key)
         self.games[game.number] = game_key
 
-    def setup_week(self):
-        w = Week(year=self.year,number=self.week_number,winner=None,games=self.games.values(),lock_picks=None,lock_scores=None)
+    def setup_week(self,lock_picks=None):
+        w = Week(year=self.year,number=self.week_number,winner=None,games=self.games.values(),lock_picks=lock_picks,lock_scores=None)
         week_key = w.put()
         self.__saved_keys.append(week_key)
         self.week = week_key

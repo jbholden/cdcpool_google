@@ -4,6 +4,13 @@ from database import *
 from calculator import *
 from code.week_results import *
 from code.player_results import *
+from code.overall_results import *
+import logging
+
+# TODO:  create test to simulate start of a pool
+#        - players signed up for year
+#        - week 1 created with games
+#        - no week 1 picks yet
 
 class Update:
 
@@ -45,6 +52,10 @@ class Update:
             player_id = players[player_key].key().id()
             summary,results = self.get_player_results(player_id,year,week_number,update=True)
 
+    def update_players(self,year):
+        # TODO:  tests
+        database = Database()
+        players = database.load_players(year,update=True)
 
     def get_week_results(self,year,week_number,update=False):
         key = "week_results_%d_%d" % (year,week_number)
@@ -78,6 +89,107 @@ class Update:
         results = player_results[1]  # redundant but makes code clearer
         return summary,results
 
+    def __setup_overall_results(self,database,year,update=False):
+        players = database.load_players(year,update)
+        results = dict()
+        for player in players.values():
+            result = OverallResults()
+            result.rank = 1
+            result.projected_rank = 1
+            result.player_id = player.key().id() 
+            result.player_name = player.name
+            result.overall = 0
+            result.projected = 0
+            result.possible = 0
+            result.week_points = []
+            result.last_week_projected = 0
+            result.last_week_possible = 0
+            results[result.player_id] = result
+        return results
+
+    # TODO:  highlight overall weekly winner somehow
+    def __update_overall_results(self,player_id,overall_results,week_result,last_week):
+        overall_results[player_id].overall += week_result.wins
+        overall_results[player_id].projected += week_result.projected_wins
+        overall_results[player_id].possible += week_result.possible_wins
+        overall_results[player_id].week_points += [ week_result.wins ]
+
+        if last_week:
+            overall_results[player_id].last_week_projected = week_result.projected_wins
+            overall_results[player_id].last_week_possible = week_result.possible_wins
+
+    def __update_overall_results_unplayed_weeks(self,overall_results,last_week_number):
+        number_of_weeks = 13
+        number_of_points_per_week = 10
+
+        assert last_week_number <= number_of_weeks, "Unexpected last week number %d, only expected %d weeks" % (last_week_number,number_of_weeks)
+
+        number_of_unplayed_weeks = number_of_weeks - last_week_number
+        number_of_points_left = number_of_points_per_week * number_of_unplayed_weeks
+        for player_id in overall_results:
+            overall_results[player_id].projected += number_of_points_left
+            overall_results[player_id].possible += number_of_points_left
+
+    def __update_overall_results_win_pct(self,overall_results,last_week_number):
+        number_of_points_per_week = 10
+        number_of_total_points_so_far = last_week_number * number_of_points_per_week
+
+        for player_id in overall_results:
+            if overall_results[player_id].overall == 0:
+                win_pct = 0.0
+            else:
+                win_pct = float(overall_results[player_id].overall) / float(number_of_total_points_so_far)
+
+            overall_results[player_id].win_pct = "%0.3f" % (win_pct)
+
+    def __calculate_overall_results(self,year,update="none"):
+        if update == "all":
+            update_players = True
+            update_week_numbers = True
+            update_all_week_results = True
+            update_last_week_results = True
+        elif update == "all_results":
+            update_players = False
+            update_week_numbers = False
+            update_all_week_results = True
+            update_last_week_results = True
+        elif update == "last_week_results":
+            update_players = False
+            update_week_numbers = False
+            update_all_week_results = False
+            update_last_week_results = True
+        elif update == "none":
+            update_players = False
+            update_week_numbers = False
+            update_all_week_results = False
+            update_last_week_results = False
+        else:
+            raise AssertionError,"Invalid update value %s" % (update)
+
+        database = Database()
+        overall_results = self.__setup_overall_results(database,year,update=update_players)
+
+        week_numbers = database.get_week_numbers(year,update=update_week_numbers)
+        last_week_number = week_numbers[-1]
+
+        for week_number in week_numbers:
+            last_week = week_number == last_week_number
+            update_week_results = update_all_week_results or (update_last_week_results and last_week)
+            week_results = self.get_week_results(year,week_number,update=update_week_results)
+            for week_result in week_results:
+                self.__update_overall_results(week_result.player_id,overall_results,week_result,last_week)
+
+        self.__update_overall_results_unplayed_weeks(overall_results,last_week_number)
+        self.__update_overall_results_win_pct(overall_results,last_week_number)
+
+        overall_results = self.__convert_overall_results_to_list(overall_results)
+        overall_results = self.assign_overall_rank(overall_results)
+        overall_results = self.assign_overall_projected_rank(overall_results)
+        overall_results = self.__sort_by_rank(overall_results)
+
+        return overall_results
+
+
     def __calculate_week_results(self,year,week_number):
         database = Database()
         week_data = database.load_week_data(year,week_number)
@@ -100,9 +212,10 @@ class Update:
 
             results.append(player_results)
 
-        results = self.assign_rank(results)
-        results = self.assign_projected_rank(results)
-        results = self.__sort_by_rank(results)
+        if len(results) > 0:
+            results = self.assign_rank(results)
+            results = self.assign_projected_rank(results)
+            results = self.__sort_by_rank(results)
 
         return results
 
@@ -174,9 +287,13 @@ class Update:
 
         return result
 
-
-    def get_overall_results(self,year):
-        pass
+    def get_overall_results(self,year,update="none"):
+        key = "overall_results_%d" % (year)
+        results = memcache.get(key)
+        if update != "none" or not(results):
+            results = self.__calculate_overall_results(year,update)
+            memcache.set(key,results)
+        return results
 
     def __sort_by_rank(self,results):
         return sorted(results,key=lambda result:result.rank)
@@ -273,6 +390,54 @@ class Update:
 
         return assigned_results
 
+    def assign_overall_rank(self,results):
+        sorted_results = sorted(results,key=lambda result:result.overall,reverse=True)
+
+        assigned_results = []
+        next_rank = 1   
+
+        overall = sorted_results[0].overall
+
+        for i,player_result in enumerate(sorted_results):
+
+            overall_changed = player_result.overall != overall
+
+            if overall_changed:
+                next_rank = i+1
+                player_result.rank = next_rank
+                overall = player_result.overall
+            else:
+                player_result.rank = next_rank
+
+            assigned_results.append(player_result)
+
+        return assigned_results
+
+
+    def assign_overall_projected_rank(self,results):
+        sorted_results = sorted(results,key=lambda result:result.projected,reverse=True)
+
+        assigned_results = []
+        next_rank = 1   
+
+        projected = sorted_results[0].projected
+
+        for i,player_result in enumerate(sorted_results):
+
+            projected_changed = player_result.projected != projected
+
+            if projected_changed:
+                next_rank = i+1
+                player_result.projected_rank = next_rank
+                projected = player_result.projected
+            else:
+                player_result.projected_rank = next_rank
+
+            assigned_results.append(player_result)
+
+        return assigned_results
+
+
     def __move_winner_to_top_of_results(self,results,winner):
         winner_index = None
         for i,player in enumerate(results):
@@ -300,6 +465,8 @@ class Update:
 
         assert winner.projected_wins >= next_best.projected_wins,"Projected winner had fewer wins than another (%d vs. %d)" % (winner.projected_wins,next_best.projected_wins)
 
+    def __convert_overall_results_to_list(self,overall_results_dict):
+        return overall_results_dict.values()
 
 
 

@@ -14,6 +14,12 @@ class PlayerResult:
     game_time_left = None
     game_date = None
 
+    def __get_date_str(self,d):
+        if not(d):
+            return None
+        date_format = "%a %m/%d/%Y %I:%M %p UTC"
+        return d.strftime(date_format)
+
     def get_dict(self):
         d = dict()
         d['player_pick'] = self.player_pick
@@ -29,7 +35,7 @@ class PlayerResult:
         d['game_spread'] = self.game_spread
         d['game_quarter'] = self.game_quarter
         d['game_time_left'] = self.game_time_left
-        d['game_date'] = self.game_date
+        d['game_date'] = self.__get_date_str(self.game_date)
         return d
 
 

@@ -8,5 +8,5 @@ class Week(db.Model):
     number = db.IntegerProperty(required=True)
     winner = db.StringProperty()   # winner key string
     games = db.ListProperty(db.Key)
-    lock_picks = db.DateTimeProperty()    # note: when setting need to consider UTC and timezone
-    lock_scores = db.DateTimeProperty()   # note: when setting need to consider UTC and timezone
+    lock_picks = db.DateTimeProperty()    
+    lock_scores = db.DateTimeProperty()   

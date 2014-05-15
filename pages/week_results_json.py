@@ -3,6 +3,9 @@ import logging
 from code.update import *
 from handler import *
 
+# TODO: JSON tests
+# - bad year, week
+
 class WeekResultsJson(Handler):
 
     def __convert_to_format_required_for_json(self,results):

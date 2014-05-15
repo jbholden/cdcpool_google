@@ -34,8 +34,10 @@ from create.create_week import *
 from pages.visual_test_page import *
 from pages.week_results_json import *
 from pages.player_results_json import *
+from pages.overall_results_json import *
 from pages.week_results_page import *
 from pages.player_results_page import *
+from pages.overall_results_page import *
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
 
@@ -56,6 +58,8 @@ app = webapp2.WSGIApplication([
     ('/([0-9]+)/week/([0-9]+)/player/([0-9]+)/results', PlayerResultsPage),
     ('/([0-9]+)/week/([0-9]+)/results/json', WeekResultsJson),
     ('/([0-9]+)/week/([0-9]+)/results', WeekResultsPage),
+    ('/([0-9]+)/results/json', OverallResultsJson),
+    ('/([0-9]+)/results', OverallResultsPage),
     ('/a/tests', MainTestPage),
     ('/a/visual_tests/setup', VisualSetupPage),
     ('/a/visual_tests/cleanup', VisualCleanupPage),

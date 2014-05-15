@@ -114,6 +114,11 @@ class OverallResultsTestData:
         game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=None,team2_score=None,favored=favored,spread=spread,state="not_started",quarter=None,time_left=None,date=start_date_utc)
         self.setup_game(game)
 
+    def setup_in_progress_game(self,number,team1,team2,favored,spread,team1_score,team2_score,quarter,time_left):
+        team1_key = self.find_team_key(team1)
+        team2_key = self.find_team_key(team2)
+        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="in_progress",quarter=quarter,time_left=time_left,date=None)
+        self.setup_game(game)
 
     def setup_pick(self,player_name=None,week_number=None,game_number=None,winner=None,team1_score=None,team2_score=None):
         pick = Pick()

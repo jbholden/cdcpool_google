@@ -45,7 +45,13 @@ class OverallResultsPage(Handler):
 
         if pool_state == "enter_picks":
             self.__render_file = "overall_enter_picks_results.html"
-        else:
+        elif pool_state == "week_not_started":
+            self.__render_file = "overall_week_not_started_results.html"
+        elif pool_state == "week_in_progress":
+            self.__render_file = "overall_week_in_progress_results.html"
+        elif pool_state == "week_final":
+            self.__render_file = "overall_week_final_results.html"
+        elif pool_state == "end_of_year":
             self.__render_file = "overall_final_results.html"
 
         params = dict()
@@ -58,6 +64,27 @@ class OverallResultsPage(Handler):
         params['sorted_by_overall_reversed'] = self.__sort_by_overall_reversed(content_params)
         params['sorted_by_players'] = self.__sort_by_players(content_params)
         params['sorted_by_players_reversed'] = self.__sort_by_players_reversed(content_params)
+
+        if pool_state == "week_not_started":
+            params['sorted_by_projected'] = ""
+            params['sorted_by_projected_reversed'] = ""
+            params['sorted_by_possible'] = self.__sort_by_overall_possible(content_params)
+            params['sorted_by_possible_reversed'] = self.__sort_by_overall_possible_reversed(content_params)
+        elif pool_state == "week_final":
+            params['sorted_by_projected'] = ""
+            params['sorted_by_projected_reversed'] = ""
+            params['sorted_by_possible'] = self.__sort_by_overall_possible(content_params)
+            params['sorted_by_possible_reversed'] = self.__sort_by_overall_possible_reversed(content_params)
+        elif pool_state == "week_in_progress":
+            params['sorted_by_projected'] = self.__sort_by_overall_projected(content_params)
+            params['sorted_by_projected_reversed'] = self.__sort_by_overall_projected_reversed(content_params)
+            params['sorted_by_possible'] = self.__sort_by_overall_possible(content_params)
+            params['sorted_by_possible_reversed'] = self.__sort_by_overall_possible_reversed(content_params)
+        else:
+            params['sorted_by_projected'] = ""
+            params['sorted_by_projected_reversed'] = ""
+            params['sorted_by_possible'] = ""
+            params['sorted_by_possible_reversed'] = ""
 
         self.render("overall_results.html",**params)
 
@@ -129,6 +156,74 @@ class OverallResultsPage(Handler):
         html_str = escape_string(content)
         return compress_html(html_str)
 
+    def __sort_by_overall_projected(self,content_params,escape=True):
+        sorted_by_overall_projected = sorted(content_params['results'],key=lambda result:result.projected_rank)
+
+        params = dict()
+        params['year'] = content_params['year']
+        params['weeks_in_year'] = content_params['weeks_in_year']
+        params['pool_state'] = content_params['pool_state']
+        params['results'] = sorted_by_overall_projected
+        params['rank'] = "projected"
+
+        self.__highlight_column('projected',params)
+
+        content = self.render_str(self.__render_file,**params)
+
+        if escape:
+            html_str = escape_string(content)
+            return compress_html(html_str)
+        return content
+
+    def __sort_by_overall_projected_reversed(self,content_params):
+        sorted_by_overall_projected_reversed = sorted(content_params['results'],key=lambda result:result.projected_rank,reverse=True)
+
+        params = dict()
+        params['year'] = content_params['year']
+        params['weeks_in_year'] = content_params['weeks_in_year']
+        params['pool_state'] = content_params['pool_state']
+        params['results'] = sorted_by_overall_projected_reversed
+        params['rank'] = "projected"
+
+        self.__highlight_column('projected',params)
+
+        content = self.render_str(self.__render_file,**params)
+        html_str = escape_string(content)
+        return compress_html(html_str)
+
+    def __sort_by_overall_possible(self,content_params,escape=True):
+        sorted_by_overall_possible = sorted(content_params['results'],key=lambda result:result.possible,reverse=True)
+
+        params = dict()
+        params['year'] = content_params['year']
+        params['weeks_in_year'] = content_params['weeks_in_year']
+        params['pool_state'] = content_params['pool_state']
+        params['results'] = sorted_by_overall_possible
+
+        self.__highlight_column('possible',params)
+
+        content = self.render_str(self.__render_file,**params)
+
+        if escape:
+            html_str = escape_string(content)
+            return compress_html(html_str)
+        return content
+
+    def __sort_by_overall_possible_reversed(self,content_params):
+        sorted_by_overall_possible_reversed = sorted(content_params['results'],key=lambda result:result.possible)
+
+        params = dict()
+        params['year'] = content_params['year']
+        params['weeks_in_year'] = content_params['weeks_in_year']
+        params['pool_state'] = content_params['pool_state']
+        params['results'] = sorted_by_overall_possible_reversed
+
+        self.__highlight_column('possible',params)
+
+        content = self.render_str(self.__render_file,**params)
+        html_str = escape_string(content)
+        return compress_html(html_str)
+
     def __highlight_no_columns(self,params):
         return self.__highlight_column(None,params)
 
@@ -137,3 +232,13 @@ class OverallResultsPage(Handler):
             params['overall_id'] = "highlight-content"
         else:
             params['overall_id'] = "content"
+
+        if name == "projected":
+            params['projected_id'] = "highlight-content"
+        else:
+            params['projected_id'] = "content"
+
+        if name == "possible":
+            params['possible_id'] = "highlight-content"
+        else:
+            params['possible_id'] = "content"

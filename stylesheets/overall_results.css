@@ -96,3 +96,33 @@
    text-align: left;
    padding: 2px 4px;
 }
+#weeknotstarted-pool-state {
+   color: gray;
+   background-color: white;
+   font-size: 10pt;
+   font-family: Helvetica;
+   font-weight: 100;
+   white-space: nowrap;
+   text-align: left;
+   padding: 2px 4px;
+}
+#weekinprogress-pool-state {
+   color: gray;
+   background-color: white;
+   font-size: 10pt;
+   font-family: Helvetica;
+   font-weight: 100;
+   white-space: nowrap;
+   text-align: left;
+   padding: 2px 4px;
+}
+#weekfinal-pool-state {
+   color: black;
+   background-color: white;
+   font-size: 10pt;
+   font-family: Helvetica;
+   font-weight: 100;
+   white-space: nowrap;
+   text-align: left;
+   padding: 2px 4px;
+}

@@ -17,7 +17,8 @@ class TestWeekLoad(unittest.TestCase):
     def __init__(self,methodName='runTest',weeks_to_test=None):
         super(TestWeekLoad,self).__init__(methodName)
         if weeks_to_test == None:
-            self.weeks = self.load_weeks_and_years(update=True)
+            d = Database()
+            self.weeks = d.load_weeks_and_years(update=True)
         else:
             assert isinstance(weeks_to_test,dict)
             self.weeks = weeks_to_test

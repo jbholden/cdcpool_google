@@ -73,3 +73,7 @@ class FBPoolHTTP:
         data = dict()
         data['id'] = team_id
         return self.httpDelete('/api/team',data)
+
+if __name__ == "__main__":
+    api = FBPoolHTTP("http://localhost:10090")
+    response = api.httpDeleteTeam("Team1")

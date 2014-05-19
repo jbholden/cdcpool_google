@@ -12,10 +12,10 @@ This directory contains scripts that make API calls using python to the FBPool A
 
 This example creates a new team.
 
-``
+```Python
 from api.fbpool_api import *
 
 api = FBPoolAPI(url='http://cdcpool.appspot.com')
 team = api.createTeam('Georgia Tech','Atlantic Coast')
-``
+```
 

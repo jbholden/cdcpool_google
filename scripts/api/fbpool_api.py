@@ -48,4 +48,3 @@ class FBPoolAPI:
 
     def createTeams(self):
         pass
-

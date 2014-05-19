@@ -276,5 +276,18 @@ class Database:
 
         teamkeys = memcache.get('teamkeys')
         if teamkeys:
-            teams[team.name] = team_key
+            teamkeys[team.name] = team_key
+            memcache.set('teamkeys',teamkeys)
+
+    def delete_team_from_memcache(self,team):
+        team_key = str(team.key())
+
+        teams = memcache.get('teams')
+        if teams and team_key in teams:
+            del teams[team_key]
+            memcache.set('teams',teams)
+
+        teamkeys = memcache.get('teamkeys')
+        if teamkeys and team.name in teamkeys:
+            del teamkeys[team.name]
             memcache.set('teamkeys',teamkeys)

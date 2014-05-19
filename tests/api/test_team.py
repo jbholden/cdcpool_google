@@ -1,5 +1,6 @@
 import unittest
 import socket
+import logging
 from google.appengine.api import urlfetch
 from scripts.api.fbpool_api import *
 from scripts.api.fbpool_api_exception import *
@@ -17,6 +18,7 @@ class TestTeam(unittest.TestCase):
             team = self.fbpool.createTeam("Team1","Conference1")
             self.fbpool.deleteTeamByID(team['id'])
         except FBAPIException as e:
+            logging.info(e)
             self.assertTrue(False)
             return
 
@@ -154,6 +156,7 @@ class TestTeam(unittest.TestCase):
 
     def test_create_team_that_already_exists(self):
         try:
+            self.fbpool.deleteTeamIfExists("Team1")
             team = self.fbpool.createTeam("Team1","Conference1")
         except FBAPIException as e:
             self.assertTrue(False)

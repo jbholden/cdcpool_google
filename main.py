@@ -80,6 +80,6 @@ app = webapp2.WSGIApplication([
     ('/a/load_weeks', LoadWeeksPage),
     ('/a/load_picks', LoadPicksPage),
     ('/a/create_week', CreateWeekPage),
-    ('/api/team', TeamAPI),
+    ('/api/team', TeamAPIPage),
     #('/a/stats', DatabaseStats)
 ], debug=True)

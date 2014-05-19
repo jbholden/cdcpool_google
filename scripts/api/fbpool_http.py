@@ -4,8 +4,11 @@ import json
 
 class FBPoolHTTP:
 
-    def __init__(self,url='http://localhost:10090'):
+    def __init__(self,url='http://cdcpool.appspot.com'):
         self.url = url
+
+    def __geturl(self,address):
+        return "%s%s" % (self.url,address)
 
     def httpGet(self,address):
         try:

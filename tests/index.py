@@ -11,6 +11,7 @@ from database.test_picks import *
 from database.test_load_week import *
 from database.test_pool_state import *
 from test_timezone import *
+from api.test_team import *
 
 # Instructions.
 # 1. create a test using the unittest class
@@ -28,4 +29,6 @@ test_classes = [('test players in datastore',TestPlayers),
                 ('test the update class',TestUpdate),
                 ('test the week results page',TestWeekResults),
                 ('test the player results page',TestPlayerResults),
-                ('test the pytz timezone module',TestTimezone) ]
+                ('test the pytz timezone module',TestTimezone),
+                ('test the team api',TestTeam) ]
+

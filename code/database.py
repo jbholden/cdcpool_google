@@ -265,3 +265,16 @@ class Database:
         if week.lock_picks == None:
             return False
         return get_current_time_in_utc() <= week.lock_picks
+
+    def add_team_to_memcache(self,team):
+        team_key = str(team.key())
+
+        teams = memcache.get('teams')
+        if teams:
+            teams[team_key] = team
+            memcache.set('teams',teams)
+
+        teamkeys = memcache.get('teamkeys')
+        if teamkeys:
+            teams[team.name] = team_key
+            memcache.set('teamkeys',teamkeys)

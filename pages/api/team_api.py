@@ -45,7 +45,9 @@ class TeamAPIPage(APIHandler):
 
     # this deletes a team object
     def delete(self):
+        logging.info("before json.loads req body=%s" % (self.request.body))
         data = json.loads(self.request.body) 
+        logging.info("after json.loads")
 
         num_params = 0
         if 'id' in data: 

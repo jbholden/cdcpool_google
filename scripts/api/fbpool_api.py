@@ -17,13 +17,19 @@ class FBPoolAPI:
         raise FBAPIException(response.code,response.read())
 
     def deleteTeam(self,name):
-        pass
+        response = self.__fbpool.httpDeleteTeam(name)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
 
     def deleteTeamByKey(self,team_key):
-        pass
+        response = self.__fbpool.httpDeleteTeamByKey(team_key)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
 
     def deleteTeamByID(self,team_id):
-        pass
+        response = self.__fbpool.httpDeleteTeamByID(team_id)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
 
     def getTeam(self,name):
         pass
@@ -41,7 +47,12 @@ class FBPoolAPI:
         pass
 
     def deleteTeamIfExists(self,name):
-        pass
+        try:
+            self.deleteTeam(name)
+        except FBAPIException as e:
+            if e.http_code == 404 and e.errmsg == "could not find the team":
+                return
+            raise FBAPIException(e.http_code,e.errmsg)
 
     def addTeam(self,name,conference):
         pass

@@ -15,6 +15,7 @@ class TestTeam(unittest.TestCase):
 
     def test_create_team(self):
         try:
+            self.fbpool.deleteTeamIfExists("Team1")
             team = self.fbpool.createTeam("Team1","Conference1")
             self.fbpool.deleteTeamByID(team['id'])
         except FBAPIException as e:
@@ -27,6 +28,7 @@ class TestTeam(unittest.TestCase):
 
     def test_delete_team(self):
         try:
+            self.fbpool.deleteTeamIfExists("Team2")
             team = self.fbpool.createTeam("Team2","Conference1")
             self.fbpool.deleteTeam("Team2")
         except FBAPIException as e:
@@ -38,6 +40,7 @@ class TestTeam(unittest.TestCase):
 
     def test_get_team(self):
         try:
+            self.fbpool.deleteTeamIfExists("Team3")
             dummy_team = self.fbpool.createTeam("Team3","Conference1")
             team = self.fbpool.getTeam("Team3")
             self.fbpool.deleteTeamByID(dummy_team['id'])
@@ -54,6 +57,7 @@ class TestTeam(unittest.TestCase):
 
     def test_delete_team_by_id(self):
         try:
+            self.fbpool.deleteTeamIfExists("Team2")
             team = self.fbpool.createTeam("Team2","Conference1")
             self.fbpool.deleteTeamByID(team['id'])
         except FBAPIException as e:
@@ -64,6 +68,7 @@ class TestTeam(unittest.TestCase):
 
     def test_delete_team_by_key(self):
         try:
+            self.fbpool.deleteTeamIfExists("Team2")
             team = self.fbpool.createTeam("Team2","Conference1")
             self.fbpool.deleteTeamByKey(team['key'])
         except FBAPIException as e:
@@ -74,6 +79,7 @@ class TestTeam(unittest.TestCase):
 
     def test_get_team_by_id(self):
         try:
+            self.fbpool.deleteTeamIfExists("Team4")
             created_team = self.fbpool.createTeam("Team4","Conference1")
             team = self.fbpool.getTeamByID(created_team['id'])
             self.fbpool.deleteTeamByID(created_team['id'])
@@ -90,6 +96,7 @@ class TestTeam(unittest.TestCase):
 
     def test_get_team_by_key(self):
         try:
+            self.fbpool.deleteTeamIfExists("Team4")
             created_team = self.fbpool.createTeam("Team4","Conference1")
             team = self.fbpool.getTeamByKey(created_team['key'])
             self.fbpool.deleteTeamByID(created_team['id'])

@@ -38,6 +38,7 @@ from pages.overall_results_json import *
 from pages.week_results_page import *
 from pages.player_results_page import *
 from pages.overall_results_page import *
+from pages.api.team_api import *
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
 
@@ -79,5 +80,6 @@ app = webapp2.WSGIApplication([
     ('/a/load_weeks', LoadWeeksPage),
     ('/a/load_picks', LoadPicksPage),
     ('/a/create_week', CreateWeekPage),
+    ('/api/team', TeamAPI),
     #('/a/stats', DatabaseStats)
 ], debug=True)

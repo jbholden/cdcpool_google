@@ -32,13 +32,19 @@ class FBPoolAPI:
             raise FBAPIException(response.code,response.read())
 
     def getTeam(self,name):
-        pass
+        response = self.__fbpool.httpGetTeam(name)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
 
     def getTeamByKey(self,team_key):
-        pass
+        response = self.__fbpool.httpGetTeamByKey(team_key)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
 
     def getTeamByID(self,team_id):
-        pass
+        response = self.__fbpool.httpGetTeamByID(team_id)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
 
     def getAllTeams(self):
         pass

@@ -29,6 +29,4 @@ test_classes = [('test players in datastore',TestPlayers),
                 ('test the update class',TestUpdate),
                 ('test the week results page',TestWeekResults),
                 ('test the player results page',TestPlayerResults),
-                ('test the pytz timezone module',TestTimezone),
-                ('test the team api',TestTeam) ]
-
+                ('test the pytz timezone module',TestTimezone) ]

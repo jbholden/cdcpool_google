@@ -1,16 +1,17 @@
+ROOT_PATH = '../../.'
+import sys
+sys.path.append(ROOT_PATH)
+
 import unittest
 import socket
 import logging
-from google.appengine.api import urlfetch
 from scripts.api.fbpool_api import *
 from scripts.api.fbpool_api_exception import *
 
 class TestTeam(unittest.TestCase):
 
     def setUp(self):
-        hostname = socket.gethostname()
-        urlfetch.set_default_fetch_deadline(60)
-        url = "http://%s" % (hostname)
+        url = "http://localhost:10090"
         self.fbpool = FBPoolAPI(url=url)
 
     def test_create_team(self):
@@ -39,6 +40,7 @@ class TestTeam(unittest.TestCase):
 
 
     def test_get_team(self):
+        import pdb; pdb.set_trace()
         try:
             self.fbpool.deleteTeamIfExists("Team3")
             dummy_team = self.fbpool.createTeam("Team3","Conference1")
@@ -48,12 +50,7 @@ class TestTeam(unittest.TestCase):
             self.assertTrue(False)
             return
 
-        self.assertIn('id',team)
-        self.assertIn('key',team)
-        self.assertIn('name',team)
-        self.assertIn('conference',team)
-        self.assertEquals(team['name'],"Team3")
-        self.assertEquals(team['conference'],"Conference1")
+        self.__verify_team(team,"Team3","Conference1")
 
     def test_delete_team_by_id(self):
         try:
@@ -249,6 +246,8 @@ class TestTeam(unittest.TestCase):
         self.assertIn('key',team)
         self.assertIn('name',team)
         self.assertIn('conference',team)
-        self.assertEquals(team.name,name)
-        self.assertEquals(team.conference,conference)
+        self.assertEquals(team['name'],name)
+        self.assertEquals(team['conference'],conference)
 
+if __name__ == "__main__":
+    unittest.main()

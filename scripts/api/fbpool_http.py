@@ -11,9 +11,15 @@ class FBPoolHTTP:
     def __geturl(self,address):
         return "%s%s" % (self.url,address)
 
-    def httpGet(self,address):
+    def httpGet(self,address,data=None):
+        if data != None:
+            headers = { 'Content-Type' : 'application/json; charset=UTF-8' }
+            data_json = json.dumps(data)
         try:
-            req = urllib2.Request(self.__geturl(address))
+            if data != None:
+                req = urllib2.Request(self.__geturl(address),data_json,headers)
+            else:
+                req = urllib2.Request(self.__geturl(address))
             response = urllib2.urlopen(req)
         except urllib2.HTTPError,err:
             response = err
@@ -73,6 +79,21 @@ class FBPoolHTTP:
         data = dict()
         data['id'] = team_id
         return self.httpDelete('/api/team',data)
+
+    def httpGetTeam(self,name):
+        data = dict()
+        data['name'] = name
+        return self.httpGet('/api/team',data)
+
+    def httpGetTeamByKey(self,team_key):
+        data = dict()
+        data['key'] = team_key
+        return self.httpGet('/api/team',data)
+
+    def httpGetTeamByID(self,team_id):
+        data = dict()
+        data['id'] = team_id
+        return self.httpGet('/api/team',data)
 
 if __name__ == "__main__":
     api = FBPoolHTTP("http://localhost:10090")

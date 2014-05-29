@@ -21,7 +21,7 @@ class TeamAPIPage(APIHandler):
         if 'name' in data: 
             num_params += 1
 
-        if num_params != 0:
+        if num_params != 1:
             self.error(400) 
             self.write("only one parameter should be defined to find the team")
             return 
@@ -42,7 +42,8 @@ class TeamAPIPage(APIHandler):
             self.write(e.errmsg)
             return
 
-
+        data = self.build_team_object(team)
+        self.render_json(data)
              
 
     # this creates a new team
@@ -82,7 +83,7 @@ class TeamAPIPage(APIHandler):
         if 'name' in data: 
             num_params += 1
 
-        if num_params != 0:
+        if num_params != 1:
             self.error(400) 
             self.write("only one parameter should be defined to find the team")
             return 

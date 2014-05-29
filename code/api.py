@@ -62,6 +62,7 @@ class API:
             raise APIException(404,"could not find the team")
             return
 
+        # TODO:  read from memcache instead?
         team = db.get(teams[name])
         return team
 

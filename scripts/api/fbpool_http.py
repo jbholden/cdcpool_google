@@ -11,15 +11,9 @@ class FBPoolHTTP:
     def __geturl(self,address):
         return "%s%s" % (self.url,address)
 
-    def httpGet(self,address,data=None):
-        if data != None:
-            headers = { 'Content-Type' : 'application/json; charset=UTF-8' }
-            data_json = json.dumps(data)
+    def httpGet(self,address):
         try:
-            if data != None:
-                req = urllib2.Request(self.__geturl(address),data_json,headers)
-            else:
-                req = urllib2.Request(self.__geturl(address))
+            req = urllib2.Request(self.__geturl(address))
             response = urllib2.urlopen(req)
         except urllib2.HTTPError,err:
             response = err
@@ -35,12 +29,16 @@ class FBPoolHTTP:
             response = err
         return response
 
-    def httpDelete(self,address,data):
-        headers = { 'Content-Type' : 'application/json; charset=UTF-8' }
-        data_json = json.dumps(data)
+    def httpDelete(self,address,data=None):
+        if data != None:
+            headers = { 'Content-Type' : 'application/json; charset=UTF-8' }
+            data_json = json.dumps(data)
         opener = urllib2.build_opener(urllib2.HTTPHandler)
         try:
-            req = urllib2.Request(self.__geturl(address),data_json,headers)
+            if data != None:
+                req = urllib2.Request(self.__geturl(address),data_json,headers)
+            else:
+                req = urllib2.Request(self.__geturl(address))
             req.get_method = lambda: 'DELETE'
             response = opener.open(req)
         except urllib2.HTTPError,err:
@@ -80,21 +78,17 @@ class FBPoolHTTP:
         data['id'] = team_id
         return self.httpDelete('/api/team',data)
 
+    def httpDeleteAllTeams(self):
+        return self.httpDelete('/api/teams')
+
     def httpGetTeam(self,name):
-        data = dict()
-        data['name'] = name
-        return self.httpGet('/api/team',data)
+        return self.httpGet('/api/team/name/%s' % (name))
 
     def httpGetTeamByKey(self,team_key):
-        data = dict()
-        data['key'] = team_key
-        return self.httpGet('/api/team',data)
+        return self.httpGet('/api/team/key/%s' % (team_key))
 
     def httpGetTeamByID(self,team_id):
-        data = dict()
-        data['id'] = team_id
-        return self.httpGet('/api/team',data)
+        return self.httpGet('/api/team/id/%d' % (team_id))
 
-if __name__ == "__main__":
-    api = FBPoolHTTP("http://localhost:10090")
-    response = api.httpDeleteTeam("Team1")
+    def httpGetAllTeams(self):
+        return self.httpGet('/api/teams')

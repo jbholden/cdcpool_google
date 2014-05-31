@@ -35,22 +35,34 @@ class FBPoolAPI:
         response = self.__fbpool.httpGetTeam(name)
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
 
     def getTeamByKey(self,team_key):
         response = self.__fbpool.httpGetTeamByKey(team_key)
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
 
     def getTeamByID(self,team_id):
         response = self.__fbpool.httpGetTeamByID(team_id)
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
 
     def getAllTeams(self):
-        pass
+        response = self.__fbpool.httpGetAllTeams()
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
 
     def deleteAllTeams(self):
-        pass
+        response = self.__fbpool.httpDeleteAllTeams()
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
 
     def deleteTeamIfExists(self,name):
         try:

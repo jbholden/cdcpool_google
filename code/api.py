@@ -54,6 +54,17 @@ class API:
 
         d.delete_team_from_memcache(team)
 
+    def delete_teams(self):
+        d = Database()
+        teams = d.load_teams("teams")
+
+        for team_key in teams:
+            team = db.get(team_key)
+            db.delete(team)
+
+        memcache.delete("teamkeys")
+        memcache.delete("teams")
+
     def get_team(self,name):
         d = Database()
         teams = d.load_teams("teamkeys")
@@ -84,5 +95,10 @@ class API:
             raise APIException(500,"exception when getting key")
             return
         return self.get_team_by_key(str(team_key))
+
+    def get_teams(self):
+        d = Database()
+        teams = d.load_teams("teams").values()
+        return teams
 
 

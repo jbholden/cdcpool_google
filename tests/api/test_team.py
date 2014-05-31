@@ -40,7 +40,6 @@ class TestTeam(unittest.TestCase):
 
 
     def test_get_team(self):
-        import pdb; pdb.set_trace()
         try:
             self.fbpool.deleteTeamIfExists("Team3")
             dummy_team = self.fbpool.createTeam("Team3","Conference1")
@@ -133,6 +132,7 @@ class TestTeam(unittest.TestCase):
 
             self.fbpool.deleteAllTeams()
         except FBAPIException as e:
+            print "FBAPIException:  code=%d, message=%s" % (e.http_code,e.errmsg)
             self.assertTrue(False)
             return
 

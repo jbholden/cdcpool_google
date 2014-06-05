@@ -4,7 +4,6 @@ sys.path.append(ROOT_PATH)
 
 import unittest
 import socket
-import logging
 from scripts.api.fbpool_api import *
 from scripts.api.fbpool_api_exception import *
 
@@ -38,7 +37,7 @@ class TestGame(unittest.TestCase):
             self.fbpool.deleteGameById(created_game['id'])
 
         except FBAPIException as e:
-            logging.info(e)
+            print e
             self.assertTrue(False)
             return
 
@@ -68,7 +67,7 @@ class TestGame(unittest.TestCase):
             self.fbpool.deleteGameById(created_game['id'])
 
         except FBAPIException as e:
-            logging.info(e)
+            print e
             self.assertTrue(False)
             return
 
@@ -99,12 +98,141 @@ class TestGame(unittest.TestCase):
             self.fbpool.deleteGameById(created_game['id'])
 
         except FBAPIException as e:
-            logging.info(e)
             self.assertTrue(False)
             return
 
         self.__verify_game(created_game,**game)
 
+    def test_delete_game_by_id(self):
+        try:
+            created_game = self.__create_game_for_test()
+            self.fbpool.deleteGameById(created_game['id'])
+        except FBAPIException as e:
+            print e
+            self.assertTrue(False)
+            return
+
+        try:
+            game = self.getGameByID(created_game['id'])
+            print "Game still exists."
+            self.assertTrue(False)
+        except FBAPIException as e:
+            self.assertEquals(e.http_code,404)
+            self.assertEquals(e.errmsg,"could not find the game")
+            return
+
+        self.__cleanup_created_game_teams()
+
+    def test_delete_game_by_key(self):
+        try:
+            created_game = self.__create_game_for_test()
+            self.fbpool.deleteGameByKey(created_game['key'])
+        except FBAPIException as e:
+            print e
+            self.assertTrue(False)
+            return
+
+        try:
+            game = self.getGameByID(created_game['id'])
+            print "Game still exists."
+            self.assertTrue(False)
+        except FBAPIException as e:
+            self.assertEquals(e.http_code,404)
+            self.assertEquals(e.errmsg,"could not find the game")
+            return
+
+        self.__cleanup_created_game_teams()
+
+    def test_delete_all_games(self):
+        try:
+            created_game = self.__create_game_for_test()
+            self.fbpool.deleteAllGames()
+            games = self.fbpool.getAllGames()
+            self.assertEquals(len(games),0)
+        except FBAPIException as e:
+            print e
+            self.assertTrue(False)
+            return
+
+        self.__cleanup_created_game_teams()
+
+    def test_get_game_by_id(self):
+        try:
+            created_game = self.__create_game_for_test()
+            game = self.fbpool.getGameByID(created_game['id'])
+            self.fbpool.deleteGameById(created_game['id'])
+        except FBAPIException as e:
+            print e
+            self.assertTrue(False)
+            return
+
+        self.assertIn('id',game)
+        self.assertEquals(created_game['id'],game['id'])
+        self.__cleanup_created_game_teams()
+
+    def test_get_game_by_key(self):
+        try:
+            created_game = self.__create_game_for_test()
+            game = self.fbpool.getGameByKey(created_game['key'])
+            self.fbpool.deleteGameById(created_game['id'])
+        except FBAPIException as e:
+            print e
+            self.assertTrue(False)
+            return
+
+        self.assertIn('key',game)
+        self.assertEquals(created_game['key'],game['key'])
+        self.__cleanup_created_game_teams()
+
+    def test_get_all_games(self):
+        try:
+            self.fbpool.deleteAllGames()
+            created_game1 = self.__create_game_for_test()
+            created_game2 = self.__create_game_for_test()
+            created_game3 = self.__create_game_for_test()
+            games = self.fbpool.getGameAllGames()
+            self.fbpool.deleteAllGames()
+        except FBAPIException as e:
+            print e
+            self.assertTrue(False)
+            return
+
+        self.assertEquals(len(games),3)
+
+        game_ids = sorted([game['id'] for game in games ])
+        expected_ids = sorted([ created_game1['id'], created_game2['id'], created_game3['id' ]])
+
+        self.assertEquals(game_ids,expected_ids)
+        self.__cleanup_created_game_teams()
+
+    def __create_game_for_test(self):
+        team1 = self.fbpool.createTeamIfDoesNotExist("Team1","Conference1")
+        team2 = self.fbpool.createTeamIfDoesNotExist("Team2","Conference1")
+
+        game = dict()
+        game['number'] = 2
+        game['team1'] = team1['key']
+        game['team2'] = team2['key']
+        game['team1_score'] = 21
+        game['team2_score'] = 20 
+        game['favored'] = "team2"
+        game['spread'] = 0.5
+        game['state'] = "final"
+        game['quarter'] = None
+        game['time_left'] = None
+        game['date'] = "09/05/2014 19:00"
+
+        created_game = self.fbpool.createGame(**game)
+        return created_game
+
+    def __cleanup_created_game_teams(self):
+        try:
+            self.fbpool.deleteTeamIfExists("Team1")
+            self.fbpool.deleteTeamIfExists("Team2")
+        except FBAPIException as e:
+            print e
+            self.AssertTrue(False)
+            return
 
     def __verify_game(self,game,number=None,team1=None,team2=None,team1_score=None,team2_score=None,favored=None,spread=None,quarter=None,time_left=None,date=None):
         self.assertIn('id',game)

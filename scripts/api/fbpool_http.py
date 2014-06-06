@@ -117,3 +117,13 @@ class FBPoolHTTP:
 
     def httpGetAllGames(self):
         return self.httpGet('/api/games')
+
+    def httpPutGameByKey(self,game_key,data):
+        put_data = dict(data)
+        put_data['key'] = game_key
+        return self.httpPut('/api/game',put_data)
+
+    def httpPutGameByID(self,game_id,data):
+        put_data = dict(data)
+        put_data['id'] = game_id
+        return self.httpPut('/api/game',put_data)

@@ -182,6 +182,63 @@ class API:
         results = list(games_query)
         return [ result for result in results ]
 
+    def edit_game_by_id(self,game_id,data):
+        try:
+            game_key = db.Key.from_path('Game',game_id)
+        except:
+            raise APIException(500,"exception when getting key")
+            return
+        self.edit_game_by_key(str(game_key),data)
+
+    def edit_game_by_key(self,game_key,data):
+        cache_data = memcache.get("games_key")
+        if cache_data and game_key in cache_data:
+            game = cache_data[game_key]
+        else:
+            game = db.get(game_key)
+
+        if 'number' in data:
+            game.number = data['number']
+
+        if 'team1' in data:
+            game.team1 = data['team1']
+
+        if 'team2' in data:
+            game.team2 = data['team2']
+
+        if 'team1_score' in data:
+            game.team1_score = data['team1_score']
+
+        if 'team2_score' in data:
+            game.team2_score = data['team2_score']
+
+        if 'favored' in data:
+            game.favored = data['favored']
+
+        if 'spread' in data:
+            game.spread = data['spread']
+
+        if 'state' in data:
+            game.state = data['state']
+
+        if 'quarter' in data:
+            game.quarter = data['quarter']
+
+        if 'time_left' in data:
+            game.time_left = data['time_left']
+
+        if 'date' in data:
+            game.date = data['date']
+
+        game.put()
+
+        game_id = game.key().id()
+
+        self.__delete_from_memcache_dict("games_id",game_id)
+        self.__delete_from_memcache_dict("games_key",game_key)
+        self.__add_to_memcache_dict("games_id",game_id,game)
+        self.__add_to_memcache_dict("games_key",game_key,game)
+
     def __add_to_memcache_dict(self,key,dict_key,dict_value):
         data = memcache.get(key)
         if not(data):

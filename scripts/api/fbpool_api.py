@@ -130,3 +130,13 @@ class FBPoolAPI:
             raise FBAPIException(response.code,response.read())
         data = json.loads(response.read())
         return data
+
+    def editGameByKey(self,game_key,data):
+        response = self.__fbpool.httpPutGameByKey(game_key,data)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
+    def editGameByID(self,game_id,data):
+        response = self.__fbpool.httpPutGameByID(game_id,data)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())

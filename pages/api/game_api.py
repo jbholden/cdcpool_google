@@ -114,4 +114,35 @@ class GameAPICreateDelete(APIHandler):
             self.write(e.errmsg)
             return
 
+    def put(self):
+        data = json.loads(self.request.body) 
+
+        num_params = 0
+        if 'id' in data: 
+            num_params += 1
+        if 'key' in data: 
+            num_params += 1
+
+        if num_params != 1:
+            self.error(400) 
+            self.write("id or key must be passed in")
+            return 
+
+        if data['date'] != None:
+            data['date'] = self.convert_to_datetime(data['date'])
+
+        try:
+            api = API()
+            if 'key' in data:
+                api.edit_game_by_key(data['key'],data)
+            elif 'id' in data:
+                api.edit_game_by_id(data['id'],data)
+            else:
+                raise AssertionError,"should not get here"
+
+        except APIException as e:
+            self.error(e.http_code)
+            self.write(e.errmsg)
+            return
+
 

@@ -33,8 +33,10 @@ class TestGame(unittest.TestCase):
             game['time_left'] = None
             game['date'] = None
 
-            created_game = self.fbpool.createGame(**game)
-            self.fbpool.deleteGameById(created_game['id'])
+            created_game = self.fbpool.createGame(game)
+            self.fbpool.deleteGameByID(created_game['id'])
+            self.fbpool.deleteTeamIfExists("Team1")
+            self.fbpool.deleteTeamIfExists("Team2")
 
         except FBAPIException as e:
             print e
@@ -63,11 +65,13 @@ class TestGame(unittest.TestCase):
             game['time_left'] = "9:57"
             game['date'] = "09/05/2014 19:00"
 
-            created_game = self.fbpool.createGame(**game)
-            self.fbpool.deleteGameById(created_game['id'])
+            created_game = self.fbpool.createGame(game)
+            self.fbpool.deleteGameByID(created_game['id'])
+            self.fbpool.deleteTeamIfExists("Team1")
+            self.fbpool.deleteTeamIfExists("Team2")
 
         except FBAPIException as e:
-            print e
+            print "code=%d, message=%s" % (e.http_code,e.errmsg)
             self.assertTrue(False)
             return
 
@@ -94,8 +98,10 @@ class TestGame(unittest.TestCase):
             game['time_left'] = None
             game['date'] = "09/05/2014 19:00"
 
-            created_game = self.fbpool.createGame(**game)
-            self.fbpool.deleteGameById(created_game['id'])
+            created_game = self.fbpool.createGame(game)
+            self.fbpool.deleteGameByID(created_game['id'])
+            self.fbpool.deleteTeamIfExists("Team1")
+            self.fbpool.deleteTeamIfExists("Team2")
 
         except FBAPIException as e:
             self.assertTrue(False)
@@ -106,14 +112,14 @@ class TestGame(unittest.TestCase):
     def test_delete_game_by_id(self):
         try:
             created_game = self.__create_game_for_test()
-            self.fbpool.deleteGameById(created_game['id'])
+            self.fbpool.deleteGameByID(created_game['id'])
         except FBAPIException as e:
             print e
             self.assertTrue(False)
             return
 
         try:
-            game = self.getGameByID(created_game['id'])
+            game = self.fbpool.getGameByID(created_game['id'])
             print "Game still exists."
             self.assertTrue(False)
         except FBAPIException as e:
@@ -133,7 +139,7 @@ class TestGame(unittest.TestCase):
             return
 
         try:
-            game = self.getGameByID(created_game['id'])
+            game = self.fbpool.getGameByID(created_game['id'])
             print "Game still exists."
             self.assertTrue(False)
         except FBAPIException as e:
@@ -160,7 +166,7 @@ class TestGame(unittest.TestCase):
         try:
             created_game = self.__create_game_for_test()
             game = self.fbpool.getGameByID(created_game['id'])
-            self.fbpool.deleteGameById(created_game['id'])
+            self.fbpool.deleteGameByID(created_game['id'])
         except FBAPIException as e:
             print e
             self.assertTrue(False)
@@ -174,7 +180,7 @@ class TestGame(unittest.TestCase):
         try:
             created_game = self.__create_game_for_test()
             game = self.fbpool.getGameByKey(created_game['key'])
-            self.fbpool.deleteGameById(created_game['id'])
+            self.fbpool.deleteGameByID(created_game['id'])
         except FBAPIException as e:
             print e
             self.assertTrue(False)
@@ -190,10 +196,10 @@ class TestGame(unittest.TestCase):
             created_game1 = self.__create_game_for_test()
             created_game2 = self.__create_game_for_test()
             created_game3 = self.__create_game_for_test()
-            games = self.fbpool.getGameAllGames()
+            games = self.fbpool.getAllGames()
             self.fbpool.deleteAllGames()
         except FBAPIException as e:
-            print e
+            print "code=%d, message=%s" % (e.http_code,e.errmsg)
             self.assertTrue(False)
             return
 
@@ -224,8 +230,8 @@ class TestGame(unittest.TestCase):
 
             self.fbpool.editGameByID(created_game['id'],game)
 
-            edited_game = self.getGameByID(created_game['id'])
-            self.fbpool.deleteGameById(created_game['id'])
+            edited_game = self.fbpool.getGameByID(created_game['id'])
+            self.fbpool.deleteGameByID(created_game['id'])
         except FBAPIException as e:
             print e
             self.assertTrue(False)
@@ -252,8 +258,8 @@ class TestGame(unittest.TestCase):
 
             self.fbpool.editGameByKey(created_game['key'],game)
 
-            edited_game = self.getGameByID(created_game['id'])
-            self.fbpool.deleteGameById(created_game['id'])
+            edited_game = self.fbpool.getGameByID(created_game['id'])
+            self.fbpool.deleteGameByID(created_game['id'])
         except FBAPIException as e:
             print e
             self.assertTrue(False)
@@ -278,7 +284,7 @@ class TestGame(unittest.TestCase):
         game['time_left'] = None
         game['date'] = "09/05/2014 19:00"
 
-        created_game = self.fbpool.createGame(**game)
+        created_game = self.fbpool.createGame(game)
         return created_game
 
     def __cleanup_created_game_teams(self):
@@ -290,7 +296,7 @@ class TestGame(unittest.TestCase):
             self.AssertTrue(False)
             return
 
-    def __verify_game(self,game,number=None,team1=None,team2=None,team1_score=None,team2_score=None,favored=None,spread=None,quarter=None,time_left=None,date=None):
+    def __verify_game(self,game,number=None,team1=None,team2=None,team1_score=None,team2_score=None,favored=None,spread=None,state=None,quarter=None,time_left=None,date=None):
         self.assertIn('id',game)
         self.assertIn('key',game)
         self.assertIn('number',game)

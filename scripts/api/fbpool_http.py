@@ -92,3 +92,28 @@ class FBPoolHTTP:
 
     def httpGetAllTeams(self):
         return self.httpGet('/api/teams')
+
+    def httpPostGameCreate(self,data):
+        return self.httpPost('/api/game',data)
+
+    def httpDeleteGameByKey(self,game_key):
+        data = dict()
+        data['key'] = game_key
+        return self.httpDelete('/api/game',data)
+
+    def httpDeleteGameByID(self,game_id):
+        data = dict()
+        data['id'] = game_id
+        return self.httpDelete('/api/game',data)
+
+    def httpGetGameByID(self,game_id):
+        return self.httpGet('/api/game/id/%d' % (game_id))
+
+    def httpGetGameByKey(self,game_key):
+        return self.httpGet('/api/game/key/%s' % (game_key))
+
+    def httpDeleteAllGames(self):
+        return self.httpDelete('/api/games')
+
+    def httpGetAllGames(self):
+        return self.httpGet('/api/games')

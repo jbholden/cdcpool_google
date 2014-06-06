@@ -127,3 +127,6 @@ class FBPoolHTTP:
         put_data = dict(data)
         put_data['id'] = game_id
         return self.httpPut('/api/game',put_data)
+
+    def httpDeleteGamesCache(self):
+        return self.httpDelete('/api/games/cache')

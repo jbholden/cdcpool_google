@@ -239,6 +239,10 @@ class API:
         self.__add_to_memcache_dict("games_id",game_id,game)
         self.__add_to_memcache_dict("games_key",game_key,game)
 
+    def delete_games_cache(self):
+        memcache.delete("games_key")
+        memcache.delete("games_id")
+
     def __add_to_memcache_dict(self,key,dict_key,dict_value):
         data = memcache.get(key)
         if not(data):

@@ -140,3 +140,8 @@ class FBPoolAPI:
         response = self.__fbpool.httpPutGameByID(game_id,data)
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
+
+    def deleteGamesCache(self):
+        response = self.__fbpool.httpDeleteGamesCache()
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())

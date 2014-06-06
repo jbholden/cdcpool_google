@@ -267,6 +267,14 @@ class TestGame(unittest.TestCase):
 
         self.__verify_game(edited_game,**game)
 
+    def test_delete_games_cache(self):
+        try:
+            self.fbpool.deleteGamesCache()
+        except FBAPIException as e:
+            print e
+            self.assertTrue(False)
+            return
+
     def __create_game_for_test(self):
         team1 = self.fbpool.createTeamIfDoesNotExist("Team1","Conference1")
         team2 = self.fbpool.createTeamIfDoesNotExist("Team2","Conference1")

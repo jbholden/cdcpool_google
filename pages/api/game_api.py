@@ -145,4 +145,13 @@ class GameAPICreateDelete(APIHandler):
             self.write(e.errmsg)
             return
 
+class GameAPIDeleteCache(APIHandler):
 
+    def delete(self):
+        try:
+            api = API()
+            api.delete_games_cache()
+        except APIException as e:
+            self.error(e.http_code)
+            self.write(e.errmsg)
+            return

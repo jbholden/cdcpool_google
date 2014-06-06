@@ -88,6 +88,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/team/key/<team_key>', TeamAPIGetByKey),
     webapp2.Route(r'/api/game', GameAPICreateDelete),
     webapp2.Route(r'/api/games', GameAPIGetDeleteAll),
+    webapp2.Route(r'/api/games/cache', GameAPIDeleteCache),
     webapp2.Route(r'/api/game/id/<game_id:([0-9]+)>', GameAPIGetById),
     webapp2.Route(r'/api/game/key/<game_key>', GameAPIGetByKey),
 ], debug=True)

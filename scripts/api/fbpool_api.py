@@ -145,3 +145,88 @@ class FBPoolAPI:
         response = self.__fbpool.httpDeleteGamesCache()
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
+
+    def deletePlayerIfExists(self,name):
+        try:
+            self.deletePlayer(name)
+        except FBAPIException as e:
+            if e.http_code == 404 and e.errmsg == "could not find the player":
+                return
+            raise FBAPIException(e.http_code,e.errmsg)
+
+    def deletePlayerByKey(self,player_key):
+        response = self.__fbpool.httpDeletePlayerByKey(player_key)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
+    def deletePlayerByID(self,player_id):
+        response = self.__fbpool.httpDeletePlayerByID(player_id)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
+    def createPlayer(self,name,years):
+        response = self.__fbpool.httpPostPlayerCreate(name,years)
+        if response.code == 200:
+            data = json.loads(response.read())
+            return data
+        raise FBAPIException(response.code,response.read())
+
+    def createPlayerIfDoesNotExist(self,name,years):
+        try:
+            player = self.createPlayer(name,years)
+        except FBAPIException as e:
+            if e.http_code == 409 and e.errmsg == "player already exists":
+                player = self.getPlayer(name)
+                return player
+            raise FBAPIException(e.http_code,e.errmsg)
+        return player
+
+    def getPlayer(self,name):
+        response = self.__fbpool.httpGetPlayer(name)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
+
+    def getPlayerByKey(self,player_key):
+        response = self.__fbpool.httpGetPlayerByKey(player_key)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
+
+    def getPlayerByID(self,player_id):
+        response = self.__fbpool.httpGetPlayerByID(player_id)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
+
+    def getAllPlayers(self):
+        response = self.__fbpool.httpGetAllPlayers()
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
+
+    def getPlayersInYear(self,year):
+        response = self.__fbpool.httpGetPlayersInYear(year)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
+
+    def deleteAllPlayers(self):
+        response = self.__fbpool.httpDeleteAllPlayers()
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
+    def editPlayerByKey(self,player_key,data):
+        response = self.__fbpool.httpPutPlayerByKey(player_key,data)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
+    def editPlayerByID(self,player_id,data):
+        response = self.__fbpool.httpPutPlayerByID(player_id,data)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())

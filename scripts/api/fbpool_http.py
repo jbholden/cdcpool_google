@@ -130,3 +130,47 @@ class FBPoolHTTP:
 
     def httpDeleteGamesCache(self):
         return self.httpDelete('/api/games/cache')
+
+    def httpDeletePlayerByKey(self,player_key):
+        data = dict()
+        data['key'] = player_key
+        return self.httpDelete('/api/player',data)
+
+    def httpDeletePlayerByID(self,player_id):
+        data = dict()
+        data['id'] = player_id
+        return self.httpDelete('/api/player',data)
+
+    def httpDeleteAllPlayers(self):
+        return self.httpDelete('/api/players')
+
+    def httpPostPlayerCreate(self,name,years):
+        data = dict()
+        data['name'] = name
+        data['years'] = years
+        return self.httpPost('/api/player',data)
+
+    def httpGetPlayer(self,name):
+        return self.httpGet('/api/player/name/%s' % (name))
+
+    def httpGetPlayerByKey(self,player_key):
+        return self.httpGet('/api/player/key/%s' % (player_key))
+
+    def httpGetPlayerByID(self,player_id):
+        return self.httpGet('/api/player/id/%d' % (player_id))
+
+    def httpGetAllPlayers(self):
+        return self.httpGet('/api/players')
+
+    def httpGetPlayersInYear(self,year):
+        return self.httpGet('/api/player/year/%d' % (year))
+
+    def httpPutPlayerByKey(self,player_key,data):
+        put_data = dict(data)
+        put_data['key'] = player_key
+        return self.httpPut('/api/player',put_data)
+
+    def httpPutPlayerByID(self,player_id,data):
+        put_data = dict(data)
+        put_data['id'] = player_id
+        return self.httpPut('/api/player',put_data)

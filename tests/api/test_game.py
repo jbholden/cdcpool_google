@@ -205,6 +205,62 @@ class TestGame(unittest.TestCase):
         self.assertEquals(game_ids,expected_ids)
         self.__cleanup_created_game_teams()
 
+    def test_edit_game_by_id(self):
+        try:
+            created_game = self.__create_game_for_test()
+
+            game = dict()
+            game['number'] = 5
+            game['team1'] = created_game['team2']
+            game['team2'] = created_game['team1']
+            game['team1_score'] = 10
+            game['team2_score'] = 17 
+            game['favored'] = "team1"
+            game['spread'] = 9.5
+            game['state'] = "in_progress"
+            game['quarter'] = "3rd"
+            game['time_left'] = "10:10"
+            game['date'] = "09/06/2014 19:00"
+
+            self.fbpool.editGameByID(created_game['id'],game)
+
+            edited_game = self.getGameByID(created_game['id'])
+            self.fbpool.deleteGameById(created_game['id'])
+        except FBAPIException as e:
+            print e
+            self.assertTrue(False)
+            return
+
+        self.__verify_game(edited_game,**game)
+    
+    def test_edit_game_by_key(self):
+        try:
+            created_game = self.__create_game_for_test()
+
+            game = dict()
+            game['number'] = 5
+            game['team1'] = created_game['team2']
+            game['team2'] = created_game['team1']
+            game['team1_score'] = 10
+            game['team2_score'] = 17 
+            game['favored'] = "team1"
+            game['spread'] = 9.5
+            game['state'] = "in_progress"
+            game['quarter'] = "3rd"
+            game['time_left'] = "10:10"
+            game['date'] = "09/06/2014 19:00"
+
+            self.fbpool.editGameByKey(created_game['key'],game)
+
+            edited_game = self.getGameByID(created_game['id'])
+            self.fbpool.deleteGameById(created_game['id'])
+        except FBAPIException as e:
+            print e
+            self.assertTrue(False)
+            return
+
+        self.__verify_game(edited_game,**game)
+
     def __create_game_for_test(self):
         team1 = self.fbpool.createTeamIfDoesNotExist("Team1","Conference1")
         team2 = self.fbpool.createTeamIfDoesNotExist("Team2","Conference1")

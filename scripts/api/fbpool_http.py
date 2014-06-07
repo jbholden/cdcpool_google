@@ -131,6 +131,9 @@ class FBPoolHTTP:
     def httpDeleteGamesCache(self):
         return self.httpDelete('/api/games/cache')
 
+    def httpDeletePlayersCache(self):
+        return self.httpDelete('/api/players/cache')
+
     def httpDeletePlayer(self,name):
         data = dict()
         data['name'] = name

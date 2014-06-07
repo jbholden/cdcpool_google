@@ -146,6 +146,11 @@ class FBPoolAPI:
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
+    def deletePlayersCache(self):
+        response = self.__fbpool.httpDeletePlayersCache()
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
     def deletePlayerIfExists(self,name):
         try:
             self.deletePlayer(name)

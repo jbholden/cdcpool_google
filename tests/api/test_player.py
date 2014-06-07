@@ -255,6 +255,14 @@ class TestPlayer(unittest.TestCase):
             self.assertTrue(False)
             return
 
+    def test_delete_players_cache(self):
+        try:
+            self.fbpool.deletePlayersCache()
+        except FBAPIException as e:
+            print e
+            self.assertTrue(False)
+            return
+
 
     def __verify_player(self,player,name,years):
         self.assertIn('id',player)

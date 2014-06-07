@@ -157,13 +157,12 @@ class PlayerAPICreateEditDelete(APIHandler):
             self.write(e.errmsg)
             return
 
-# TODO
 class PlayerAPIDeleteCache(APIHandler):
 
     def delete(self):
         try:
             api = API()
-            api.delete_games_cache()
+            api.delete_players_cache()
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)

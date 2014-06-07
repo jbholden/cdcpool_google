@@ -243,6 +243,9 @@ class API:
         memcache.delete("games_key")
         memcache.delete("games_id")
 
+    def delete_players_cache(self):
+        memcache.delete("players")
+
     def create_player(self,name,years):
         players = self.__load_players_in_memcache()
 

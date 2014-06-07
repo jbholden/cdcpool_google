@@ -40,6 +40,7 @@ from pages.player_results_page import *
 from pages.overall_results_page import *
 from pages.api.team_api import *
 from pages.api.game_api import *
+from pages.api.player_api import *
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
 
@@ -86,9 +87,15 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/team/name/<team_name>', TeamAPIGetByName),
     webapp2.Route(r'/api/team/id/<team_id:([0-9]+)>', TeamAPIGetById),
     webapp2.Route(r'/api/team/key/<team_key>', TeamAPIGetByKey),
-    webapp2.Route(r'/api/game', GameAPICreateDelete),
+    webapp2.Route(r'/api/game', GameAPICreateEditDelete),
     webapp2.Route(r'/api/games', GameAPIGetDeleteAll),
     webapp2.Route(r'/api/games/cache', GameAPIDeleteCache),
     webapp2.Route(r'/api/game/id/<game_id:([0-9]+)>', GameAPIGetById),
     webapp2.Route(r'/api/game/key/<game_key>', GameAPIGetByKey),
+    webapp2.Route(r'/api/player', PlayerAPICreateEditDelete),
+    webapp2.Route(r'/api/players', PlayerAPIGetDeleteAll),
+    webapp2.Route(r'/api/players/year/<year:([0-9]+)>', PlayerAPIGetInYear),
+    webapp2.Route(r'/api/player/name/<player_name>', PlayerAPIGetByName),
+    webapp2.Route(r'/api/player/id/<player_id:([0-9]+)>', PlayerAPIGetById),
+    webapp2.Route(r'/api/player/key/<player_key>', PlayerAPIGetByKey),
 ], debug=True)

@@ -154,6 +154,11 @@ class FBPoolAPI:
                 return
             raise FBAPIException(e.http_code,e.errmsg)
 
+    def deletePlayer(self,name):
+        response = self.__fbpool.httpDeletePlayer(name)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
     def deletePlayerByKey(self,player_key):
         response = self.__fbpool.httpDeletePlayerByKey(player_key)
         if response.code != 200:

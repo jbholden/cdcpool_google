@@ -6,86 +6,97 @@ from models.games import *
 from code.api import *
 from code.api_exception import *
 
-class GameAPIGetDeleteAll(APIHandler):
+class PlayerAPIGetDeleteAll(APIHandler):
 
     def get(self):
         try:
             api = API()
-            games = api.get_games()
+            players = api.get_players()
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
             return
 
-        data = [ self.build_game_object(game) for game in games ]
+        data = [ self.build_player_object(player) for player in players ]
         self.render_json(data)
 
     def delete(self):
         try:
             api = API()
-            api.delete_games()
+            api.delete_players()
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
             return
 
-class GameAPIGetById(APIHandler):
+class PlayerAPIGetById(APIHandler):
 
-    def get(self,game_id):
+    def get(self,player_id):
         try:
             api = API()
-            game = api.get_game_by_id(int(game_id))
+            player = api.get_player_by_id(int(player_id))
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
             return
 
-        data = self.build_game_object(game)
+        data = self.build_player_object(player)
         self.render_json(data)
 
-class GameAPIGetByKey(APIHandler):
+class PlayerAPIGetByKey(APIHandler):
 
-    def get(self,game_key):
+    def get(self,player_key):
         try:
             api = API()
-            game = api.get_game_by_key(game_key)
+            player = api.get_player_by_key(player_key)
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
             return
 
-        data = self.build_game_object(game)
+        data = self.build_player_object(player)
+        self.render_json(data)
+
+class PlayerAPIGetInYear(APIHandler):
+
+    def get(self,year):
+        try:
+            api = API()
+            players = api.get_players_in_year(int(year))
+        except APIException as e:
+            self.error(e.http_code)
+            self.write(e.errmsg)
+            return
+
+        data = [ self.build_player_object(player) for player in players ]
         self.render_json(data)
 
 
-class GameAPICreateEditDelete(APIHandler):
+# TODO
+class PlayerAPICreateEditDelete(APIHandler):
 
-    # this creates a new game
+    # this creates a new player
     def post(self):
         data = json.loads(self.request.body) 
 
-        required_fields = ['number','team1','team2','team1_score','team2_score','favored','spread','state','quarter','time_left','date']
+        required_fields = ['name','years']
 
         for field in required_fields:
             if self.is_field_missing(field,data):
                 return
 
-        # change date format
-        if data['date'] != None:
-            data['date'] = self.convert_to_datetime(data['date'])
-
         try:
             api = API()
-            game = api.create_game(data)
+            player = api.create_player(data['name'],data['years'])
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
             return
 
-        return_data = self.build_game_object(game)
+        return_data = self.build_player_object(player)
         self.render_json(return_data)
 
-    # this deletes a game object
+    # this deletes a player object
     def delete(self):
         data = json.loads(self.request.body) 
 
@@ -94,18 +105,22 @@ class GameAPICreateEditDelete(APIHandler):
             num_params += 1
         if 'key' in data: 
             num_params += 1
+        if 'name' in data: 
+            num_params += 1
 
         if num_params != 1:
             self.error(400) 
-            self.write("only one parameter should be defined to find the game")
+            self.write("only one parameter should be defined to find the player")
             return 
 
         try:
             api = API()
             if 'key' in data:
-                api.delete_game_by_key(data['key'])
+                api.delete_player_by_key(data['key'])
             elif 'id' in data:
-                api.delete_game_by_id(data['id'])
+                api.delete_player_by_id(data['id'])
+            elif 'name' in data:
+                api.delete_player(data['name'])
             else:
                 raise AssertionError,"should not get here"
 
@@ -128,15 +143,12 @@ class GameAPICreateEditDelete(APIHandler):
             self.write("id or key must be passed in")
             return 
 
-        if data['date'] != None:
-            data['date'] = self.convert_to_datetime(data['date'])
-
         try:
             api = API()
             if 'key' in data:
-                api.edit_game_by_key(data['key'],data)
+                api.edit_player_by_key(data['key'],data)
             elif 'id' in data:
-                api.edit_game_by_id(data['id'],data)
+                api.edit_player_by_id(data['id'],data)
             else:
                 raise AssertionError,"should not get here"
 
@@ -145,7 +157,8 @@ class GameAPICreateEditDelete(APIHandler):
             self.write(e.errmsg)
             return
 
-class GameAPIDeleteCache(APIHandler):
+# TODO
+class PlayerAPIDeleteCache(APIHandler):
 
     def delete(self):
         try:
@@ -155,3 +168,17 @@ class GameAPIDeleteCache(APIHandler):
             self.error(e.http_code)
             self.write(e.errmsg)
             return
+
+class PlayerAPIGetByName(APIHandler):
+
+    def get(self,player_name):
+        try:
+            api = API()
+            player = api.get_player(player_name)
+        except APIException as e:
+            self.error(e.http_code)
+            self.write(e.errmsg)
+            return
+
+        data = self.build_player_object(player)
+        self.render_json(data)

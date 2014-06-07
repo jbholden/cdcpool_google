@@ -35,12 +35,14 @@ class TestPlayer(unittest.TestCase):
             self.assertTrue(False)
         except FBAPIException as e:
             if e.http_code != 409 or e.errmsg != "player already exists":
+                print str(e)
                 self.assertTrue(False)
                 return
 
         try:
-            self.fbpool.deletePlayerByID(player['id'])
+            self.fbpool.deletePlayerByID(player1['id'])
         except FBAPIException as e:
+            print str(e)
             self.assertTrue(False)
             return
 
@@ -58,9 +60,9 @@ class TestPlayer(unittest.TestCase):
 
     def test_get_player_by_id(self):
         try:
-            self.fbpool.createPlayerIfDoesNotExist("Player2",[2014])
-            player = self.fbpool.getPlayerByID("Player2")
-            self.fbpool.deletePlayerByID(player['id'])
+            created_player = self.fbpool.createPlayerIfDoesNotExist("Player2",[2014])
+            player = self.fbpool.getPlayerByID(created_player['id'])
+            self.fbpool.deletePlayerByID(created_player['id'])
         except FBAPIException as e:
             print str(e)
             self.assertTrue(False)
@@ -70,9 +72,9 @@ class TestPlayer(unittest.TestCase):
 
     def test_get_player_by_key(self):
         try:
-            self.fbpool.createPlayerIfDoesNotExist("Player2",[2014])
-            player = self.fbpool.getPlayerByKey("Player2")
-            self.fbpool.deletePlayerByID(player['id'])
+            created_player = self.fbpool.createPlayerIfDoesNotExist("Player2",[2014])
+            player = self.fbpool.getPlayerByKey(created_player['key'])
+            self.fbpool.deletePlayerByID(created_player['id'])
         except FBAPIException as e:
             print str(e)
             self.assertTrue(False)
@@ -95,7 +97,7 @@ class TestPlayer(unittest.TestCase):
             self.assertTrue(False)
             return
 
-        player_names = sorted([player.name for player in players ])
+        player_names = sorted([player['name'] for player in players ])
         self.assertEquals(["Player1","Player2","Player3","Player4","Player5"],player_names)
 
     def test_get_players_in_year(self):
@@ -113,7 +115,7 @@ class TestPlayer(unittest.TestCase):
             self.assertTrue(False)
             return
 
-        player_names = sorted([player.name for player in players ])
+        player_names = sorted([player['name'] for player in players ])
         self.assertEquals(["Player3","Player4"],player_names)
 
     def test_delete_all_players(self):
@@ -133,6 +135,25 @@ class TestPlayer(unittest.TestCase):
 
         self.assertEquals(len(players),0)
 
+    def test_delete_player_by_name(self):
+        try:
+            self.fbpool.deleteAllPlayers()
+            player1 = self.fbpool.createPlayer("Player1",[2014])
+            player2 = self.fbpool.createPlayer("Player2",[2014])
+            player3 = self.fbpool.createPlayer("Player3",[2000])
+            player4 = self.fbpool.createPlayer("Player4",[2000])
+            player5 = self.fbpool.createPlayer("Player5",[2010])
+            self.fbpool.deletePlayer("Player3")
+            players = self.fbpool.getAllPlayers()
+            self.fbpool.deleteAllPlayers()
+        except FBAPIException as e:
+            print str(e)
+            self.assertTrue(False)
+            return
+
+        player_names = sorted([player['name'] for player in players ])
+        self.assertEquals(["Player1","Player2","Player4","Player5"],player_names)
+
     def test_delete_player_by_id(self):
         try:
             self.fbpool.deleteAllPlayers()
@@ -149,7 +170,7 @@ class TestPlayer(unittest.TestCase):
             self.assertTrue(False)
             return
 
-        player_names = sorted([player.name for player in players ])
+        player_names = sorted([player['name'] for player in players ])
         self.assertEquals(["Player1","Player2","Player4","Player5"],player_names)
 
     def test_delete_player_by_key(self):
@@ -168,7 +189,7 @@ class TestPlayer(unittest.TestCase):
             self.assertTrue(False)
             return
 
-        player_names = sorted([player.name for player in players ])
+        player_names = sorted([player['name'] for player in players ])
         self.assertEquals(["Player1","Player2","Player4","Player5"],player_names)
 
     def test_edit_player_by_id(self):

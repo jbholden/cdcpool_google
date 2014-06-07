@@ -243,6 +243,144 @@ class API:
         memcache.delete("games_key")
         memcache.delete("games_id")
 
+    def create_player(self,name,years):
+        players = self.__load_players_in_memcache()
+
+        for player in players.values():
+            if player.name == name:
+                raise APIException(409,"player already exists")
+                return
+
+        player = Player(name=name,years=years)
+        player.put()
+
+        self.__add_to_memcache_dict("players",player.key().id(),player)
+        return player
+
+
+    def delete_player(self,name):
+        player = self.__find_player_in_memcache(name)
+        if player != None:
+            player_key = player.key()
+            player_obj = db.get(player_key)
+        else:
+            player_obj = self.__find_player_in_database(name)
+            if player_obj:
+                player_key = player_obj.key()
+
+        if player_obj == None:
+            raise APIException(404,"could not find the player")
+            return
+
+        db.delete(player)
+        self.__delete_from_memcache_dict("players",player_key)
+
+    def delete_player_by_id(self,player_id):
+        try:
+            player_key = db.Key.from_path('Player',player_id)
+        except:
+            raise APIException(500,"exception when getting key")
+            return
+        self.delete_player_by_key(str(player_key))
+
+    def delete_player_by_key(self,player_key):
+        player = db.get(player_key)
+        if player == None:
+            raise APIException(404,"could not find the player")
+            return
+
+        db.delete(player)
+        self.__delete_from_memcache_dict("players",player_key)
+
+    def delete_players(self):
+        players_query = db.GqlQuery('select * from Player')
+        if players_query != None:
+            for player in players_query:
+                db.delete(player)
+
+        memcache.delete("players")
+
+    def get_players(self):
+        players_by_key = self.__load_players_in_memcache()
+        return players_by_key.values()
+
+    def get_players_in_year(self,year):
+        players_by_key = self.__load_players_in_memcache()
+        players_in_year = [ player for player in players_by_key.values() if year in player.years]
+        return players_in_year
+
+    def get_player(self,name):
+        # see if player is in memcache
+        player = self.__find_player_in_memcache(name)
+        if player:
+            return player
+
+        # now check if is in database
+        players = self.__load_players_in_memcache()
+        player = self.__find_player_in_memcache(name)
+        if player:
+            return player
+
+        raise APIException(404,"could not find the player")
+        return
+
+    def get_player_by_key(self,player_key):
+        # try memcache first
+        players = memcache.get("players")
+        if player_key in players:
+            return players[player_key]
+
+        # next try the database
+        players = self.__load_players_in_memcache()
+        if player_key in players:
+            return players[player_key]
+
+        raise APIException(404,"could not find the player")
+        return
+
+    def get_player_by_id(self,player_id):
+        try:
+            player_key = db.Key.from_path('Player',player_id)
+        except:
+            raise APIException(500,"exception when getting key")
+            return
+        return self.get_player_by_key(str(player_key))
+
+    def edit_player_by_id(self,player_id,data):
+        try:
+            player_key = db.Key.from_path('Player',player_id)
+        except:
+            raise APIException(500,"exception when getting key")
+            return
+        self.edit_player_by_key(str(player_key),data)
+
+    def edit_player_by_key(self,player_key,data):
+        cache_data = memcache.get("players")
+        if cache_data and player_key in cache_data:
+            player = cache_data[player_key]
+        else:
+            player = db.get(player_key)
+
+        if player == None:
+            raise APIException(404,"could not find the player")
+            return
+
+        if 'name' in data:
+            existing_name = self.__find_player_in_database(data['name'])
+            if existing_name != None:
+                raise APIException(409,"player already exists")
+                return
+            player.name = data['name']
+
+        if 'years' in data:
+            player.years = data['years']
+
+        player.put()
+
+        self.__delete_from_memcache_dict("players",player_key)
+        self.__add_to_memcache_dict("players",player_key,player)
+
+
     def __add_to_memcache_dict(self,key,dict_key,dict_value):
         data = memcache.get(key)
         if not(data):
@@ -255,5 +393,32 @@ class API:
         if data != None and dict_key in data:
             del data[dict_key]
             memcache.set(key,data)
+
+    def __load_players_in_memcache(self):
+        players = dict()
+        players_query = db.GqlQuery('select * from Player')
+        if players_query != None:
+            players = {str(player.key()):player for player in players_query}
+        memcache.set("players",players)
+        return players
+
+    def __find_player_in_memcache(self,name):
+        players = memcache.get("players")
+        if players == None:
+            return
+        players_with_name = [player for player in players.values() if player.name == name]
+        if len(players_with_name) > 1:
+            raise APIException(500,"Found multiple players with the same name")
+        if len(players_with_name) == 1:
+            return players_with_name[0]
+        return None
+
+    def __find_player_in_database(self,name):
+        players_query = db.GqlQuery('select * from Player')
+        if players_query != None:
+            for player in players_query:
+                if player.name == name:
+                    return player
+        return None
 
 

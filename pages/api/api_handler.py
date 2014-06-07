@@ -29,6 +29,14 @@ class APIHandler(Handler):
         g['date'] = self.format_date(game.date)
         return g
 
+    def build_player_object(self,player):
+        p = dict()
+        p['id'] = player.key().id()
+        p['key'] = str(player.key())
+        p['name'] = player.name
+        p['years'] = player.years
+        return p
+
     def is_field_missing(self,field,data):
         if field not in data:
             self.error(400)

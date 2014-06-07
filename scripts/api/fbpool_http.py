@@ -131,6 +131,11 @@ class FBPoolHTTP:
     def httpDeleteGamesCache(self):
         return self.httpDelete('/api/games/cache')
 
+    def httpDeletePlayer(self,name):
+        data = dict()
+        data['name'] = name
+        return self.httpDelete('/api/player',data)
+
     def httpDeletePlayerByKey(self,player_key):
         data = dict()
         data['key'] = player_key
@@ -163,7 +168,7 @@ class FBPoolHTTP:
         return self.httpGet('/api/players')
 
     def httpGetPlayersInYear(self,year):
-        return self.httpGet('/api/player/year/%d' % (year))
+        return self.httpGet('/api/players/year/%d' % (year))
 
     def httpPutPlayerByKey(self,player_key,data):
         put_data = dict(data)

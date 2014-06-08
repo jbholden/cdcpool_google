@@ -240,3 +240,85 @@ class FBPoolAPI:
         response = self.__fbpool.httpPutPlayerByID(player_id,data)
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
+
+    def deleteWeekIfExists(self,year,week_number):
+        try:
+            self.deleteWeek(year=year,week_number=week_number)
+        except FBAPIException as e:
+            if e.http_code == 404 and e.errmsg == "could not find the week":
+                return
+            raise FBAPIException(e.http_code,e.errmsg)
+
+    def deleteWeek(self,year,week_number):
+        response = self.__fbpool.httpDeleteWeek(year=year,week_number=week_number)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
+    def deleteWeekByKey(self,week_key):
+        response = self.__fbpool.httpDeleteWeekByKey(week_key)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
+    def deleteWeekByID(self,week_id):
+        response = self.__fbpool.httpDeleteWeekByID(week_id)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
+    def createWeek(self,data):
+        response = self.__fbpool.httpPostWeekCreate(data)
+        if response.code == 200:
+            data = json.loads(response.read())
+            return data
+        raise FBAPIException(response.code,response.read())
+
+    def getWeekByKey(self,week_key):
+        response = self.__fbpool.httpGetWeekByKey(week_key)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
+
+    def getWeekByID(self,week_id):
+        response = self.__fbpool.httpGetWeekByID(week_id)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
+
+    def deleteAllWeeks(self):
+        response = self.__fbpool.httpDeleteAllWeeks()
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
+    def getAllWeeks(self):
+        response = self.__fbpool.httpGetAllWeeks()
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
+
+    def getWeeksInYear(self,year):
+        response = self.__fbpool.httpWeeksInYear(year)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
+
+    def getWeek(self,year,week_number):
+        response = self.__fbpool.httpGetWeek(year,week_number)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
+
+    def editWeekByKey(self,week_key,data):
+        response = self.__fbpool.httpPutWeekByKey(week_key,data)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
+    def editWeekByID(self,week_id,data):
+        response = self.__fbpool.httpPutWeekByID(week_id,data)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
+

@@ -182,3 +182,50 @@ class FBPoolHTTP:
         put_data = dict(data)
         put_data['id'] = player_id
         return self.httpPut('/api/player',put_data)
+
+    def httpDeleteWeek(self,year,week_number):
+        data = dict()
+        data['year'] = year
+        data['number'] = week_number
+        return self.httpDelete('/api/week',data)
+
+    def httpPostWeekCreate(self,data):
+        return self.httpPost('/api/week',data)
+
+    def httpDeleteWeekByKey(self,week_key):
+        data = dict()
+        data['key'] = week_key
+        return self.httpDelete('/api/week',data)
+
+    def httpDeleteWeekByID(self,week_id):
+        data = dict()
+        data['id'] = week_id
+        return self.httpDelete('/api/week',data)
+
+    def httpGetWeekByKey(self,week_key):
+        return self.httpGet('/api/week/key/%s' % (week_key))
+
+    def httpGetWeekByID(self,week_id):
+        return self.httpGet('/api/week/id/%d' % (player_id))
+
+    def httpDeleteAllWeeks(self):
+        return self.httpDelete('/api/weeks')
+
+    def httpGetAllWeeks(self):
+        return self.httpGet('/api/weeks')
+
+    def httpGetWeeksInYear(self,year):
+        return self.httpGet('/api/week/year/%d' % (year))
+
+    def httpGetWeek(self,year,week_number):
+        return self.httpGet('/api/week/%d/year/%d' % (week_number,year))
+
+    def httpPutWeekByKey(self,week_key,data):
+        put_data = dict(data)
+        put_data['key'] = week_key
+        return self.httpPut('/api/week',put_data)
+
+    def httpPutWeekByID(self,week_id,data):
+        put_data = dict(data)
+        put_data['id'] = week_id
+        return self.httpPut('/api/week',put_data)

@@ -6,58 +6,55 @@ from models.weeks import *
 from code.api import *
 from code.api_exception import *
 
-# TODO
 class WeekAPIGetDeleteAll(APIHandler):
 
     def get(self):
         try:
             api = API()
-            players = api.get_players()
+            weeks = api.get_weeks()
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
             return
 
-        data = [ self.build_player_object(player) for player in players ]
+        data = [ self.build_week_object(week) for week in weeks ]
         self.render_json(data)
 
     def delete(self):
         try:
             api = API()
-            api.delete_players()
+            api.delete_weeks()
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
             return
 
-# TODO
 class WeekAPIGetById(APIHandler):
 
-    def get(self,player_id):
+    def get(self,week_id):
         try:
             api = API()
-            player = api.get_player_by_id(int(player_id))
+            week = api.get_week_by_id(int(week_id))
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
             return
 
-        data = self.build_player_object(player)
+        data = self.build_week_object(week)
         self.render_json(data)
 
-# TODO
 class WeekAPIGetByKey(APIHandler):
 
-    def get(self,player_key):
+    def get(self,week_key):
         try:
             api = API()
-            player = api.get_player_by_key(player_key)
+            week = api.get_week_by_key(week_key)
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
             return
 
-        data = self.build_player_object(player)
+        data = self.build_week_object(week)
         self.render_json(data)
 
 # TODO

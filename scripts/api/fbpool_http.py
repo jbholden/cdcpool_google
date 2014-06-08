@@ -206,7 +206,7 @@ class FBPoolHTTP:
         return self.httpGet('/api/week/key/%s' % (week_key))
 
     def httpGetWeekByID(self,week_id):
-        return self.httpGet('/api/week/id/%d' % (player_id))
+        return self.httpGet('/api/week/id/%d' % (week_id))
 
     def httpDeleteAllWeeks(self):
         return self.httpDelete('/api/weeks')

@@ -98,7 +98,7 @@ class TestWeek(unittest.TestCase):
     def test_get_week_by_key(self):
         try:
             self.fbpool.deleteWeekIfExists(year=1978,week_number=1)
-            created_week = self.__create_test_week(year,week_number)
+            created_week = self.__create_test_week(1978,1)
             week = self.fbpool.getWeekByKey(created_week['key'])
             self.fbpool.deleteWeekByID(created_week['id'])
         except FBAPIException as e:
@@ -111,7 +111,7 @@ class TestWeek(unittest.TestCase):
     def test_get_week_by_id(self):
         try:
             self.fbpool.deleteWeekIfExists(year=1978,week_number=1)
-            created_week = self.__create_test_week(year,week_number)
+            created_week = self.__create_test_week(1978,1)
             week = self.fbpool.getWeekByID(created_week['id'])
             self.fbpool.deleteWeekByID(created_week['id'])
         except FBAPIException as e:

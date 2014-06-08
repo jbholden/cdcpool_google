@@ -488,3 +488,43 @@ class API:
         weeks_and_years = d.load_weeks_and_years()
         return year in weeks_and_years and week_number in weeks_and_years[year]
 
+    def get_week_by_key(self,week_key):
+        week = db.get(week_key)
+        if week == None:
+            raise APIException(404,"could not find week")
+            return
+        return week
+
+    def get_week_by_id(self,week_id):
+        try:
+            week_key = db.Key.from_path('Week',week_id)
+        except:
+            raise APIException(500,"exception when getting key")
+            return
+        return self.get_week_by_key(str(week_key))
+
+    def get_weeks(self):
+        d = Database()
+        weeks_and_years = d.load_weeks_and_years(update=True)
+        weeks = []
+        for year in weeks_and_years:
+            week_numbers = weeks_and_years[year]
+            weeks += [d.load_week(year,number) for number in week_numbers]
+        return weeks
+
+    def delete_weeks(self):
+        d = Database()
+        weeks_and_years = d.load_weeks_and_years(update=True)
+
+        weeks_query = db.GqlQuery('select * from Week')
+        if weeks_query != None:
+            for week in weeks_query:
+                db.delete(week)
+
+        tmp = d.load_weeks_and_years(update=True)
+        for year in weeks_and_years:
+            week_numbers = weeks_and_years[year]
+            for number in week_numbers:
+                tmp = d.load_week(year,number)
+
+

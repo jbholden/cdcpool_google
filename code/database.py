@@ -190,6 +190,10 @@ class Database:
         logging.info("Load picks = %f" % (picks_elapsed_time))
         return week,games,picks
 
+    # added call for the API
+    def load_week(self,year,week_number,update=False):
+        return self.__get_week_in_database(year,week_number,update)
+
     def __get_week_in_database(self,year,week_number,update):
         key = "week_%d_%d" % (year,week_number)
         week = memcache.get(key)

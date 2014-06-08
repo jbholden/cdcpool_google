@@ -37,6 +37,24 @@ class APIHandler(Handler):
         p['years'] = player.years
         return p
 
+    def build_week_object(self,week):
+        w = dict()
+        w['id'] = week.key().id()
+        w['key'] = str(week.key())
+        w['year'] = week.year
+        w['number'] = week.number
+        w['winner'] = week.winner
+        w['lock_picks'] = self.format_date(week.lock_picks)
+        w['lock_scores'] = self.format_date(week.lock_scores)
+
+        if week.games == None:
+            w['games'] = None
+        else:
+            w['games'] = [ str(game_key) for game_key in week.games]
+
+        return w
+
+
     def is_field_missing(self,field,data):
         if field not in data:
             self.error(400)

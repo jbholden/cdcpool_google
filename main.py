@@ -40,6 +40,7 @@ from pages.player_results_page import *
 from pages.overall_results_page import *
 from pages.api.team_api import *
 from pages.api.game_api import *
+from pages.api.week_api import *
 from pages.api.player_api import *
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
@@ -99,4 +100,5 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/player/name/<player_name>', PlayerAPIGetByName),
     webapp2.Route(r'/api/player/id/<player_id:([0-9]+)>', PlayerAPIGetById),
     webapp2.Route(r'/api/player/key/<player_key>', PlayerAPIGetByKey),
+    webapp2.Route(r'/api/week', WeekAPICreateEditDelete),
 ], debug=True)

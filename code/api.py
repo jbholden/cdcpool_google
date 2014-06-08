@@ -383,6 +383,41 @@ class API:
         self.__delete_from_memcache_dict("players",player_key)
         self.__add_to_memcache_dict("players",player_key,player)
 
+    def delete_week_by_id(self,week_id):
+        try:
+            week_key = db.Key.from_path('Week',week_id)
+        except:
+            raise APIException(500,"exception when getting key")
+            return
+        self.delete_week_by_key(str(week_key))
+
+    def delete_week_by_key(self,week_key):
+        week = db.get(week_key)
+        if week == None:
+            raise APIException(404,"could not find week")
+            return
+
+        db.delete(week)
+
+        # update memcache
+        d = Database()
+        tmp = d.load_weeks_and_years(update=True)
+        tmp = d.load_week(week.year,week.number)
+
+    def delete_week(self,year,number):
+        if not self.__does_week_exist(year,number):
+            raise APIException(404,"could not find the week")
+            return
+
+        d = Database()
+        cached_week = d.load_week(year,number)
+
+        week = db.get(str(cached_week.key()))
+        db.delete(week)
+
+        # update memcache
+        tmp = d.load_weeks_and_years(update=True)
+        tmp = d.load_week(year,number)
 
     def __add_to_memcache_dict(self,key,dict_key,dict_value):
         data = memcache.get(key)
@@ -424,4 +459,32 @@ class API:
                     return player
         return None
 
+    def create_week(self,data):
+        if self.__does_week_exist(data['year'],data['number']):
+            raise APIException(409,"week already exists")
+            return
+
+        week = Week(year=data['year'],number=data['number'])
+        week.winner = data['winner']
+        week.lock_picks = data['lock_picks']
+        week.lock_scores = data['lock_scores']
+
+        if data['games'] == None:
+            week.games = None
+        else:
+            week.games = [db.Key(game_key) for game_key in data['games'] ]
+
+        week.put()
+
+        # update the memcache
+        d = Database()
+        tmp = d.load_weeks_and_years(update=True)
+        tmp = d.load_week(week.year,week.number)
+
+        return week
+
+    def __does_week_exist(self,year,week_number):
+        d = Database()
+        weeks_and_years = d.load_weeks_and_years()
+        return year in weeks_and_years and week_number in weeks_and_years[year]
 

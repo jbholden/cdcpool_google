@@ -2,11 +2,12 @@ import webapp2
 import logging
 import json
 from pages.api.api_handler import *
-from models.games import *
+from models.weeks import *
 from code.api import *
 from code.api_exception import *
 
-class PlayerAPIGetDeleteAll(APIHandler):
+# TODO
+class WeekAPIGetDeleteAll(APIHandler):
 
     def get(self):
         try:
@@ -29,7 +30,8 @@ class PlayerAPIGetDeleteAll(APIHandler):
             self.write(e.errmsg)
             return
 
-class PlayerAPIGetById(APIHandler):
+# TODO
+class WeekAPIGetById(APIHandler):
 
     def get(self,player_id):
         try:
@@ -43,7 +45,8 @@ class PlayerAPIGetById(APIHandler):
         data = self.build_player_object(player)
         self.render_json(data)
 
-class PlayerAPIGetByKey(APIHandler):
+# TODO
+class WeekAPIGetByKey(APIHandler):
 
     def get(self,player_key):
         try:
@@ -57,7 +60,8 @@ class PlayerAPIGetByKey(APIHandler):
         data = self.build_player_object(player)
         self.render_json(data)
 
-class PlayerAPIGetInYear(APIHandler):
+# TODO
+class WeekAPIGetInYear(APIHandler):
 
     def get(self,year):
         try:
@@ -72,30 +76,37 @@ class PlayerAPIGetInYear(APIHandler):
         self.render_json(data)
 
 
-class PlayerAPICreateEditDelete(APIHandler):
+# TODO
+class WeekAPICreateEditDelete(APIHandler):
 
-    # this creates a new player
+    # this creates a new week
     def post(self):
         data = json.loads(self.request.body) 
 
-        required_fields = ['name','years']
+        required_fields = ['year','number','winner','games','lock_picks','lock_scores']
 
         for field in required_fields:
             if self.is_field_missing(field,data):
                 return
 
+        if data['lock_picks'] != None:
+            data['lock_picks'] = self.convert_to_datetime(data['lock_picks'])
+
+        if data['lock_scores'] != None:
+            data['lock_scores'] = self.convert_to_datetime(data['lock_scores'])
+
         try:
             api = API()
-            player = api.create_player(data['name'],data['years'])
+            week = api.create_week(data)
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
             return
 
-        return_data = self.build_player_object(player)
+        return_data = self.build_week_object(week)
         self.render_json(return_data)
 
-    # this deletes a player object
+    # this deletes a week object
     def delete(self):
         data = json.loads(self.request.body) 
 
@@ -104,22 +115,22 @@ class PlayerAPICreateEditDelete(APIHandler):
             num_params += 1
         if 'key' in data: 
             num_params += 1
-        if 'name' in data: 
+        if 'year' in data and 'number' in data: 
             num_params += 1
 
         if num_params != 1:
             self.error(400) 
-            self.write("only one parameter should be defined to find the player")
+            self.write("only one parameter should be defined to find the week")
             return 
 
         try:
             api = API()
             if 'key' in data:
-                api.delete_player_by_key(data['key'])
+                api.delete_week_by_key(data['key'])
             elif 'id' in data:
-                api.delete_player_by_id(data['id'])
-            elif 'name' in data:
-                api.delete_player(data['name'])
+                api.delete_week_by_id(data['id'])
+            elif 'year' in data and 'number' in data:
+                api.delete_week(data['year'],data['number'])
             else:
                 raise AssertionError,"should not get here"
 
@@ -156,7 +167,8 @@ class PlayerAPICreateEditDelete(APIHandler):
             self.write(e.errmsg)
             return
 
-class PlayerAPIDeleteCache(APIHandler):
+# TODO
+class WeekAPIDeleteCache(APIHandler):
 
     def delete(self):
         try:
@@ -167,7 +179,8 @@ class PlayerAPIDeleteCache(APIHandler):
             self.write(e.errmsg)
             return
 
-class PlayerAPIGetByName(APIHandler):
+# TODO
+class WeekAPIGetByName(APIHandler):
 
     def get(self,player_name):
         try:

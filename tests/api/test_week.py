@@ -20,7 +20,7 @@ class TestWeek(unittest.TestCase):
         data['year'] = 1980
         data['number'] = 1
         data['winner'] = None
-        data['games'] = None
+        data['games'] = []
         data['lock_picks'] = None
         data['lock_scores'] = None
 
@@ -74,7 +74,7 @@ class TestWeek(unittest.TestCase):
         data['year'] = 1980
         data['number'] = 1
         data['winner'] = None
-        data['games'] = None
+        data['games'] = []
         data['lock_picks'] = None
         data['lock_scores'] = None
 
@@ -362,14 +362,22 @@ class TestWeek(unittest.TestCase):
             self.assertIn(field,week)
 
         for field in fields:
-            self.assertEquals(week[field],expected[field])
+            if field != "games":
+                self.assertEquals(week[field],expected[field])
+
+        self.assertEquals(len(week['games']),len(expected['games']))
+        week_games = sorted(week['games'])
+        expected_games = sorted(expected['games'])
+        for i in range(len(week_games)):
+            self.assertEquals(str(week_games[i]),str(expected_games[i]))
+
 
     def __create_test_week(self,year,number):
         data = dict()
         data['year'] = year
         data['number'] = number
         data['winner'] = None
-        data['games'] = None
+        data['games'] = []
         data['lock_picks'] = None
         data['lock_scores'] = None
         return self.fbpool.createWeek(data)

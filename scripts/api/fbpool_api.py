@@ -321,4 +321,35 @@ class FBPoolAPI:
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
+    def createPick(self,data):
+        response = self.__fbpool.httpPostPickCreate(data)
+        if response.code == 200:
+            data = json.loads(response.read())
+            return data
+        raise FBAPIException(response.code,response.read())
+
+    def getPickByKey(self,pick_key):
+        response = self.__fbpool.httpGetPickByKey(pick_key)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
+
+    def getPickByID(self,pick_id):
+        response = self.__fbpool.httpGetPickByID(pick_id)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
+
+    def deletePickByKey(self,pick_key):
+        response = self.__fbpool.httpDeletePickByKey(pick_key)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
+    def deletePickByID(self,pick_id):
+        response = self.__fbpool.httpDeletePickByID(pick_id)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
 

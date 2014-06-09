@@ -229,3 +229,22 @@ class FBPoolHTTP:
         put_data = dict(data)
         put_data['id'] = week_id
         return self.httpPut('/api/week',put_data)
+
+    def httpPostPickCreate(self,data):
+        return self.httpPost('/api/pick',data)
+
+    def httpGetPickByKey(self,pick_key):
+        return self.httpGet('/api/pick/key/%s' % (pick_key))
+
+    def httpGetPickByID(self,pick_id):
+        return self.httpGet('/api/pick/id/%d' % (pick_id))
+
+    def httpDeletePickByKey(self,pick_key):
+        data = dict()
+        data['key'] = pick_key
+        return self.httpDelete('/api/pick',data)
+
+    def httpDeletePickByID(self,pick_id):
+        data = dict()
+        data['id'] = pick_id
+        return self.httpDelete('/api/pick',data)

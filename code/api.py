@@ -479,7 +479,7 @@ class API:
         # update the memcache
         d = Database()
         tmp = d.load_weeks_and_years(update=True)
-        tmp = d.load_week(week.year,week.number)
+        tmp = d.load_week(week.year,week.number,update=True)
 
         return week
 
@@ -521,10 +521,84 @@ class API:
             for week in weeks_query:
                 db.delete(week)
 
-        tmp = d.load_weeks_and_years(update=True)
+        memcache.delete("weeks_and_years")
         for year in weeks_and_years:
             week_numbers = weeks_and_years[year]
             for number in week_numbers:
-                tmp = d.load_week(year,number)
+                memcache.delete("week_%d_%d" % (year,number))
+
+    def get_weeks_in_year(self,year):
+        d = Database()
+        weeks_and_years = d.load_weeks_and_years(update=True)
+
+        if year not in weeks_and_years:
+            raise APIException(404,"could not find any weeks in year")
+            return
+
+        weeks = []
+        week_numbers = weeks_and_years[year]
+        weeks += [d.load_week(year,number) for number in week_numbers]
+        return weeks
+
+    def get_week_in_year(self,year,number):
+        d = Database()
+        weeks_and_years = d.load_weeks_and_years(update=True)
+
+        if year not in weeks_and_years:
+            raise APIException(404,"could not find week in year")
+            return
+
+        if number not in weeks_and_years[year]:
+            raise APIException(404,"could not find week in year")
+            return
+
+        return d.load_week(year,number)
+
+    def edit_week_by_id(self,week_id,data):
+        try:
+            week_key = db.Key.from_path('Week',week_id)
+        except:
+            raise APIException(500,"exception when getting key")
+            return
+        self.edit_week_by_key(str(week_key),data)
 
 
+    def edit_week_by_key(self,week_key,data):
+        d = Database()
+        weeks_and_years = d.load_weeks_and_years(update=True)
+
+        week = db.get(week_key)
+
+        if 'year' in data:
+            changed_year = True
+            week.year = data['year']
+
+        if 'number' in data:
+            changed_number = True
+            week.number = data['number']
+
+        if changed_year or changed_number:
+            if self.__does_week_exist(week.year,week.number):
+                raise APIException(409,"week already exists")
+                return
+
+        if 'winner' in data:
+            week.winner = data['winner']
+
+        if 'lock_picks' in data:
+            week.lock_picks = data['lock_picks']
+
+        if 'lock_scores' in data:
+            week.lock_scores = data['lock_scores']
+
+        if 'games' in data:
+            if data['games'] == None:
+                week.games = None
+            else:
+                week.games = [db.Key(game_key) for game_key in data['games'] ]
+
+        week.put()
+
+        # update memcache
+        tmp = d.load_weeks_and_years(update=True)
+        tmp = d.load_week(week.year,week.number,update=True)

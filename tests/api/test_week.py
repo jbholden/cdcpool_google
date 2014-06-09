@@ -142,9 +142,9 @@ class TestWeek(unittest.TestCase):
         expected.append(week_1980_1['key'])
         expected.append(week_1980_2['key'])
         expected.append(week_1980_3['key'])
-        expected.append(week_1980_1['key'])
-        expected.append(week_1980_2['key'])
-        expected.append(week_1980_3['key'])
+        expected.append(week_1981_1['key'])
+        expected.append(week_1981_2['key'])
+        expected.append(week_1981_3['key'])
         expected.sort()
 
         self.assertEquals(week_keys,expected)
@@ -167,9 +167,9 @@ class TestWeek(unittest.TestCase):
 
         week_keys = sorted([ week['key'] for week in weeks ])
         expected = []
-        expected.append(week_1980_1['key'])
-        expected.append(week_1980_2['key'])
-        expected.append(week_1980_3['key'])
+        expected.append(week_1981_1['key'])
+        expected.append(week_1981_2['key'])
+        expected.append(week_1981_3['key'])
         expected.sort()
 
         self.assertEquals(week_keys,expected)
@@ -206,7 +206,7 @@ class TestWeek(unittest.TestCase):
             week = self.fbpool.getWeekByID(week['id'])
             self.assertTrue(False)
         except FBAPIException as e:
-            if e.http_code != 404 or e.errmsg != "week does not exist":
+            if e.http_code != 404 or e.errmsg != "could not find week":
                 self.assertTrue(False)
                 return
 
@@ -224,7 +224,7 @@ class TestWeek(unittest.TestCase):
             week = self.fbpool.getWeekByID(week['id'])
             self.assertTrue(False)
         except FBAPIException as e:
-            if e.http_code != 404 or e.errmsg != "week does not exist":
+            if e.http_code != 404 or e.errmsg != "could not find week":
                 self.assertTrue(False)
                 return
 
@@ -328,8 +328,8 @@ class TestWeek(unittest.TestCase):
         edit = dict()
         edit['year'] = 1981
         edit['number'] = 2 
-        edit['winner'] = winner['key']
-        edit['games'] = game_keys
+        edit['winner'] = None
+        edit['games'] = None
         edit['lock_picks'] = "05/05/2014 19:00"
         edit['lock_scores'] = "05/10/2014 21:00"
 

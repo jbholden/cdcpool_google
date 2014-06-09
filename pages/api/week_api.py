@@ -57,20 +57,34 @@ class WeekAPIGetByKey(APIHandler):
         data = self.build_week_object(week)
         self.render_json(data)
 
-# TODO
 class WeekAPIGetInYear(APIHandler):
 
     def get(self,year):
         try:
             api = API()
-            players = api.get_players_in_year(int(year))
+            weeks = api.get_weeks_in_year(int(year))
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
             return
 
-        data = [ self.build_player_object(player) for player in players ]
+        data = [ self.build_week_object(week) for week in weeks ]
         self.render_json(data)
+
+class WeekAPIGetWeekInYear(APIHandler):
+
+    def get(self,week_number,year):
+        try:
+            api = API()
+            week = api.get_week_in_year(int(year),int(week_number))
+        except APIException as e:
+            self.error(e.http_code)
+            self.write(e.errmsg)
+            return
+
+        data = self.build_week_object(week)
+        self.render_json(data)
+
 
 
 # TODO
@@ -150,12 +164,18 @@ class WeekAPICreateEditDelete(APIHandler):
             self.write("id or key must be passed in")
             return 
 
+        if 'lock_picks' in data and data['lock_picks'] != None:
+            data['lock_picks'] = self.convert_to_datetime(data['lock_picks'])
+
+        if 'lock_scores' in data and data['lock_scores'] != None:
+            data['lock_scores'] = self.convert_to_datetime(data['lock_scores'])
+
         try:
             api = API()
             if 'key' in data:
-                api.edit_player_by_key(data['key'],data)
+                api.edit_week_by_key(data['key'],data)
             elif 'id' in data:
-                api.edit_player_by_id(data['id'],data)
+                api.edit_week_by_id(data['id'],data)
             else:
                 raise AssertionError,"should not get here"
 
@@ -175,18 +195,3 @@ class WeekAPIDeleteCache(APIHandler):
             self.error(e.http_code)
             self.write(e.errmsg)
             return
-
-# TODO
-class WeekAPIGetByName(APIHandler):
-
-    def get(self,player_name):
-        try:
-            api = API()
-            player = api.get_player(player_name)
-        except APIException as e:
-            self.error(e.http_code)
-            self.write(e.errmsg)
-            return
-
-        data = self.build_player_object(player)
-        self.render_json(data)

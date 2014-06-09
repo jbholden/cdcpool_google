@@ -102,6 +102,8 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/player/key/<player_key>', PlayerAPIGetByKey),
     webapp2.Route(r'/api/week', WeekAPICreateEditDelete),
     webapp2.Route(r'/api/weeks', WeekAPIGetDeleteAll),
+    webapp2.Route(r'/api/weeks/year/<year:([0-9]+)>', WeekAPIGetInYear),
     webapp2.Route(r'/api/week/id/<week_id:([0-9]+)>', WeekAPIGetById),
     webapp2.Route(r'/api/week/key/<week_key>', WeekAPIGetByKey),
+    webapp2.Route(r'/api/week/<week_number:([0-9]+)>/year/<year:([0-9]+)>', WeekAPIGetWeekInYear),
 ], debug=True)

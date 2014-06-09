@@ -215,7 +215,7 @@ class FBPoolHTTP:
         return self.httpGet('/api/weeks')
 
     def httpGetWeeksInYear(self,year):
-        return self.httpGet('/api/week/year/%d' % (year))
+        return self.httpGet('/api/weeks/year/%d' % (year))
 
     def httpGetWeek(self,year,week_number):
         return self.httpGet('/api/week/%d/year/%d' % (week_number,year))

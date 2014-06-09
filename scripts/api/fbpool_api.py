@@ -298,7 +298,7 @@ class FBPoolAPI:
         return data
 
     def getWeeksInYear(self,year):
-        response = self.__fbpool.httpWeeksInYear(year)
+        response = self.__fbpool.httpGetWeeksInYear(year)
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
         data = json.loads(response.read())

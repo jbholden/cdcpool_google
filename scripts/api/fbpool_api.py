@@ -352,4 +352,28 @@ class FBPoolAPI:
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
+    def getWeekPicks(self,year,week_number):
+        response = self.__fbpool.httpGetWeekPicks(year,week_number)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
+
+    def getPlayerPicks(self,year,week_number,player):
+        response = self.__fbpool.httpGetPlayerPicks(year,week_number,player)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+        data = json.loads(response.read())
+        return data
+
+    def editPickByKey(self,pick_key,data):
+        response = self.__fbpool.httpPutPickByKey(pick_key,data)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
+    def editPickByID(self,pick_id,data):
+        response = self.__fbpool.httpPutPickByID(pick_id,data)
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
 

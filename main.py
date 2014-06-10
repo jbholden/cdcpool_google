@@ -41,6 +41,7 @@ from pages.overall_results_page import *
 from pages.api.team_api import *
 from pages.api.game_api import *
 from pages.api.week_api import *
+from pages.api.pick_api import *
 from pages.api.player_api import *
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
@@ -106,4 +107,6 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/week/id/<week_id:([0-9]+)>', WeekAPIGetById),
     webapp2.Route(r'/api/week/key/<week_key>', WeekAPIGetByKey),
     webapp2.Route(r'/api/week/<week_number:([0-9]+)>/year/<year:([0-9]+)>', WeekAPIGetWeekInYear),
+    webapp2.Route(r'/api/pick', PickAPICreateEditDelete),
+    webapp2.Route(r'/api/picks', PickAPIDeleteAll),
 ], debug=True)

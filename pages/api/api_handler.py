@@ -54,6 +54,18 @@ class APIHandler(Handler):
 
         return w
 
+    def build_pick_object(self,pick):
+        p = dict()
+        p['id'] = pick.key().id()
+        p['key'] = str(pick.key())
+        p['week'] = pick.week
+        p['player'] = pick.player
+        p['game'] = pick.game
+        p['winner'] = pick.winner
+        p['team1_score'] = pick.team1_score
+        p['team2_score'] = pick.team2_score
+        return p
+
 
     def is_field_missing(self,field,data):
         if field not in data:

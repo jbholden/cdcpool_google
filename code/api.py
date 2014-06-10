@@ -2,6 +2,7 @@ from google.appengine.ext import db
 from google.appengine.api import memcache
 import logging
 from models.teams import *
+from models.picks import *
 from api_exception import *
 from database import *
 
@@ -275,7 +276,7 @@ class API:
             raise APIException(404,"could not find the player")
             return
 
-        db.delete(player)
+        db.delete(player_obj)
         self.__delete_from_memcache_dict("players",player_key)
 
     def delete_player_by_id(self,player_id):
@@ -602,3 +603,48 @@ class API:
         # update memcache
         tmp = d.load_weeks_and_years(update=True)
         tmp = d.load_week(week.year,week.number,update=True)
+
+
+    def create_pick(self,data):
+        pick = Pick()
+        pick.week = data['week']
+        pick.player = data['player']
+        pick.game = data['game']
+        pick.winner = data['winner']
+        pick.team1_score = data['team1_score']
+        pick.team2_score = data['team2_score']
+
+        pick.put()
+
+        # store temporarily in memcache for subsequent get calls
+        # once done with API calls, can delete this with DELETE /api/picks/cache
+        self.__add_to_memcache_dict("picks_id",pick.key().id(),pick)
+        self.__add_to_memcache_dict("picks_key",str(pick.key()),pick)
+
+        return pick
+
+    def delete_pick_by_id(self,pick_id):
+        try:
+            pick_key = db.Key.from_path('Pick',pick_id)
+        except:
+            raise APIException(500,"exception when getting key")
+            return
+        self.delete_pick_by_key(str(pick_key))
+
+
+    def delete_pick_by_key(self,pick_key):
+        pick = db.get(pick_key)
+        pick_id = pick.key().id()
+        db.delete(pick)
+        self.__delete_from_memcache_dict("picks_id",pick_id)
+        self.__delete_from_memcache_dict("picks_key",pick_key)
+
+    def delete_picks(self):
+        picks_query = db.GqlQuery('select * from Pick')
+        if picks_query != None:
+            for pick in picks_query:
+                db.delete(pick)
+
+        memcache.delete("picks_key")
+        memcache.delete("picks_id")
+

@@ -44,8 +44,8 @@ class TestPick(unittest.TestCase):
             self.assertTrue(False)
             return
 
-        self.assertFalse(self.__does_pick_exist(pick['id'])
-        self.__cleanup_pick(pick,week,game,player)
+        self.assertFalse(self.__does_pick_exist(pick['id']))
+        self.__cleanup_pick(week=week,game=game,player=player)
 
     def test_delete_pick_by_key(self):
         pick,week,game,player = self.__setup_pick(1984,1,"Player1")
@@ -57,10 +57,11 @@ class TestPick(unittest.TestCase):
             self.assertTrue(False)
             return
 
-        self.assertFalse(self.__does_pick_exist(pick['id'])
-        self.__cleanup_pick(pick,week,game,player)
+        self.assertFalse(self.__does_pick_exist(pick['id']))
+        self.__cleanup_pick(week=week,game=game,player=player)
 
     def test_delete_all_picks(self):
+        import pdb; pdb.set_trace()
         try:
             self.fbpool.deleteAllPicks()
         except FBAPIException as e:
@@ -79,13 +80,13 @@ class TestPick(unittest.TestCase):
             self.assertTrue(False)
             return
 
-        self.assertFalse(self.__does_pick_exist(pick1[0]['id'])
-        self.assertFalse(self.__does_pick_exist(pick2[0]['id'])
-        self.assertFalse(self.__does_pick_exist(pick3[0]['id'])
+        self.assertFalse(self.__does_pick_exist(pick1[0]['id']))
+        self.assertFalse(self.__does_pick_exist(pick2[0]['id']))
+        self.assertFalse(self.__does_pick_exist(pick3[0]['id']))
 
-        self.__cleanup_pick(pick=pick1[0],week=pick1[1],game=pick1[2],player=pick1[3])
-        self.__cleanup_pick(pick=pick2[0],week=pick2[1],game=pick2[2],player=pick2[3])
-        self.__cleanup_pick(pick=pick3[0],week=pick3[1],game=pick3[2],player=pick3[3])
+        self.__cleanup_pick(week=pick1[1],game=pick1[2],player=pick1[3])
+        self.__cleanup_pick(week=pick2[1],game=pick2[2],player=pick2[3])
+        self.__cleanup_pick(week=pick3[1],game=pick3[2],player=pick3[3])
 
 
     def test_get_pick_by_id(self):
@@ -246,7 +247,7 @@ class TestPick(unittest.TestCase):
             self.fbpool.deletePlayerIfExists(player)
 
             game = self.__create_test_game(game_number)
-            week = self.__create_test_week(year,week_number,[game])
+            week = self.__create_test_week(year,week_number,[game['key']])
             player = self.__create_test_player(player,year)
 
         except FBAPIException as e:
@@ -303,8 +304,8 @@ class TestPick(unittest.TestCase):
         return self.fbpool.createGame(data)
 
     def __verify_pick(self,pick,expected):
-        self.assertIn('id',week)
-        self.assertIn('key',week)
+        self.assertIn('id',pick)
+        self.assertIn('key',pick)
 
         fields = [ 'week', 'player', 'game', 'winner', 'team1_score', 'team2_score' ]
         for field in fields:
@@ -315,7 +316,7 @@ class TestPick(unittest.TestCase):
 
     def __does_pick_exist(self,pick_id):
         try:
-            pick = self.fbpool.getPickByID(pick['id'])
+            pick = self.fbpool.getPickByID(pick_id)
             return True
         except FBAPIException as e:
             if e.http_code != 404 or e.errmsg != "could not find pick":

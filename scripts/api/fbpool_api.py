@@ -376,4 +376,9 @@ class FBPoolAPI:
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
+    def deleteAllPicks(self):
+        response = self.__fbpool.httpDeleteAllPicks()
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
 

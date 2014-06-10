@@ -264,3 +264,6 @@ class FBPoolHTTP:
         put_data = dict(data)
         put_data['id'] = pick_id
         return self.httpPut('/api/pick',put_data)
+
+    def httpDeleteAllPicks(self):
+        return self.httpDelete('/api/picks')

@@ -381,4 +381,9 @@ class FBPoolAPI:
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
+    def deleteWeeksCache(self):
+        response = self.__fbpool.httpDeleteWeeksCache()
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
 

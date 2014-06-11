@@ -247,6 +247,10 @@ class API:
     def delete_players_cache(self):
         memcache.delete("players")
 
+    def delete_weeks_cache(self):
+        memcache.delete("weeks_key")
+        memcache.delete("weeks_id")
+
     def create_player(self,name,years):
         players = self.__load_players_in_memcache()
 
@@ -398,27 +402,36 @@ class API:
             raise APIException(404,"could not find week")
             return
 
+        week_key = str(week.key())
+        week_id = week.key().id()
+
         db.delete(week)
 
         # update memcache
-        d = Database()
-        tmp = d.load_weeks_and_years(update=True)
-        tmp = d.load_week(week.year,week.number)
+        self.__delete_from_memcache_dict("weeks_id",week_id)
+        self.__delete_from_memcache_dict("weeks_key",week_key)
 
     def delete_week(self,year,number):
-        if not self.__does_week_exist(year,number):
+        week = self.__find_week(year,number)
+        if week == None:
             raise APIException(404,"could not find the week")
             return
 
-        d = Database()
-        cached_week = d.load_week(year,number)
+        week_key = str(week.key())
+        week_id = week.key().id()
 
-        week = db.get(str(cached_week.key()))
-        db.delete(week)
+        week_obj = db.get(week_key)
+        db.delete(week_obj)
 
         # update memcache
-        tmp = d.load_weeks_and_years(update=True)
-        tmp = d.load_week(year,number)
+        self.__delete_from_memcache_dict("weeks_id",week_id)
+        self.__delete_from_memcache_dict("weeks_key",week_key)
+
+    def __is_key_in_cache(self,key,dict_key):
+        data = memcache.get(key)
+        if not(data):
+            return False
+        return dict_key in data
 
     def __add_to_memcache_dict(self,key,dict_key,dict_value):
         data = memcache.get(key)
@@ -478,18 +491,64 @@ class API:
         week.put()
 
         # update the memcache
-        d = Database()
-        tmp = d.load_weeks_and_years(update=True)
-        tmp = d.load_week(week.year,week.number,update=True)
+        self.__add_to_memcache_dict("weeks_id",week.key().id(),week)
+        self.__add_to_memcache_dict("weeks_key",str(week.key()),week)
 
         return week
 
     def __does_week_exist(self,year,week_number):
-        d = Database()
-        weeks_and_years = d.load_weeks_and_years()
-        return year in weeks_and_years and week_number in weeks_and_years[year]
+        return self.__find_week(year,week_number) != None
+
+    def __find_week(self,year,week_number):
+        week = self.__check_cache_for_week(year,week_number)
+        if week != None:
+            return week
+
+        week = self.__check_db_for_week(year,week_number) 
+        if week != None:
+            return week
+
+        return None
+
+    def __check_cache_for_week(self,year,week_number):
+        weeks = memcache.get("weeks_key")
+        if weeks == None:
+            return None
+        for week in weeks.values():
+            found_week = week.year == year and week.number == week_number
+            if found_week:
+                return week
+        return None
+
+    def __check_db_for_week(self,year,week_number):
+        weeks_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year and number=:week',year=year,week=week_number)
+        if weeks_query == None:
+            return None
+
+        weeks = list(weeks_query)
+        if len(weeks) != 1:
+            return None
+
+        week = weeks[0]
+
+        # update cache to avoid a query next time
+        week_key = str(week.key())
+        week_id = week.key().id()
+
+        if not self.__is_key_in_cache("weeks_key",week_key):
+            self.__add_to_memcache_dict("weeks_key",week_key,week)
+
+        if not self.__is_key_in_cache("weeks_id",week_id):
+            self.__add_to_memcache_dict("weeks_id",week_id,week)
+
+        return week
+
 
     def get_week_by_key(self,week_key):
+        weeks = memcache.get("weeks_key")
+        if weeks and week_key in weeks:
+            return weeks[week_key]
+
         week = db.get(week_key)
         if week == None:
             raise APIException(404,"could not find week")
@@ -497,6 +556,10 @@ class API:
         return week
 
     def get_week_by_id(self,week_id):
+        weeks = memcache.get("weeks_id")
+        if weeks and week_id in weeks:
+            return weeks[week_id]
+
         try:
             week_key = db.Key.from_path('Week',week_id)
         except:
@@ -505,55 +568,40 @@ class API:
         return self.get_week_by_key(str(week_key))
 
     def get_weeks(self):
-        d = Database()
-        weeks_and_years = d.load_weeks_and_years(update=True)
         weeks = []
-        for year in weeks_and_years:
-            week_numbers = weeks_and_years[year]
-            weeks += [d.load_week(year,number) for number in week_numbers]
+        weeks_query = db.GqlQuery('select * from Week')
+        if weeks_query != None:
+            for week in weeks_query:
+                weeks.append(week)
         return weeks
 
     def delete_weeks(self):
-        d = Database()
-        weeks_and_years = d.load_weeks_and_years(update=True)
-
         weeks_query = db.GqlQuery('select * from Week')
         if weeks_query != None:
             for week in weeks_query:
                 db.delete(week)
+        memcache.delete("weeks_id")
+        memcache.delete("weeks_key")
 
-        memcache.delete("weeks_and_years")
-        for year in weeks_and_years:
-            week_numbers = weeks_and_years[year]
-            for number in week_numbers:
-                memcache.delete("week_%d_%d" % (year,number))
 
     def get_weeks_in_year(self,year):
-        d = Database()
-        weeks_and_years = d.load_weeks_and_years(update=True)
+        weeks = []
+        weeks_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year',year=year)
+        for week in weeks_query:
+            weeks.append(week)
 
-        if year not in weeks_and_years:
+        if len(weeks) == 0:
             raise APIException(404,"could not find any weeks in year")
             return
 
-        weeks = []
-        week_numbers = weeks_and_years[year]
-        weeks += [d.load_week(year,number) for number in week_numbers]
         return weeks
 
     def get_week_in_year(self,year,number):
-        d = Database()
-        weeks_and_years = d.load_weeks_and_years(update=True)
-
-        if year not in weeks_and_years:
+        week = self.__find_week(year,number)
+        if week == None:
             raise APIException(404,"could not find week in year")
             return
-
-        if number not in weeks_and_years[year]:
-            raise APIException(404,"could not find week in year")
-            return
-
-        return d.load_week(year,number)
+        return week
 
     def edit_week_by_id(self,week_id,data):
         try:
@@ -565,9 +613,6 @@ class API:
 
 
     def edit_week_by_key(self,week_key,data):
-        d = Database()
-        weeks_and_years = d.load_weeks_and_years(update=True)
-
         week = db.get(week_key)
 
         if 'year' in data:
@@ -600,9 +645,14 @@ class API:
 
         week.put()
 
+        week_key = str(week.key())
+        week_id = week.key().id()
+
         # update memcache
-        tmp = d.load_weeks_and_years(update=True)
-        tmp = d.load_week(week.year,week.number,update=True)
+        self.__delete_from_memcache_dict("weeks_id",week_id)
+        self.__delete_from_memcache_dict("weeks_key",week_key)
+        self.__add_to_memcache_dict("weeks_id",week_id,week)
+        self.__add_to_memcache_dict("weeks_key",week_key,week)
 
 
     def create_pick(self,data):

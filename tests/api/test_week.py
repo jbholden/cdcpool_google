@@ -353,6 +353,14 @@ class TestWeek(unittest.TestCase):
             self.assertTrue(False)
             return
 
+    def test_delete_weeks_cache(self):
+        try:
+            self.fbpool.deleteWeeksCache()
+        except FBAPIException as e:
+            print e
+            self.assertTrue(False)
+            return
+
     def __verify_week(self,week,expected):
         self.assertIn('id',week)
         self.assertIn('key',week)

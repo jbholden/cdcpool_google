@@ -61,7 +61,6 @@ class TestPick(unittest.TestCase):
         self.__cleanup_pick(week=week,game=game,player=player)
 
     def test_delete_all_picks(self):
-        import pdb; pdb.set_trace()
         try:
             self.fbpool.deleteAllPicks()
         except FBAPIException as e:
@@ -69,9 +68,15 @@ class TestPick(unittest.TestCase):
             self.assertTrue(False)
             return
 
-        pick1 = self.__setup_pick(1980,1,"Player1")
-        pick2 = self.__setup_pick(1980,1,"Player2")
-        pick3 = self.__setup_pick(1980,1,"Player3")
+        game = self.__setup_game(1)
+        week = self.__setup_week(1980,1,game)
+        player1 = self.__setup_player("Player1",1980)
+        player2 = self.__setup_player("Player2",1980)
+        player3 = self.__setup_player("Player3",1980)
+
+        pick1 = self.__setup_pick_only(week,player1,game)
+        pick2 = self.__setup_pick_only(week,player2,game)
+        pick3 = self.__setup_pick_only(week,player3,game)
 
         try:
             self.fbpool.deleteAllPicks()
@@ -80,14 +85,14 @@ class TestPick(unittest.TestCase):
             self.assertTrue(False)
             return
 
-        self.assertFalse(self.__does_pick_exist(pick1[0]['id']))
-        self.assertFalse(self.__does_pick_exist(pick2[0]['id']))
-        self.assertFalse(self.__does_pick_exist(pick3[0]['id']))
+        self.assertFalse(self.__does_pick_exist(pick1['id']))
+        self.assertFalse(self.__does_pick_exist(pick2['id']))
+        self.assertFalse(self.__does_pick_exist(pick3['id']))
 
-        self.__cleanup_pick(week=pick1[1],game=pick1[2],player=pick1[3])
-        self.__cleanup_pick(week=pick2[1],game=pick2[2],player=pick2[3])
-        self.__cleanup_pick(week=pick3[1],game=pick3[2],player=pick3[3])
-
+        self.__cleanup_pick(week=week,game=game)
+        self.__cleanup_pick(player=player1)
+        self.__cleanup_pick(player=player2)
+        self.__cleanup_pick(player=player3)
 
     def test_get_pick_by_id(self):
         pick,week,game,player = self.__setup_pick(1984,1,"Player1")
@@ -123,10 +128,18 @@ class TestPick(unittest.TestCase):
             self.assertTrue(False)
             return
 
-        pick1 = self.__setup_pick(1980,week_number=1,player="Player1")
-        pick2 = self.__setup_pick(1980,week_number=1,player="Player2")
-        pick3 = self.__setup_pick(1980,week_number=1,player="Player3")
-        pick4 = self.__setup_pick(1980,week_number=2,player="Player3")
+        game1 = self.__setup_game(1)
+        game2 = self.__setup_game(2)
+        week1 = self.__setup_week(1980,1,game1)
+        week2 = self.__setup_week(1980,2,game2)
+        player1 = self.__setup_player("Player1",1980)
+        player2 = self.__setup_player("Player2",1980)
+        player3 = self.__setup_player("Player3",1980)
+
+        pick1 = self.__setup_pick_only(week1,player1,game1)
+        pick2 = self.__setup_pick_only(week1,player2,game1)
+        pick3 = self.__setup_pick_only(week1,player3,game1)
+        pick4 = self.__setup_pick_only(week2,player3,game2)
 
         try:
             picks = self.fbpool.getWeekPicks(year=1980,week_number=1)
@@ -140,10 +153,11 @@ class TestPick(unittest.TestCase):
 
         self.assertEquals(pick_ids,expected)
 
-        self.__cleanup_pick(pick=pick1[0],week=pick1[1],game=pick1[2],player=pick1[3])
-        self.__cleanup_pick(pick=pick2[0],week=pick2[1],game=pick2[2],player=pick2[3])
-        self.__cleanup_pick(pick=pick3[0],week=pick3[1],game=pick3[2],player=pick3[3])
-        self.__cleanup_pick(pick=pick4[0],week=pick4[1],game=pick4[2],player=pick4[3])
+        self.__cleanup_pick(week=week1,game=game1)
+        self.__cleanup_pick(week=week2,game=game2)
+        self.__cleanup_pick(player=player1)
+        self.__cleanup_pick(player=player2)
+        self.__cleanup_pick(player=player3)
 
 
     def test_get_player_picks(self):
@@ -154,10 +168,17 @@ class TestPick(unittest.TestCase):
             self.assertTrue(False)
             return
 
-        pick1 = self.__setup_pick(1980,week_number=1,player="Player1")
-        pick2 = self.__setup_pick(1980,week_number=1,player="Player2")
-        pick3 = self.__setup_pick(1980,week_number=1,player="Player2")
-        pick4 = self.__setup_pick(1980,week_number=2,player="Player2")
+        game1 = self.__setup_game(1)
+        game2 = self.__setup_game(2)
+        week1 = self.__setup_week(1980,1,game1)
+        week2 = self.__setup_week(1980,2,game2)
+        player1 = self.__setup_player("Player1",1980)
+        player2 = self.__setup_player("Player2",1980)
+
+        pick1 = self.__setup_pick_only(week1,player1,game1)
+        pick2 = self.__setup_pick_only(week1,player2,game1)
+        pick3 = self.__setup_pick_only(week1,player2,game1)
+        pick4 = self.__setup_pick_only(week2,player2,game2)
 
         try:
             picks = self.fbpool.getPlayerPicks(year=1980,week_number=1,player="Player2")
@@ -171,10 +192,10 @@ class TestPick(unittest.TestCase):
 
         self.assertEquals(pick_ids,expected)
 
-        self.__cleanup_pick(pick=pick1[0],week=pick1[1],game=pick1[2],player=pick1[3])
-        self.__cleanup_pick(pick=pick2[0],week=pick2[1],game=pick2[2],player=pick2[3])
-        self.__cleanup_pick(pick=pick3[0],week=pick3[1],game=pick3[2],player=pick3[3])
-        self.__cleanup_pick(pick=pick4[0],week=pick4[1],game=pick4[2],player=pick4[3])
+        self.__cleanup_pick(week=week1,game=game1)
+        self.__cleanup_pick(week=week2,game=game2)
+        self.__cleanup_pick(player=player1)
+        self.__cleanup_pick(player=player2)
 
     def test_edit_pick_by_id(self):
         pick,week,game,player = self.__setup_pick(1984,1,"Player1")
@@ -221,6 +242,15 @@ class TestPick(unittest.TestCase):
         self.__verify_pick(pick_edit,data)
         self.__cleanup_pick(pick,week,game,player)
 
+
+    def test_delete_picks_cache(self):
+        try:
+            self.fbpool.deletePicksCache()
+        except FBAPIException as e:
+            print e
+            self.assertTrue(False)
+            return
+
     def __setup_pick(self,year=1984,week_number=1,player="Player1"):
         week,game,player = self.__setup_pick_data(year,week_number,player)
 
@@ -241,6 +271,24 @@ class TestPick(unittest.TestCase):
 
         return pick,week,game,player
 
+    def __setup_pick_only(self,week,player,game):
+        data = dict()
+        data['week'] = week['key']
+        data['player'] = player['key']
+        data['game'] = game['key']
+        data['winner'] = "team1"
+        data['team1_score'] = None
+        data['team2_score'] = None
+
+        try:
+            pick = self.fbpool.createPick(data)
+        except FBAPIException as e:
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+            self.assertTrue(False)
+            return
+
+        return pick
+
     def __setup_pick_data(self,year,week_number,player,game_number=1):
         try:
             self.fbpool.deleteWeekIfExists(year=year,week_number=week_number)
@@ -255,6 +303,36 @@ class TestPick(unittest.TestCase):
             self.assertTrue(False)
             return
         return week,game,player
+
+    def __setup_player(self,name,year):
+        try:
+            self.fbpool.deletePlayerIfExists(name)
+            player = self.__create_test_player(name,year)
+        except FBAPIException as e:
+            print e
+            self.assertTrue(False)
+            return
+        return player
+
+    def __setup_game(self,game_number):
+        try:
+            game = self.__create_test_game(game_number)
+        except FBAPIException as e:
+            print e
+            self.assertTrue(False)
+            return
+        return game
+
+    def __setup_week(self,year,week_number,game):
+        try:
+            self.fbpool.deleteWeekIfExists(year=year,week_number=week_number)
+            week = self.__create_test_week(year,week_number,[game['key']])
+        except FBAPIException as e:
+            print e
+            self.assertTrue(False)
+            return
+        return week
+
 
     def __cleanup_pick(self,pick=None,week=None,game=None,player=None):
         try:

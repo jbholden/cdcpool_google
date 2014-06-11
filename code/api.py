@@ -698,3 +698,105 @@ class API:
         memcache.delete("picks_key")
         memcache.delete("picks_id")
 
+    def get_pick_by_key(self,pick_key):
+        picks = memcache.get("picks_key")
+        if picks and pick_key in picks:
+            return picks[pick_key]
+
+        pick = db.get(pick_key)
+        if pick == None:
+            raise APIException(404,"could not find pick")
+            return
+        return pick
+
+    def get_pick_by_id(self,pick_id):
+        picks = memcache.get("picks_id")
+        if picks and pick_id in picks:
+            return picks[pick_id]
+
+        try:
+            pick_key = db.Key.from_path('Pick',pick_id)
+        except:
+            raise APIException(500,"exception when getting key")
+            return
+        return self.get_pick_by_key(str(pick_key))
+
+    def get_week_picks(self,year,week_number):
+        week = self.__find_week(year,week_number)
+        if week == None:
+            raise APIException(404,"could not find week")
+            return
+
+        picks = []
+        picks_query = db.GqlQuery('SELECT * FROM Pick WHERE week=:week',week=str(week.key()))
+        for pick in picks_query:
+            picks.append(pick)
+
+        if len(picks) == 0:
+            raise APIException(404,"could not find any picks")
+            return
+
+        return picks
+
+    def get_player_week_picks(self,year,week_number,player_name):
+        week = self.__find_week(year,week_number)
+        if week == None:
+            raise APIException(404,"could not find week")
+            return
+
+        player = self.get_player(player_name)
+        player_key = str(player.key())
+
+        picks = []
+        picks_query = db.GqlQuery('SELECT * FROM Pick WHERE week=:week AND player=:player ',week=str(week.key()),player=player_key)
+        for pick in picks_query:
+            picks.append(pick)
+
+        if len(picks) == 0:
+            raise APIException(404,"could not find any picks")
+            return
+
+        return picks
+
+    def edit_pick_by_id(self,pick_id,data):
+        try:
+            pick_key = db.Key.from_path('Pick',pick_id)
+        except:
+            raise APIException(500,"exception when getting key")
+            return
+        self.edit_pick_by_key(str(pick_key),data)
+
+
+    def edit_pick_by_key(self,pick_key,data):
+        pick = db.get(pick_key)
+
+        if 'week' in data:
+            pick.week = data['week']
+
+        if 'player' in data:
+            pick.player = data['player']
+
+        if 'game' in data:
+            pick.game = data['game']
+
+        if 'winner' in data:
+            pick.winner = data['winner']
+
+        if 'team1_score' in data:
+            pick.team1_score = data['team1_score']
+
+        if 'team2_score' in data:
+            pick.team2_score = data['team2_score']
+
+        pick.put()
+
+        pick_key = str(pick.key())
+        pick_id = pick.key().id()
+
+        # update memcache
+        self.__delete_from_memcache_dict("picks_id",pick_id)
+        self.__delete_from_memcache_dict("picks_key",pick_key)
+        self.__add_to_memcache_dict("picks_id",pick_id,pick)
+        self.__add_to_memcache_dict("picks_key",pick_key,pick)
+
+

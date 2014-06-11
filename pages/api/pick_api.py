@@ -17,72 +17,71 @@ class PickAPIDeleteAll(APIHandler):
             self.write(e.errmsg)
             return
 
-#TODO
+
 class PickAPIGetById(APIHandler):
 
-    def get(self,week_id):
+    def get(self,pick_id):
         try:
             api = API()
-            week = api.get_week_by_id(int(week_id))
+            pick = api.get_pick_by_id(int(pick_id))
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
             return
 
-        data = self.build_week_object(week)
+        data = self.build_pick_object(pick)
         self.render_json(data)
 
-#TODO
+
 class PickAPIGetByKey(APIHandler):
 
-    def get(self,week_key):
+    def get(self,pick_key):
         try:
             api = API()
-            week = api.get_week_by_key(week_key)
+            pick = api.get_pick_by_key(pick_key)
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
             return
 
-        data = self.build_week_object(week)
+        data = self.build_pick_object(pick)
         self.render_json(data)
 
-#TODO
-class PickAPIGetInYear(APIHandler):
 
-    def get(self,year):
+class PickAPIGetWeekPicks(APIHandler):
+
+    def get(self,year,week_number):
         try:
             api = API()
-            weeks = api.get_weeks_in_year(int(year))
+            picks = api.get_week_picks(int(year),int(week_number))
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
             return
 
-        data = [ self.build_week_object(week) for week in weeks ]
+        data = [ self.build_pick_object(pick) for pick in picks ]
         self.render_json(data)
 
-#TODO
-class PickAPIGetWeekInYear(APIHandler):
+class PickAPIGetPlayerPicks(APIHandler):
 
-    def get(self,week_number,year):
+    def get(self,year,week_number,name):
         try:
             api = API()
-            week = api.get_week_in_year(int(year),int(week_number))
+            picks = api.get_player_week_picks(int(year),int(week_number),name)
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
             return
 
-        data = self.build_week_object(week)
+        data = [ self.build_pick_object(pick) for pick in picks ]
         self.render_json(data)
 
 
 
-# TODO
+
 class PickAPICreateEditDelete(APIHandler):
 
-    # this creates a new week
+    # this creates a new pick
     def post(self):
         data = json.loads(self.request.body) 
 
@@ -146,18 +145,12 @@ class PickAPICreateEditDelete(APIHandler):
             self.write("id or key must be passed in")
             return 
 
-        if 'lock_picks' in data and data['lock_picks'] != None:
-            data['lock_picks'] = self.convert_to_datetime(data['lock_picks'])
-
-        if 'lock_scores' in data and data['lock_scores'] != None:
-            data['lock_scores'] = self.convert_to_datetime(data['lock_scores'])
-
         try:
             api = API()
             if 'key' in data:
-                api.edit_week_by_key(data['key'],data)
+                api.edit_pick_by_key(data['key'],data)
             elif 'id' in data:
-                api.edit_week_by_id(data['id'],data)
+                api.edit_pick_by_id(data['id'],data)
             else:
                 raise AssertionError,"should not get here"
 

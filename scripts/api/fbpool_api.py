@@ -386,4 +386,9 @@ class FBPoolAPI:
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
+    def deletePicksCache(self):
+        response = self.__fbpool.httpDeletePicksCache()
+        if response.code != 200:
+            raise FBAPIException(response.code,response.read())
+
 

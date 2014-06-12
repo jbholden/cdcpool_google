@@ -159,13 +159,12 @@ class PickAPICreateEditDelete(APIHandler):
             self.write(e.errmsg)
             return
 
-# TODO
 class PickAPIDeleteCache(APIHandler):
 
     def delete(self):
         try:
             api = API()
-            api.delete_players_cache()
+            api.delete_picks_cache()
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)

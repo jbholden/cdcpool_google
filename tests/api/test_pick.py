@@ -232,7 +232,7 @@ class TestPick(unittest.TestCase):
         data['team2_score'] = 30
 
         try:
-            self.fbpool.editPickByKey(pick['id'],data)
+            self.fbpool.editPickByKey(pick['key'],data)
             pick_edit = self.fbpool.getPickByID(pick['id'])
         except FBAPIException as e:
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
@@ -397,7 +397,7 @@ class TestPick(unittest.TestCase):
             pick = self.fbpool.getPickByID(pick_id)
             return True
         except FBAPIException as e:
-            if e.http_code != 404 or e.errmsg != "could not find pick":
+            if e.http_code == 404 and e.errmsg == "could not find pick":
                 return False
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
             self.assertTrue(False)

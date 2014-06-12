@@ -114,4 +114,5 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/pick/key/<pick_key>', PickAPIGetByKey),
     webapp2.Route(r'/api/picks/year/<year:([0-9]+)>/week/<week_number:([0-9]+)>', PickAPIGetWeekPicks),
     webapp2.Route(r'/api/picks/year/<year:([0-9]+)>/week/<week_number:([0-9]+)>/player/<name>', PickAPIGetPlayerPicks),
+    webapp2.Route(r'/api/picks/cache', PickAPIDeleteCache),
 ], debug=True)

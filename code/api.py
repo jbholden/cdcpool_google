@@ -251,6 +251,10 @@ class API:
         memcache.delete("weeks_key")
         memcache.delete("weeks_id")
 
+    def delete_picks_cache(self):
+        memcache.delete("picks_key")
+        memcache.delete("picks_id")
+
     def create_player(self,name,years):
         players = self.__load_players_in_memcache()
 

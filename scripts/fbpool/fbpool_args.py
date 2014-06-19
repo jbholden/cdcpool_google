@@ -73,7 +73,7 @@ class FBPoolArgs:
         name = file_ext[0]
         extension = file_ext[1]
 
-        not_excel_file = extension not in [ ".xls", ".xlsm" ]
+        not_excel_file = extension not in [ "xls", "xlsm" ]
         if not_excel_file:
             return None
 
@@ -93,10 +93,9 @@ class FBPoolArgs:
         return year
 
     def __get_excel_files(self):
-        extensions = [ ".xls", ".xlsm" ]
         files = os.listdir(self.args.excel_dir)
 
-        pool_files = []
+        pool_files = dict()
         for filename in files:
             year = self.__parse_excel_filename(filename)
             if year != None:

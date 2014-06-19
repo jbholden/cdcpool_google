@@ -82,7 +82,8 @@ class FBPoolHTTP:
         return self.httpDelete('/api/teams')
 
     def httpGetTeam(self,name):
-        return self.httpGet('/api/team/name/%s' % (name))
+        name_encoded = urllib.quote(name)
+        return self.httpGet('/api/team/name/%s' % (name_encoded))
 
     def httpGetTeamByKey(self,team_key):
         return self.httpGet('/api/team/key/%s' % (team_key))
@@ -165,7 +166,8 @@ class FBPoolHTTP:
         return self.httpPost('/api/player',data)
 
     def httpGetPlayer(self,name):
-        return self.httpGet('/api/player/name/%s' % (name))
+        name_encoded = urllib.quote(name)
+        return self.httpGet('/api/player/name/%s' % (name_encoded))
 
     def httpGetPlayerByKey(self,player_key):
         return self.httpGet('/api/player/key/%s' % (player_key))
@@ -259,7 +261,8 @@ class FBPoolHTTP:
         return self.httpGet('/api/picks/year/%d/week/%d' % (year,week_number))
 
     def httpGetPlayerPicks(self,year,week_number,player):
-        return self.httpGet('/api/picks/year/%d/week/%d/player/%s' % (year,week_number,player))
+        name_encoded = urllib.quote(player)
+        return self.httpGet('/api/picks/year/%d/week/%d/player/%s' % (year,week_number,name_encoded))
 
     def httpPutPickByKey(self,pick_key,data):
         put_data = dict(data)

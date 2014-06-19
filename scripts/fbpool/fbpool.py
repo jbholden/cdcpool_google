@@ -35,8 +35,8 @@ class FBPool:
 
         try:
             fbpool_api = FBPoolAPI(url=self.url)
-            for excel_player in excel_players:
-                player_name = self.__remove_remote(excel_player.name)
+            for excel_player_name in excel_players:
+                player_name = self.__remove_remote(excel_player_name)
                 player = fbpool_api.createPlayerIfDoesNotExist(player_name,[year])
                 if year not in player['years']:
                     data = { "years":player['years'] + [year] }
@@ -51,7 +51,7 @@ class FBPool:
         try:
             fbpool_api = FBPoolAPI(url=self.url)
 
-            for excel_game in excel_games:
+            for excel_game in excel_games.values():
                 team1 = fbpool_api.getTeam(excel_game.team1) 
                 team2 = fbpool_api.getTeam(excel_game.team2) 
 
@@ -94,7 +94,7 @@ class FBPool:
 
     def __find_game_number(self,games,number):
         for game in games:
-            if game.number == number:
+            if game['number'] == number:
                 return game
         print "**ERROR** Encountered error when loading games"
         print "----------------------------------------------"
@@ -108,8 +108,14 @@ class FBPool:
 
         try:
             fbpool_api = FBPoolAPI(url=self.url)
+
+            players = fbpool_api.getPlayersInYear(week['year'])
+            player_lookup = { player['name']:player for player in players }
+
+
             for excel_pick in excel_picks:
-                player = fbpool_api.getPlayer(excel_pick.player_name)
+                name = self.__remove_remote(excel_pick.player_name)
+                player = player_lookup[name]
                 game = self.__find_game_number(week_games,excel_pick.game_number)
 
                 data = dict()
@@ -126,7 +132,7 @@ class FBPool:
                     data['team1_score'] = excel_pick.team1_score
                     data['team2_score'] = excel_pick.team2_score
 
-                pick = self.fbpool.createPick(data)
+                pick = fbpool_api.createPick(data)
         except FBAPIException as e:
             self.__load_error("week picks",e)
 
@@ -159,6 +165,9 @@ class FBPool:
         excel = PoolSpreadsheet(year,self.__excel_full_path())
         week_numbers = excel.get_week_numbers()
 
+        self.load_teams(year)
+        self.load_players(year)
+
         for week_number in week_numbers:
             self.load_week(year,week_number)
 
@@ -181,6 +190,9 @@ if __name__ == "__main__":
     url = fbpool_args.get_url()
     args = fbpool_args.get_args()
     action = fbpool_args.get_action()
+
+    # TODO:  cleanup cache
+    # TODO:  verbose option
 
     if action == "load_teams_most_recent_year":
         most_recent_year,excel_file = fbpool_args.get_latest_pool_file_and_year()

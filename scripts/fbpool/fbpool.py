@@ -14,9 +14,27 @@ class FBPool:
         self.url = url
         self.excel_dir = excel_dir
         self.excel_workbook = excel_workbook
+        self.verbose = True
+
+    def supress_output(self,supress):
+        if supress == None or supress == False:
+            self.verbose = True
+        else:
+            self.verbose = False
 
     def __excel_full_path(self):
         return "%s/%s" % (self.excel_dir,self.excel_workbook)
+
+    def load_missing_teams(self,year):
+        excel = PoolSpreadsheet(year,self.__excel_full_path())
+        teams = excel.get_teams()
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            for team in teams:
+                fbpool_api.createTeamIfDoesNotExist(team.name,team.conference)
+        except FBAPIException as e:
+            self.__load_error("teams",e)
 
     def load_teams(self,year):
         excel = PoolSpreadsheet(year,self.__excel_full_path())
@@ -47,6 +65,9 @@ class FBPool:
     def __load_week_games(self,excel,week_number):
         excel_games = excel.get_games(week_number)
         week_games = []
+
+        if self.verbose:
+            print " : week games..."
 
         try:
             fbpool_api = FBPoolAPI(url=self.url)
@@ -106,6 +127,9 @@ class FBPool:
     def __load_week_picks(self,excel,week,week_games):
         excel_picks = excel.get_picks(week['number'])
 
+        if self.verbose:
+            print " : week picks..."
+
         try:
             fbpool_api = FBPoolAPI(url=self.url)
 
@@ -113,7 +137,14 @@ class FBPool:
             player_lookup = { player['name']:player for player in players }
 
 
-            for excel_pick in excel_picks:
+            # TODO:  try this
+            #for excel_pick in excel_picks:
+            number_of_picks = len(excel_picks)
+            for i,excel_pick in enumerate(excel_picks):
+
+                if self.verbose and (i%50) == 0:
+                    print " : week picks (%d of %d)..." % (i,number_of_picks)
+
                 name = self.__remove_remote(excel_pick.player_name)
                 player = player_lookup[name]
                 game = self.__find_game_number(week_games,excel_pick.game_number)
@@ -137,8 +168,13 @@ class FBPool:
             self.__load_error("week picks",e)
 
     def load_week(self,year,week):
-        # ensure players are loaded
-        # ensure teams are loaded
+        if self.verbose:
+            print ""
+            print "loading week %d..." % (week)
+            print " : verifying week teams and players are loaded..."
+
+        self.load_missing_teams(year)
+        self.load_players(year)
 
         excel = PoolSpreadsheet(year,self.__excel_full_path())
 
@@ -153,6 +189,9 @@ class FBPool:
         week_data['lock_picks'] = None
         week_data['lock_scores'] = None
 
+        if self.verbose:
+            print " : week object..."
+
         try:
             fbpool_api = FBPoolAPI(url=self.url)
             week = fbpool_api.createWeek(week_data)
@@ -161,18 +200,65 @@ class FBPool:
 
         self.__load_week_picks(excel,week,week_games)
 
+        if self.verbose:
+            print "week %d loaded." % (week)
+            print ""
+
     def load_year(self,year):
         excel = PoolSpreadsheet(year,self.__excel_full_path())
         week_numbers = excel.get_week_numbers()
 
-        self.load_teams(year)
+        self.load_missing_teams(year)
         self.load_players(year)
 
         for week_number in week_numbers:
             self.load_week(year,week_number)
 
+    def verify_player_exists(self,player_name,year):
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            player = fbpool_api.getPlayer(player_name)
+        except FBAPIException as e:
+            player_does_not_exist = e.http_code == 404 and e.errmsg == "could not find the player"
+            if player_does_not_exist:
+                return False
+
+            print "**ERROR** Encountered error when getting players in year %d" % (year)
+            print "---------------------------------------------------------------------"
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+            print ""
+            sys.exit(1)
+
+        if year in player['years']:
+            return True
+        return False
+
+    def verify_team_exists(self,team_name):
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            team = fbpool_api.getTeam(team_name)
+        except FBAPIException as e:
+            team_does_not_exist = e.http_code == 404 and e.errmsg == "could not find the team"
+            if team_does_not_exist:
+                return False
+
+            print "**ERROR** Encountered error when getting team %s" % (team_name)
+            print "---------------------------------------------------------------------"
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+            print ""
+            sys.exit(1)
+
+        return True
+
 
     def __load_error(self,name,e):
+        print "**ERROR** Encountered error when loading %s" % (name)
+        print "---------------------------------------------"
+        print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+        print "Database data may be in an invalid state."
+        print ""
+        sys.exit(1)
+
         print "**ERROR** Encountered error when loading %s" % (name)
         print "---------------------------------------------"
         print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
@@ -191,37 +277,50 @@ if __name__ == "__main__":
     args = fbpool_args.get_args()
     action = fbpool_args.get_action()
 
-    # TODO:  cleanup cache
+    # TODO:  cleanup cache, load memcache
     # TODO:  verbose option
+    # TODO:  finer grain:  load week picks, load week games, load week, load specific player week picks (?)
+    # TODO:  delete week, etc.
+    # TODO:  search for unassociated data
+    # TODO:  conflicts:  teams, player names
+    # TODO:  check if players in year loaded or not?  teams in year?
+    # TODO:  update week results
+    # TODO:  query for data?  list players, list games in week, etc.
 
     if action == "load_teams_most_recent_year":
         most_recent_year,excel_file = fbpool_args.get_latest_pool_file_and_year()
         fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file)
+        fbpool.supress_output(args.quiet)
         fbpool.load_teams(most_recent_year)
 
     elif action == "load_teams_in_year":
         excel_file = fbpool_args.get_excel_file(args.year)
         fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file)
+        fbpool.supress_output(args.quiet)
         fbpool.load_teams(args.year)
 
     elif action == "load_players_in_year":
         excel_file = fbpool_args.get_excel_file(args.year)
         fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file)
+        fbpool.supress_output(args.quiet)
         fbpool.load_players(args.year)
 
     elif action == "load_players_all_years":
         excel_files = fbpool_args.get_excel_files()
         for year in excel_files:
             fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=excel_files[year])
+            fbpool.supress_output(args.quiet)
             fbpool.load_players(year)
 
     elif action == "load_week":
         excel_file = fbpool_args.get_excel_file(args.year)
         fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file)
+        fbpool.supress_output(args.quiet)
         fbpool.load_week(args.year,args.week)
 
     elif action == "load_year":
         excel_file = fbpool_args.get_excel_file(args.year)
         fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file)
+        fbpool.supress_output(args.quiet)
         fbpool.load_year(args.year)
 

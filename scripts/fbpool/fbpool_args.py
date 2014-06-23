@@ -63,6 +63,11 @@ class FBPoolArgs:
                             default="../data",
                             help="directory where the excel files are located")
 
+        parser.add_argument("-q","--quiet",
+                            action="store_true",
+                            default=False,
+                            help="supress printing out extra information for a command")
+
         self.args = parser.parse_args()
 
     def __parse_excel_filename(self,filename):

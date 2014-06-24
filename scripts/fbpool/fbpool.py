@@ -136,9 +136,6 @@ class FBPool:
             players = fbpool_api.getPlayersInYear(week['year'])
             player_lookup = { player['name']:player for player in players }
 
-
-            # TODO:  try this
-            #for excel_pick in excel_picks:
             number_of_picks = len(excel_picks)
             for i,excel_pick in enumerate(excel_picks):
 
@@ -167,14 +164,90 @@ class FBPool:
         except FBAPIException as e:
             self.__load_error("week picks",e)
 
-    def load_week(self,year,week):
+    def delete_year(self,year):
         if self.verbose:
             print ""
-            print "loading week %d..." % (week)
-            print " : verifying week teams and players are loaded..."
+            print "deleting year %d..." % (year)
 
-        self.load_missing_teams(year)
-        self.load_players(year)
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            weeks = fbpool_api.getWeeksInYear(year)
+        except FBAPIException as e:
+            self.__delete_year_error("could not get weeks in %d" % (year),e)
+
+        for week in weeks:
+            if self.verbose:
+                print " : deleting %d week %d..." % (year,week['number'])
+            self.__delete_week(fbpool_api,week)
+
+
+    def delete_week(self,year,week_number):
+        if self.verbose:
+            print ""
+            print "deleting year %d week %d..." % (year,week_number)
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            week = fbpool_api.getWeek(year,week_number)
+        except FBAPIException as e:
+            self.__delete_week_error("could not get %d week %d" % (year,week_number),e)
+
+        self.__delete_week(fbpool_api,week)
+
+    def __delete_week(self,fbpool_api,week):
+        year = week['year']
+        week_number = week['number']
+
+        # try to delete as many games as possible, ignore errors
+        if self.verbose:
+            print " : deleting week games..."
+
+        for game_key in week['games']:
+            try:
+                fbpool_api.deleteGameByKey(game_key)
+            except FBAPIException as e:
+                continue
+
+        # try to delete as many picks as possible, ignore errors
+        if self.verbose:
+            print " : deleting week picks..."
+
+        try:
+            picks = fbpool_api.getWeekPicks(year,week_number)
+        except FBAPIException as e:
+            picks = None
+
+        if picks != None:
+            number_of_picks = len(picks)
+            for i,pick in enumerate(picks):
+                if self.verbose and (i%50) == 0:
+                    print " : deleting week picks (%d of %d)..." % (i,number_of_picks)
+
+                try:
+                    fbpool_api.deletePickByKey(pick['key'])
+                except FBAPIException as e:
+                    continue
+
+        # finally try and delete the week
+        try:
+            fbpool_api.deleteWeekByKey(week['key'])
+        except FBAPIException as e:
+            self.__delete_week_error("could not delete %d week %d" % (year,week_number),e)
+
+        if self.verbose:
+            print ""
+
+
+    def load_week(self,year,week,load_teams_and_players=True):
+        if self.verbose:
+            print ""
+            print "loading year %d week %d..." % (year,week)
+
+        if load_teams_and_players:
+            if self.verbose:
+                print " : verifying week teams and players are loaded..."
+            self.load_missing_teams(year)
+            self.load_players(year)
 
         excel = PoolSpreadsheet(year,self.__excel_full_path())
 
@@ -194,25 +267,39 @@ class FBPool:
 
         try:
             fbpool_api = FBPoolAPI(url=self.url)
-            week = fbpool_api.createWeek(week_data)
+            created_week = fbpool_api.createWeek(week_data)
         except FBAPIException as e:
             self.__load_error("week",e)
 
-        self.__load_week_picks(excel,week,week_games)
+        self.__load_week_picks(excel,created_week,week_games)
 
         if self.verbose:
             print "week %d loaded." % (week)
             print ""
 
-    def load_year(self,year):
+    def load_year(self,year,load_teams_in_year=True,load_players_in_year=True):
+        if self.verbose:
+            print ""
+            print "loading year %d..." % (year)
+
         excel = PoolSpreadsheet(year,self.__excel_full_path())
         week_numbers = excel.get_week_numbers()
 
-        self.load_missing_teams(year)
-        self.load_players(year)
+        if load_teams_in_year:
+            if self.verbose:
+                print " : verifying teams are loaded..."
+            self.load_missing_teams(year)
+
+        if load_players_in_year:
+            if self.verbose:
+                print " : verifying players are loaded..."
+            self.load_players(year)
 
         for week_number in week_numbers:
-            self.load_week(year,week_number)
+            self.load_week(year,week_number,load_teams_and_players=False)
+
+        if self.verbose:
+            print ""
 
     def verify_player_exists(self,player_name,year):
         try:
@@ -259,12 +346,22 @@ class FBPool:
         print ""
         sys.exit(1)
 
-        print "**ERROR** Encountered error when loading %s" % (name)
-        print "---------------------------------------------"
+    def __delete_week_error(self,message,e):
+        print "**ERROR** Encountered error when deleting week"
+        print "----------------------------------------------"
         print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
-        print "Database data may be in an invalid state."
+        print message
         print ""
         sys.exit(1)
+
+    def __delete_year_error(self,message,e):
+        print "**ERROR** Encountered error when deleting year"
+        print "----------------------------------------------"
+        print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+        print message
+        print ""
+        sys.exit(1)
+
 
     def __remove_remote(self,name):
         return string.replace(name,"Remote","").strip()
@@ -323,4 +420,62 @@ if __name__ == "__main__":
         fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file)
         fbpool.supress_output(args.quiet)
         fbpool.load_year(args.year)
+
+    elif action == "update_week":
+        pass
+
+    elif action == "delete_year":
+        excel_file = fbpool_args.get_excel_file(args.year)
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file)
+        fbpool.supress_output(args.quiet)
+        fbpool.delete_year(args.year)
+
+    elif action == "delete_week":
+        excel_file = fbpool_args.get_excel_file(args.year)
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file)
+        fbpool.supress_output(args.quiet)
+        fbpool.delete_week(args.year,args.week)
+
+    elif action == "delete_all":
+        pass
+
+    elif action == "delete_players":
+        pass
+
+    elif action == "delete_teams":
+        pass
+
+    elif action == "flush_memcache":
+        pass
+
+    elif action == "load_memcache":
+        pass
+
+    elif action == "cleanup_api":
+        pass
+
+    elif action == "search_for_unassociated_data":
+        pass
+
+    elif action == "search_for_errors":
+        # duplicate weeks
+        # unassociated data
+        pass
+
+    elif action == "list_teams":
+        pass
+
+    elif action == "list_players":
+        pass
+
+    elif action == "list_weeks":
+        pass
+
+    elif action == "list_picks":
+        pass
+
+    elif action == "list_games":
+        pass
+
+
 

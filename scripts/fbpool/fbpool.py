@@ -237,6 +237,88 @@ class FBPool:
         if self.verbose:
             print ""
 
+    def delete_all(self):
+        if self.verbose:
+            print ""
+            print "deleting entire database..."
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+
+            if self.verbose:
+                print " : deleting teams..."
+            fbpool_api.deleteAllTeams()
+
+            if self.verbose:
+                print " : deleting players..."
+            fbpool_api.deleteAllPlayers()
+
+            if self.verbose:
+                print " : deleting weeks..."
+            fbpool_api.deleteAllWeeks()
+
+            if self.verbose:
+                print " : deleting games..."
+            fbpool_api.deleteAllGames()
+
+            if self.verbose:
+                print " : deleting picks..."
+            fbpool_api.deleteAllPicks()
+
+        except FBAPIException as e:
+            self.__delete_error(e)
+
+        if self.verbose:
+            print ""
+
+    def update_week(self,year,week_number):
+        if self.verbose:
+            print ""
+            print "updating results for year %d week %d..." % (year,week_number)
+
+        excel = PoolSpreadsheet(year,self.__excel_full_path())
+        week_winner_name = excel.get_week_winner(week_number)
+        excel_games = excel.get_games(week_number)
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            week = fbpool_api.getWeek(year,week_number)
+
+            # update the week winner
+            if week_winner_name == None and week['winner'] != None:
+                edit_data = dict()
+                edit_data['winner'] = None
+                fbpool_api.editWeekByKey(week['key'],edit_data)
+            elif week_winner_name != None:
+                player = fbpool_api.getPlayer(week_winner_name)
+                winner_key = player['key']
+                winner_changed = winner_key != week['winner']
+                if winner_changed:
+                    edit_data = dict()
+                    edit_data['winner'] = winner_key
+                    fbpool_api.editWeekByKey(week['key'],edit_data)
+
+            # update the game info
+            for game_key in week['games']:
+                game = fbpool_api.getGameByKey(game_key)
+                excel_game = excel_games.get(game['number'])
+                if excel_game == None:
+                    continue
+
+                edit_data = dict()
+                edit_data['team1_score'] = excel_game.team1_score
+                edit_data['team2_score'] = excel_game.team2_score
+                edit_data['state'] = excel_game.state
+
+                fbpool_api.editGameByKey(game_key,edit_data)
+
+
+        except FBAPIException as e:
+            self.__update_week_error(e)
+
+        if self.verbose:
+            print ""
+
 
     def load_week(self,year,week,load_teams_and_players=True):
         if self.verbose:
@@ -346,11 +428,25 @@ class FBPool:
         print ""
         sys.exit(1)
 
+    def __update_week_error(self,e):
+        print "**ERROR** Encountered error when updating week"
+        print "----------------------------------------------"
+        print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+        print ""
+        sys.exit(1)
+
     def __delete_week_error(self,message,e):
         print "**ERROR** Encountered error when deleting week"
         print "----------------------------------------------"
         print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
         print message
+        print ""
+        sys.exit(1)
+
+    def __delete_error(self,e):
+        print "**ERROR** Encountered error when deleting database"
+        print "--------------------------------------------------"
+        print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
         print ""
         sys.exit(1)
 
@@ -422,7 +518,10 @@ if __name__ == "__main__":
         fbpool.load_year(args.year)
 
     elif action == "update_week":
-        pass
+        excel_file = fbpool_args.get_excel_file(args.year)
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file)
+        fbpool.supress_output(args.quiet)
+        fbpool.update_week(args.year,args.week)
 
     elif action == "delete_year":
         excel_file = fbpool_args.get_excel_file(args.year)
@@ -437,7 +536,10 @@ if __name__ == "__main__":
         fbpool.delete_week(args.year,args.week)
 
     elif action == "delete_all":
-        pass
+        excel_file = fbpool_args.get_excel_file(args.year)
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file)
+        fbpool.supress_output(args.quiet)
+        fbpool.delete_all()
 
     elif action == "delete_players":
         pass

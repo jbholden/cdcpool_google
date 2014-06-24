@@ -24,6 +24,8 @@ class FBPoolArgs:
             return "delete_week"
         elif self.args.delete == "year" and self.args.year:
             return "delete_year"
+        elif self.args.update == "week" and self.args.year and self.args.week:
+            return "update_week"
 
     def get_url(self):
         if self.args.port != None:
@@ -35,15 +37,20 @@ class FBPoolArgs:
 
     def __setup_args(self):
         parser = argparse.ArgumentParser(description="load, edit, and query the football pool database ")
-        parser.add_argument("-l","--load",
+        parser.add_argument("--load",
                             type=str,
                             action="store",
                             help="loads data from an excel file into the database")
 
-        parser.add_argument("-d","--delete",
+        parser.add_argument("--delete",
                             type=str,
                             action="store",
                             help="deletes data from the database")
+
+        parser.add_argument("--update",
+                            type=str,
+                            action="store",
+                            help="updates data from the excel file into the database")
 
         parser.add_argument("-u","--url",
                             type=str,
@@ -66,7 +73,7 @@ class FBPoolArgs:
                             action="store",
                             help="specify the week number")
     
-        parser.add_argument("-e","--excel_dir",
+        parser.add_argument("-d","--excel_dir",
                             type=str,
                             action="store",
                             default="../data",

@@ -92,14 +92,14 @@ have completed for a week, then this command can be used to update the game scor
 
 ### Implementation Details
 
-```/scripts/fbpool```
+`/scripts/fbpool`<br>
 this directory contains the fbpool.py script as described in this document
 
-```/scripts/api```
+`/scripts/api`<br>
 the fbpool.py script uses HTTP API calls to perform actions
 
-```/scripts/excel```
+`/scripts/excel`<br>
 the fbpool.py script uses the excel directory to read the data from the excel files
 
-```/scripts/data```
+`/scripts/data`<br>
 this directory contains the excel files

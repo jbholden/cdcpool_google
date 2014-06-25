@@ -279,6 +279,10 @@ class FBPool:
                 print " : deleting picks..."
             fbpool_api.deleteAllPicks()
 
+            if self.verbose:
+                print " : flushing memcache..."
+            fbpool_api.deleteCache()
+
         except FBAPIException as e:
             self.__delete_error(e)
 

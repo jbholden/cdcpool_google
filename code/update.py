@@ -27,7 +27,10 @@ class Update:
             self.update_all_week_results_in_a_year(year)
 
     def update_all_overall_results(self):
-        pass
+        database = Database()
+        years = database.get_years()
+        for year in years:
+            self.update_overall_results(year)
 
     def update_all_week_results_in_a_year(self,year):
         # TODO:  tests
@@ -42,7 +45,7 @@ class Update:
         results = self.get_week_results(year,week_number,update=True)
 
     def update_overall_results(self,year):
-        pass
+        results = self.get_overall_results(year,update="all_results")
 
     def update_all_player_results(self):
         database = Database()

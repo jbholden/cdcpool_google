@@ -320,7 +320,7 @@ class FBPool:
             print ""
 
 
-    def load_week(self,year,week,load_teams_and_players=True):
+    def load_week(self,year,week,load_teams_and_players=True,update_memcache=True):
         if self.verbose:
             print ""
             print "loading year %d week %d..." % (year,week)
@@ -363,7 +363,18 @@ class FBPool:
             fbpool_api.deleteGamesCache()
             fbpool_api.deleteWeeksCache()
         except FBAPIException as e:
-            pass
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+            print "Not stopping because of exception..."
+
+        if update_memcache:
+            if self.verbose:
+                print " : updating memcache..."
+
+            try:
+                fbpool_api.updateCacheForWeek(year,week)
+            except FBAPIException as e:
+                print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+                print "Not stopping because of exception..."
 
         if self.verbose:
             print "week %d loaded." % (week)
@@ -388,7 +399,7 @@ class FBPool:
             self.load_players(year)
 
         for week_number in week_numbers:
-            self.load_week(year,week_number,load_teams_and_players=False)
+            self.load_week(year,week_number,load_teams_and_players=False,update_memcache=False)
 
         if self.verbose:
             print " : cleaning up..."
@@ -397,7 +408,17 @@ class FBPool:
             fbpool_api = FBPoolAPI(url=self.url)
             fbpool_api.deletePlayersCache()
         except FBAPIException as e:
-            pass
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+            print "Not stopping because of exception..."
+
+        if self.verbose:
+            print " : updating memcache..."
+
+        try:
+            fbpool_api.updateCacheForYear(year)
+        except FBAPIException as e:
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+            print "Not stopping because of exception..."
 
         if self.verbose:
             print ""

@@ -594,8 +594,7 @@ if __name__ == "__main__":
         fbpool.delete_week(args.year,args.week)
 
     elif action == "delete_all":
-        excel_file = fbpool_args.get_excel_file(args.year)
-        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file)
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=None)
         fbpool.supress_output(args.quiet)
         fbpool.delete_all()
 

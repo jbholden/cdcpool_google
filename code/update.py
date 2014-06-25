@@ -44,6 +44,18 @@ class Update:
     def update_overall_results(self,year):
         pass
 
+    def update_all_player_results(self):
+        database = Database()
+        years = database.get_years()
+        for year in years:
+            self.update_player_results_in_year(year)
+
+    def update_player_results_in_year(self,year):
+        database = Database()
+        week_numbers = database.get_week_numbers(year)
+        for week_number in week_numbers:
+            self.update_player_results(year,week_number)
+
     def update_player_results(self,year,week_number):
         # TODO:  tests
         database = Database()
@@ -52,10 +64,22 @@ class Update:
             player_id = players[player_key].key().id()
             summary,results = self.get_player_results(player_id,year,week_number,update=True)
 
+    def update_players_all_years(self):
+        database = Database()
+        years = database.get_years()
+        for year in years:
+            self.update_players(year)
+
     def update_players(self,year):
         # TODO:  tests
         database = Database()
         players = database.load_players(year,update=True)
+
+    def update_teams(self):
+        # TODO:  tests
+        database = Database()
+        teams = database.load_teams("teams",update=True)
+        teams = database.load_teams("teamkeys",update=True)
 
     def get_week_results(self,year,week_number,update=False):
         key = "week_results_%d_%d" % (year,week_number)

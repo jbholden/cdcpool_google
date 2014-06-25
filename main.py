@@ -43,6 +43,7 @@ from pages.api.game_api import *
 from pages.api.week_api import *
 from pages.api.pick_api import *
 from pages.api.player_api import *
+from pages.api.cache_api import *
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
 
@@ -115,4 +116,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/picks/year/<year:([0-9]+)>/week/<week_number:([0-9]+)>', PickAPIGetWeekPicks),
     webapp2.Route(r'/api/picks/year/<year:([0-9]+)>/week/<week_number:([0-9]+)>/player/<name>', PickAPIGetPlayerPicks),
     webapp2.Route(r'/api/picks/cache', PickAPIDeleteCache),
+    webapp2.Route(r'/api/cache', CacheAPILoadDelete),
+    webapp2.Route(r'/api/cache/year/<year:([0-9]+)>', CacheAPILoadYear),
+    webapp2.Route(r'/api/cache/year/<year:([0-9]+)>/week/<week_number:([0-9]+)>', CacheAPILoadWeek),
 ], debug=True)

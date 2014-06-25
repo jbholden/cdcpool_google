@@ -19,7 +19,7 @@ class FBPoolHTTP:
             response = err
         return response
 
-    def httpPost(self,address,data):
+    def httpPost(self,address,data=None):
         headers = { 'Content-Type' : 'application/json; charset=UTF-8' }
         data_json = json.dumps(data)
         try:
@@ -276,3 +276,15 @@ class FBPoolHTTP:
 
     def httpDeleteAllPicks(self):
         return self.httpDelete('/api/picks')
+
+    def httpDeleteCache(self):
+        return self.httpDelete('/api/cache')
+    
+    def httpPostUpdateCache(self):
+        return self.httpPost('/api/cache')
+
+    def httpPostUpdateCacheForYear(self,year):
+        return self.httpPost('/api/cache/year/%d' % (year))
+
+    def httpPostUpdateCacheForWeek(self,year,week):
+        return self.httpPost('/api/cache/year/%d/week/%d' % (year,week))

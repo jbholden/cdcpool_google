@@ -5,6 +5,7 @@ from models.teams import *
 from models.picks import *
 from api_exception import *
 from database import *
+from update import *
 
 class API:
 
@@ -802,5 +803,30 @@ class API:
         self.__delete_from_memcache_dict("picks_key",pick_key)
         self.__add_to_memcache_dict("picks_id",pick_id,pick)
         self.__add_to_memcache_dict("picks_key",pick_key,pick)
+
+    def update_cache(self):
+        u = Update()
+        u.update_teams()
+        u.update_players_all_years()
+        u.update_all_week_results()
+        u.update_all_player_results()
+        u.update_all_overall_results()
+
+    def update_cache_for_year(self,year):
+        u = Update()
+        u.update_players(year)
+        u.update_all_week_results_in_a_year(year)
+        u.update_player_results_in_year(year)
+        u.update_overall_results(year)
+
+    def update_cache_for_week(self,year,week_number):
+        u = Update()
+        u.update_years_and_week_numbers()
+        u.update_week_results(year,week_number)
+        u.update_player_results(year,week_number)
+        u.update_overall_results(year)
+
+    def flush_cache(self):
+        memcache.flush_all()
 
 

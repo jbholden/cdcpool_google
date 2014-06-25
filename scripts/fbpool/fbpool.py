@@ -356,6 +356,16 @@ class FBPool:
         self.__load_week_picks(excel,created_week,week_games)
 
         if self.verbose:
+            print " : cleaning up..."
+
+        try:
+            fbpool_api.deletePicksCache()
+            fbpool_api.deleteGamesCache()
+            fbpool_api.deleteWeeksCache()
+        except FBAPIException as e:
+            pass
+
+        if self.verbose:
             print "week %d loaded." % (week)
             print ""
 
@@ -379,6 +389,15 @@ class FBPool:
 
         for week_number in week_numbers:
             self.load_week(year,week_number,load_teams_and_players=False)
+
+        if self.verbose:
+            print " : cleaning up..."
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            fbpool_api.deletePlayersCache()
+        except FBAPIException as e:
+            pass
 
         if self.verbose:
             print ""

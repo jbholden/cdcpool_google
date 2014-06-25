@@ -60,3 +60,46 @@ in the 2013 sheet will not overwrite the values from 2012.
 This will load all of the data for 2013 week 1.
 The key argument here is "--load week" which indicates a week should be loaded.
 
+### Step 3.  Deleting data
+
+The following commands can be used to delete data from the database.  A typical use case
+could be to delete a week from the database and then reload it (for debug purposes).
+
+#### delete a year
+
+```
+    python -p 10090 --delete year -y 2013
+    python --port 10090 --delete year --year 2013
+```
+
+#### delete a week
+
+```
+    python -p 10090 --delete week -y 2013 -w 1
+    python --port 10090 --delete week --year 2013 --week 1
+```
+
+### Step 4.  Updating a week
+
+The following command is intended to be used to update a week after it is already in the database.
+The use case for this is when a week is loaded but has not started yet.  Once all of the games
+have completed for a week, then this command can be used to update the game scores and winner.
+
+```
+    python -p 10090 --update week -y 2013 -w 1
+    python --port 10090 --update week --year 2013 --week 1
+```
+
+### Implementation Details
+
+```/scripts/fbpool```
+this directory contains the fbpool.py script as described in this document
+
+```/scripts/api```
+the fbpool.py script uses HTTP API calls to perform actions
+
+```/scripts/excel```
+the fbpool.py script uses the excel directory to read the data from the excel files
+
+```/scripts/data```
+this directory contains the excel files

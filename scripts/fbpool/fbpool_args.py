@@ -26,6 +26,8 @@ class FBPoolArgs:
             return "delete_year"
         elif self.args.update == "week" and self.args.year and self.args.week:
             return "update_week"
+        elif self.args.delete == "cache":
+            return "flush_memcache"
 
     def get_url(self):
         if self.args.port != None:

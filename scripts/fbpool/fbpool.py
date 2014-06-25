@@ -237,6 +237,20 @@ class FBPool:
         if self.verbose:
             print ""
 
+    def flush_memcache(self):
+        if self.verbose:
+            print ""
+            print "flushing entire memcache..."
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            fbpool_api.deleteCache()
+        except FBAPIException as e:
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+
+        if self.verbose:
+            print ""
+
     def delete_all(self):
         if self.verbose:
             print ""
@@ -588,7 +602,10 @@ if __name__ == "__main__":
         pass
 
     elif action == "flush_memcache":
-        pass
+        excel_file = fbpool_args.get_excel_file(args.year)
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file)
+        fbpool.supress_output(args.quiet)
+        fbpool.flush_memcache()
 
     elif action == "load_memcache":
         pass

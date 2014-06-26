@@ -90,6 +90,85 @@ have completed for a week, then this command can be used to update the game scor
     python --port 10090 --update week --year 2013 --week 1
 ```
 
+### Examples
+```
+# note:  in these examples, the target is http://localhost:10090
+
+# load the teams the most recent year
+python -p 10090 --load teams
+
+# load the teams for a particular year
+python -p 10090 --load teams --year 2010
+
+# load the players for every year
+python -p 10090 --load players
+
+# load the players for a particular year
+python -p 10090 --load players --year 2009
+
+# load the data for a specific week
+python -p 10090 --load week --year 2013 --week 4
+
+# load the data for each week in a year
+python -p 10090 --load week --year 2013
+
+# update the game scores and winner for a week
+python -p 10090 --update week --year 2013 --week 4
+
+# delete the week data for a year
+python -p 10090 --delete year --year 2013
+
+# delete the week data for a specific week
+python -p 10090 --delete year --year 2013 --week 5
+
+# delete the entire database
+python -p 10090 --delete all
+
+# delete the players in a year
+python -p 10090 --delete players --year 2012
+
+# delete all the players in the database
+python -p 10090 --delete players
+
+# delete all the teams
+python -p 10090 --delete teams
+
+# flush the memcache
+python -p 10090 --delete cache
+
+# reload the entire memcache
+python -p 10090 --load cache
+
+# delete a week and reload it
+python -p 10090 --delete week --year 2013 --week 2
+python -p 10090 --load week --year 2013 --week 2
+
+# delete a year and reload it
+python -p 10090 --delete year --year 2013
+python -p 10090 --load year --year 2013
+
+# load a year in multiple steps
+python -p 10090 --load teams
+python -p 10090 --load players --year 2013
+python -p 10090 --load week --year 2013 --week 1
+python -p 10090 --load week --year 2013 --week 2
+python -p 10090 --load week --year 2013 --week 3
+python -p 10090 --load week --year 2013 --week 4
+python -p 10090 --load week --year 2013 --week 5
+python -p 10090 --load week --year 2013 --week 6
+python -p 10090 --load week --year 2013 --week 7
+python -p 10090 --load week --year 2013 --week 8
+python -p 10090 --load week --year 2013 --week 9
+python -p 10090 --load week --year 2013 --week 10 
+python -p 10090 --load week --year 2013 --week 11
+python -p 10090 --load week --year 2013 --week 12
+python -p 10090 --load week --year 2013 --week 13
+
+# load a week at cdcpool.appspot.com
+python --url http://cdcpool.appspot.com --load week --year 2013 --week 1
+
+```
+
 ### Implementation Details
 
 `/scripts/fbpool`<br>

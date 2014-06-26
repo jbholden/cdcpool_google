@@ -30,6 +30,18 @@ class FBPoolArgs:
             return "flush_memcache"
         elif self.args.delete == "all":
             return "delete_all"
+        elif self.args.delete == "players" and self.args.year:
+            return "delete_players_from_year"
+        elif self.args.delete == "players":
+            return "delete_all_players"
+        elif self.args.delete == "teams":
+            return "delete_teams"
+        elif self.args.load == "cache" and args.year and args.week:
+            return "load_memcache_for_year"
+        elif self.args.load == "cache" and args.year:
+            return "load_memcache"
+        elif self.args.load == "cache":
+            return "load_memcache_for_week"
 
     def get_url(self):
         if self.args.port != None:

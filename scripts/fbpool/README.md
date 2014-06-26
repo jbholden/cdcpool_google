@@ -139,6 +139,12 @@ python -p 10090 --delete cache
 # reload the entire memcache
 python -p 10090 --load cache
 
+# reload year data into the memcache
+python -p 10090 --load cache --year 2010
+
+# reload a specific week's data into the memcache
+python -p 10090 --load cache --year 2011 --week 3
+
 # delete a week and reload it
 python -p 10090 --delete week --year 2013 --week 2
 python -p 10090 --load week --year 2013 --week 2
@@ -166,6 +172,10 @@ python -p 10090 --load week --year 2013 --week 13
 
 # load a week at cdcpool.appspot.com
 python --url http://cdcpool.appspot.com --load week --year 2013 --week 1
+
+# API calls store some data in the memcache to speed up other API calls
+# this call will cleanup that data from the memcache
+python -p 10090 --clean api
 
 ```
 

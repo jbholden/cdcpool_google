@@ -237,6 +237,21 @@ class FBPool:
         if self.verbose:
             print ""
 
+    def cleanup_api(self):
+        if self.verbose:
+            print "Flushing API data from the memcache..."
+
+        try:
+            fbpool_api.deletePicksCache()
+            fbpool_api.deleteGamesCache()
+            fbpool_api.deleteWeeksCache()
+            fbpool_api.deletePlayersCache()
+        except FBAPIException as e:
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+
+        if self.verbose:
+            print ""
+
     def flush_memcache(self):
         if self.verbose:
             print ""
@@ -250,6 +265,101 @@ class FBPool:
 
         if self.verbose:
             print ""
+
+    def load_memcache(self):
+        if self.verbose:
+            print ""
+            print "loading entire memcache..."
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            fbpool_api.updateCache()
+        except FBAPIException as e:
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+
+        if self.verbose:
+            print ""
+
+    def load_memcache_for_year(self,year):
+        if self.verbose:
+            print ""
+            print "loading %d into memcache..." % (year)
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            fbpool_api.updateCacheForYear(year)
+        except FBAPIException as e:
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+
+        if self.verbose:
+            print ""
+
+    def load_memcache_for_week(self,year,week_number):
+        if self.verbose:
+            print ""
+            print "loading %d week %d into memcache..." % (year,week_number)
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            fbpool_api.updateCacheForWeek(year,week_number)
+        except FBAPIException as e:
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+
+        if self.verbose:
+            print ""
+
+
+    def delete_teams(self):
+        if self.verbose:
+            print ""
+            print "deleting all teams..."
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            fbpool_api.deleteAllTeams()
+        except FBAPIException as e:
+            self.__delete_error(e)
+
+        if self.verbose:
+            print ""
+
+    def delete_players(self):
+        if self.verbose:
+            print ""
+            print "deleting all players..."
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            fbpool_api.deleteAllPlayers()
+        except FBAPIException as e:
+            self.__delete_error(e)
+
+        if self.verbose:
+            print ""
+
+    def delete_players_from_year(self,year):
+        if self.verbose:
+            print ""
+            print "deleting players from %d..." % (year)
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            players = fbpool_api.getPlayersInYear(year)
+            for player in players:
+                if len(player['years']) == 1:
+                    fbpool_api.deletePlayerByKey(player['key'])
+                else:
+                    data = dict()
+                    data['years'] = players['years']
+                    data['years'].remove(year)
+                    fbpool_api.editPlayerByKey(player['key'],data)
+
+        except FBAPIException as e:
+            self.__delete_error(e)
+
+        if self.verbose:
+            print ""
+
 
     def delete_all(self):
         if self.verbose:
@@ -477,6 +587,114 @@ class FBPool:
 
         return True
 
+    def check_for_missing_weeks_and_years(self):
+        if self.verbose:
+            print ""
+            print "checking for missing weeks..."
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            weeks = fbpool_api.getAllWeeks()
+        except:
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+            sys.exit(1)
+
+        years = sorted(set([week['year'] for week in weeks ]))
+
+        # check for missing years
+        first_year = min(years)
+        last_year = max(years)
+        missing_years = []
+        for year in range(first_year,last_year+1):
+            if year not in years:
+                missing_years.append(year)
+
+        # check for missing weeks
+        week_numbers = dict()
+        for year in years:
+            numbers = sorted([ week['number'] for week in weeks if week['year'] == year])
+            week_numbers[year] = numbers
+
+        missing = dict()
+        for year in years:
+            if year != last_year:
+                for number in range(1,14):
+                    if number not in week_numbers[year]:
+                        if year not in missing:
+                            missing[year] = [number]
+                        else:
+                            missing[year].append(number)
+        
+        last_week = max(week_numbers[last_year])
+        for number in range(1,last_week+1):
+            if number not in week_numbers[last_year]:
+                if last_year not in missing:
+                    missing[last_year] = [number]
+                else:
+                    missing[last_year].append(number)
+
+        duplicates = dict()
+        for year in years:
+            first = min(week_numbers[year])
+            last = max(week_numbers[year])
+            for number in range(first,last+1):
+                count = 0
+                for current_number in week_numbers[year]:
+                    if number == current_number:
+                        count += 1
+                if count > 1:
+                    if year not in duplicates:
+                        duplicates[year] = [number]
+                    else:
+                        duplicates[year].append(number)
+
+        extras = dict()
+        for year in years:
+            for number in week_numbers[year]:
+                if number < 1 or number > 13:
+                    if year not in extras:
+                        extras[year] = [number]
+                    else:
+                        extras[year].append(number)
+
+        print ""
+        if len(missing_years) == 0:
+            print "Missing Years   :  None"
+        else:
+            print "Missing Years   : %s" % (self.__array_str(missing_years))
+
+        if len(missing) == 0:
+            print "Missing Weeks   :  None"
+        else:
+            print "Missing Weeks   :"
+            for year in missing:
+                print "           %s : %s" % (year,self.__array_str(missing[year]))
+
+        if len(duplicates) == 0:
+            print "Duplicate Weeks :  None"
+        else:
+            print "Duplicate Weeks :  "
+            for year in duplicates:
+                print "           %s : %s" % (year,self.__array_str(duplicates[year]))
+
+        if len(extra) == 0:
+            print "Extra Weeks     :  None"
+        else:
+            print "Extra Weeks     :  "
+            for year in extra:
+                print "           %s : %s" % (year,self.__array_str(extra[year]))
+
+        print ""
+
+    def __array_str(self,a):
+        s = ""
+        last = len(a)
+        for i in range(last+1):
+            if i == last:
+                s += str(a)
+            else:
+                s += "%s, " % (a)
+
 
     def __load_error(self,name,e):
         print "**ERROR** Encountered error when loading %s" % (name)
@@ -502,8 +720,8 @@ class FBPool:
         sys.exit(1)
 
     def __delete_error(self,e):
-        print "**ERROR** Encountered error when deleting database"
-        print "--------------------------------------------------"
+        print "**ERROR** Encountered error when deleting"
+        print "-----------------------------------------"
         print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
         print ""
         sys.exit(1)
@@ -598,11 +816,20 @@ if __name__ == "__main__":
         fbpool.supress_output(args.quiet)
         fbpool.delete_all()
 
-    elif action == "delete_players":
-        pass
+    elif action == "delete_all_players":
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=None)
+        fbpool.supress_output(args.quiet)
+        fbpool.delete_players()
+
+    elif action == "delete_players_from_year":
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=None)
+        fbpool.supress_output(args.quiet)
+        fbpool.delete_players_from_year(args.year)
 
     elif action == "delete_teams":
-        pass
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=None)
+        fbpool.supress_output(args.quiet)
+        fbpool.delete_teams()
 
     elif action == "flush_memcache":
         fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=None)
@@ -610,10 +837,24 @@ if __name__ == "__main__":
         fbpool.flush_memcache()
 
     elif action == "load_memcache":
-        pass
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=None)
+        fbpool.supress_output(args.quiet)
+        fbpool.load_memcache()
+
+    elif action == "load_memcache_for_year":
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=None)
+        fbpool.supress_output(args.quiet)
+        fbpool.load_memcache_for_year(args.year)
+
+    elif action == "load_memcache_for_week":
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=None)
+        fbpool.supress_output(args.quiet)
+        fbpool.load_memcache_for_year(args.year,args.week)
 
     elif action == "cleanup_api":
-        pass
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=None)
+        fbpool.supress_output(args.quiet)
+        fbpool.cleanup_api()
 
     elif action == "search_for_unassociated_data":
         pass

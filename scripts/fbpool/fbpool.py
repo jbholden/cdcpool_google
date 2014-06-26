@@ -595,7 +595,7 @@ class FBPool:
         try:
             fbpool_api = FBPoolAPI(url=self.url)
             weeks = fbpool_api.getAllWeeks()
-        except:
+        except FBAPIException as e:
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
             sys.exit(1)
 
@@ -684,6 +684,78 @@ class FBPool:
             for year in extra:
                 print "           %s : %s" % (year,self.__array_str(extra[year]))
 
+        print ""
+
+    def list_all_teams(self):
+        if self.verbose:
+            print ""
+            print "reading teams from database..."
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            teams = fbpool_api.getAllTeams()
+        except FBAPIException as e:
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+            sys.exit(1)
+
+        teams_sorted = sorted(teams,key=lambda team:team['name'])
+
+        print ""
+        print "Teams:"
+        print "----------------------------------------------------------------------------------"
+        for team in teams_sorted:
+            print "%40s %s" % (team['name'],team['conference'])
+        print "----------------------------------------------------------------------------------"
+        print ""
+
+    def list_all_players(self):
+        if self.verbose:
+            print ""
+            print "reading players from database..."
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            players = fbpool_api.getAllPlayers()
+        except FBAPIException as e:
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+            sys.exit(1)
+
+        players_sorted = sorted(players,key=lambda player:player['name'])
+
+        print ""
+        print "Players:"
+        print "----------------------------------------------------------------------------------"
+        for player in players_sorted:
+            print "%40s %s" % (player['name'],self.__array_str(player['years']))
+        print "----------------------------------------------------------------------------------"
+        print ""
+
+    def list_all_weeks(self):
+        if self.verbose:
+            print ""
+            print "reading weeks from database..."
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            weeks = fbpool_api.getAllWeeks()
+        except FBAPIException as e:
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+            sys.exit(1)
+
+        years = sorted(set([week['year'] for week in weeks ]))
+
+        print ""
+        print "Weeks:"
+        print "----------------------------------------------------------------------------------"
+        for year in years:
+            numbers = sorted([ week['number'] for week in weeks if week['year'] == year])
+
+            for week_number in numbers:
+                print "%d Week %d" % (year,week_number)
+
+            print ""
+
+        print "----------------------------------------------------------------------------------"
         print ""
 
     def __array_str(self,a):
@@ -865,13 +937,19 @@ if __name__ == "__main__":
         pass
 
     elif action == "list_teams":
-        pass
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=None)
+        fbpool.supress_output(args.quiet)
+        fbpool.list_all_teams()
 
     elif action == "list_players":
-        pass
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=None)
+        fbpool.supress_output(args.quiet)
+        fbpool.list_all_players()
 
     elif action == "list_weeks":
-        pass
+        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=None)
+        fbpool.supress_output(args.quiet)
+        fbpool.list_all_weeks()
 
     elif action == "list_picks":
         pass

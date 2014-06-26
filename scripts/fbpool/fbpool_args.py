@@ -42,6 +42,14 @@ class FBPoolArgs:
             return "load_memcache"
         elif self.args.load == "cache":
             return "load_memcache_for_week"
+        elif self.args.clean == "api":
+            return "cleanup_api"
+        elif self.args.list == "teams":
+            return "list_teams"
+        elif self.args.list == "players":
+            return "list_players"
+        elif self.args.list == "weeks":
+            return "list_weeks"
 
     def get_url(self):
         if self.args.port != None:
@@ -67,6 +75,16 @@ class FBPoolArgs:
                             type=str,
                             action="store",
                             help="updates data from the excel file into the database")
+
+        parser.add_argument("--list",
+                            type=str,
+                            action="store",
+                            help="print out data from the database")
+
+        parser.add_argument("--clean",
+                            type=str,
+                            action="store",
+                            help="cleanup extra data in the memcache or database")
 
         parser.add_argument("-u","--url",
                             type=str,

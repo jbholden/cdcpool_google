@@ -701,10 +701,10 @@ class FBPool:
         teams_sorted = sorted(teams,key=lambda team:team['name'])
 
         print ""
-        print "Teams:"
+        print "Teams: (%d)" % (len(teams_sorted))
         print "----------------------------------------------------------------------------------"
         for team in teams_sorted:
-            print "%40s %s" % (team['name'],team['conference'])
+            print "%-40s %s" % (team['name'],team['conference'])
         print "----------------------------------------------------------------------------------"
         print ""
 
@@ -726,7 +726,7 @@ class FBPool:
         print "Players:"
         print "----------------------------------------------------------------------------------"
         for player in players_sorted:
-            print "%40s %s" % (player['name'],self.__array_str(player['years']))
+            print "%-40s %s" % (player['name'],self.__array_str(player['years']))
         print "----------------------------------------------------------------------------------"
         print ""
 
@@ -760,12 +760,13 @@ class FBPool:
 
     def __array_str(self,a):
         s = ""
-        last = len(a)
+        last = len(a)-1
         for i in range(last+1):
             if i == last:
-                s += str(a)
+                s += str(a[i])
             else:
-                s += "%s, " % (a)
+                s += "%s, " % (a[i])
+        return s
 
 
     def __load_error(self,name,e):
@@ -807,8 +808,33 @@ class FBPool:
         sys.exit(1)
 
 
+    # TODO:  fix this
     def __remove_remote(self,name):
-        return string.replace(name,"Remote","").strip()
+        return self.__extract_name_and_hide_lastname(name)
+        #return string.replace(name,"Remote","").strip()
+
+    def __extract_name_and_hide_lastname(self,name): 
+        words = name.split(',') 
+        assert len(words) == 2 
+        last_name = words[0].strip() 
+        first_name = self.__remove_remote_and_middle_name(words[1]).strip() 
+        conflicting_names = self.__adjust_for_same_name(last_name) 
+        if conflicting_names == None: 
+            return "%s %s." % (first_name,last_name[0]) 
+        else: 
+            return conflicting_names 
+ 
+    def __adjust_for_same_name(self,last_name): 
+        if last_name == "Ferguson": 
+            return "Scott Fe." 
+        if last_name == "Freedman": 
+            return "Scott Fr."
+        return None
+
+    def __remove_remote_and_middle_name(self,name):
+        words = name.strip().split(' ')
+        assert len(words) > 0
+        return string.replace(words[0],"Remote","").strip()
 
 
 if __name__ == "__main__":

@@ -36,12 +36,12 @@ class FBPoolArgs:
             return "delete_all_players"
         elif self.args.delete == "teams":
             return "delete_teams"
-        elif self.args.load == "cache" and args.year and args.week:
-            return "load_memcache_for_year"
-        elif self.args.load == "cache" and args.year:
-            return "load_memcache"
-        elif self.args.load == "cache":
+        elif self.args.load == "cache" and self.args.year and self.args.week:
             return "load_memcache_for_week"
+        elif self.args.load == "cache" and self.args.year:
+            return "load_memcache_for_year"
+        elif self.args.load == "cache":
+            return "load_memcache"
         elif self.args.clean == "api":
             return "cleanup_api"
         elif self.args.list == "teams":

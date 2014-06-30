@@ -814,6 +814,7 @@ class API:
 
     def update_cache_for_year(self,year):
         u = Update()
+        u.update_years_and_week_numbers()
         u.update_players(year)
         u.update_all_week_results_in_a_year(year)
         u.update_player_results_in_year(year)

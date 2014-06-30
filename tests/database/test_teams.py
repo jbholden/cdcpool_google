@@ -11,7 +11,7 @@ class TestTeams(unittest.TestCase):
         teams_query = db.GqlQuery('select * from Team')
         self.assertIsNotNone(teams_query)
         teams = list(teams_query)
-        self.assertEquals(len(teams),252)
+        self.assertEquals(len(teams),128)
         for team in teams:
             self.__check_team_state(team)
 
@@ -28,7 +28,7 @@ class TestTeams(unittest.TestCase):
         self.__test_team_conference_query("Big 12",10)
         self.__test_team_conference_query("Big Ten",12)
         self.__test_team_conference_query("American Athletic",10)
-        self.__test_team_conference_query("Conference USA",14)
+        self.__test_team_conference_query("Conference USA",15)
         self.__test_team_conference_query("Independents",7)
         self.__test_team_conference_query("Mid American",13)
         self.__test_team_conference_query("Sun Belt",8)

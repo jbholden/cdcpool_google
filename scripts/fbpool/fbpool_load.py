@@ -9,16 +9,18 @@ from scripts.excel.team import *
 from fbpool_args import *
 from fbpool_player_name import *
 from fbpool_error import *
+from fbpool_verbose import *
 import string
 
 class FBPoolLoad:
 
-    def __init__(self,url,excel_dir,excel_workbook):
+    def __init__(self,url,excel_dir,excel_workbook,quiet=False):
         self.url = url
         self.excel_dir = excel_dir
         self.excel_workbook = excel_workbook
         self.verbose = True
         self.__modify_player_name = FBPoolPlayerName("hide_lastname")
+        self.__verbose = FBPoolVerbose(quiet)
 
     def __excel_full_path(self):
         return "%s/%s" % (self.excel_dir,self.excel_workbook)
@@ -170,13 +172,10 @@ class FBPoolLoad:
 
 
     def load_week(self,year,week,load_teams_and_players=True,update_memcache=True):
-        if self.verbose:
-            print ""
-            print "loading year %d week %d..." % (year,week)
+        self.__verbose.start("loading year %d week %d..." % (year,week))
 
         if load_teams_and_players:
-            if self.verbose:
-                print " : verifying week teams and players are loaded..."
+            self.__verbose.update("verifying week teams and players are loaded...")
             self.load_missing_teams(year)
             self.load_players(year)
 
@@ -193,8 +192,7 @@ class FBPoolLoad:
         week_data['lock_picks'] = None
         week_data['lock_scores'] = None
 
-        if self.verbose:
-            print " : week object..."
+        self.__verbose.update("week object...")
 
         try:
             fbpool_api = FBPoolAPI(url=self.url)
@@ -204,8 +202,7 @@ class FBPoolLoad:
 
         self.__load_week_picks(excel,created_week,week_games)
 
-        if self.verbose:
-            print " : cleaning up..."
+        self.__verbose.update("cleaning up...")
 
         try:
             fbpool_api.deletePicksCache()
@@ -216,8 +213,7 @@ class FBPoolLoad:
             FBPoolError.error_no_exit("deleting api cache",e,additional_message)
 
         if update_memcache:
-            if self.verbose:
-                print " : updating memcache..."
+            self.__verbose.update("updating memcache...")
 
             try:
                 fbpool_api.updateCacheForWeek(year,week)
@@ -225,9 +221,8 @@ class FBPoolLoad:
                 additional_message = "Not stopping because of exception..."
                 FBPoolError.error_no_exit("updating memcache",e,additional_message)
 
-        if self.verbose:
-            print "week %d loaded." % (week)
-            print ""
+        self.__verbose.done("load week %d" % (week)
+
 
     def load_year(self,year,load_teams_in_year=True,load_players_in_year=True):
         if self.verbose:

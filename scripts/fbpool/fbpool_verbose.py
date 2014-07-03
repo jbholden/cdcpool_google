@@ -19,3 +19,10 @@ class FBPoolVerbose:
         if self.quiet:
             return
         print " : %s" % (message)
+
+    def update_every(self,message,current_i,update_i,total_iterations):
+        if self.quiet:
+            return
+        if (current_i % update_i) == 0:
+            print " : %s (%d of %d)" % (message,current_i,total_iterations)
+

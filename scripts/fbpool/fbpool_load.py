@@ -6,7 +6,6 @@ from scripts.api.fbpool_api import *
 from scripts.api.fbpool_api_exception import *
 from scripts.excel.pool_spreadsheet import *
 from scripts.excel.team import *
-from fbpool_args import *
 from fbpool_player_name import *
 from fbpool_error import *
 from fbpool_verbose import *
@@ -25,12 +24,6 @@ class FBPoolLoad:
     def __excel_full_path(self):
         return "%s/%s" % (self.excel_dir,self.excel_workbook)
 
-    def supress_output(self,supress):
-        if supress == None or supress == False:
-            self.verbose = True
-        else:
-            self.verbose = False
-
     def load_missing_teams(self,year):
         excel = PoolSpreadsheet(year,self.__excel_full_path())
         teams = excel.get_teams()
@@ -43,6 +36,12 @@ class FBPoolLoad:
             FBPoolError.exit_with_error("teams",e)
 
     def load_teams(self,year):
+        self.__verbose.start("loading teams from year %d..." % (year))
+
+        if year == 2012:
+            msg = "2012 spreadsheet has an error, Nevada appears twice, need to fix"
+            FBPoolError.exit_with_error("loading teams",additional_message=msg)
+
         excel = PoolSpreadsheet(year,self.__excel_full_path())
         teams = excel.get_teams()
 
@@ -51,9 +50,14 @@ class FBPoolLoad:
             for team in teams:
                 fbpool_api.createTeam(team.name,team.conference)
         except FBAPIException as e:
+            import pdb; pdb.set_trace()
             FBPoolError.exit_with_error("teams",e)
 
+        self.__verbose.done("load teams")
+
     def load_players(self,year):
+        self.__verbose.start("loading players from year %d..." % (year))
+
         excel = PoolSpreadsheet(year,self.__excel_full_path())
         excel_players = excel.get_players()
 
@@ -62,18 +66,17 @@ class FBPoolLoad:
             for excel_player_name in excel_players:
                 player_name = self.__modify_player_name.get_name(excel_player_name)
                 player = fbpool_api.createPlayerIfDoesNotExist(player_name,[year])
-                if year not in player['years']:
-                    data = { "years":player['years'] + [year] }
-                    fbpool_api.editPlayerByKey(player['key'],data)
+                self.__add_year_to_player_if_missing(fbpool_api,year,player)
         except FBAPIException as e:
             FBPoolError.exit_with_error("players",e)
+
+        self.__verbose.done("load players")
 
     def __load_week_games(self,excel,week_number):
         excel_games = excel.get_games(week_number)
         week_games = []
 
-        if self.verbose:
-            print " : week games..."
+        self.__verbose.update("week games...")
 
         try:
             fbpool_api = FBPoolAPI(url=self.url)
@@ -123,18 +126,14 @@ class FBPoolLoad:
         for game in games:
             if game['number'] == number:
                 return game
-        print "**ERROR** Encountered error when loading games"
-        print "----------------------------------------------"
-        print "Could not find game number %d" % (number)
-        print ""
-        sys.exit(1)
+        additional_message = "could not find game number %d" % (number)
+        FBPoolError.exit_with_error("loading games",additional_message)
 
 
     def __load_week_picks(self,excel,week,week_games):
         excel_picks = excel.get_picks(week['number'])
 
-        if self.verbose:
-            print " : week picks..."
+        self.__verbose.update("week picks...")
 
         try:
             fbpool_api = FBPoolAPI(url=self.url)
@@ -145,8 +144,7 @@ class FBPoolLoad:
             number_of_picks = len(excel_picks)
             for i,excel_pick in enumerate(excel_picks):
 
-                if self.verbose and (i%50) == 0:
-                    print " : week picks (%d of %d)..." % (i,number_of_picks)
+                self.__verbose.update_every("week picks...",i,50,number_of_picks)
 
                 name = self.__modify_player_name.get_name(excel_pick.player_name)
                 player = player_lookup[name]
@@ -221,32 +219,27 @@ class FBPoolLoad:
                 additional_message = "Not stopping because of exception..."
                 FBPoolError.error_no_exit("updating memcache",e,additional_message)
 
-        self.__verbose.done("load week %d" % (week)
+        self.__verbose.done("load week %d" % (week))
 
 
     def load_year(self,year,load_teams_in_year=True,load_players_in_year=True):
-        if self.verbose:
-            print ""
-            print "loading year %d..." % (year)
+        self.__verbose.start("loading year %d..." % (year))
 
         excel = PoolSpreadsheet(year,self.__excel_full_path())
         week_numbers = excel.get_week_numbers()
 
         if load_teams_in_year:
-            if self.verbose:
-                print " : verifying teams are loaded..."
+            self.__verbose.update("verifying teams are loaded...")
             self.load_missing_teams(year)
 
         if load_players_in_year:
-            if self.verbose:
-                print " : verifying players are loaded..."
+            self.__verbose.update("verifying players are loaded...")
             self.load_players(year)
 
         for week_number in week_numbers:
             self.load_week(year,week_number,load_teams_and_players=False,update_memcache=False)
 
-        if self.verbose:
-            print " : cleaning up..."
+        self.__verbose.update("cleaning up...")
 
         try:
             fbpool_api = FBPoolAPI(url=self.url)
@@ -255,8 +248,7 @@ class FBPoolLoad:
             additional_message = "Not stopping because of exception..."
             FBPoolError.error_no_exit("deleting player api cache",e,additional_message)
 
-        if self.verbose:
-            print " : updating memcache..."
+        self.__verbose.update("updating memcache...")
 
         try:
             fbpool_api.updateCacheForYear(year)
@@ -264,5 +256,10 @@ class FBPoolLoad:
             additional_message = "Not stopping because of exception..."
             FBPoolError.error_no_exit("updating memcache",e,additional_message)
 
-        if self.verbose:
-            print ""
+        self.__verbose.done("load year")
+
+
+    def __add_year_to_player_if_missing(self,fbpool_api,year,player):
+        if year not in player['years']:
+            data = { "years":player['years'] + [year] }
+            fbpool_api.editPlayerByKey(player['key'],data)

@@ -6,6 +6,7 @@ from models.picks import *
 from api_exception import *
 from database import *
 from update import *
+import logging
 
 class API:
 

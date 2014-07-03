@@ -9,6 +9,8 @@ from scripts.excel.team import *
 from fbpool_args import *
 from fbpool_load import *
 from fbpool_delete import *
+from fbpool_list import *
+from fbpool_update import *
 import string
 
 class FBPool:
@@ -94,55 +96,6 @@ class FBPool:
             fbpool_api.updateCacheForWeek(year,week_number)
         except FBAPIException as e:
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
-
-        if self.verbose:
-            print ""
-
-
-    def update_week(self,year,week_number):
-        if self.verbose:
-            print ""
-            print "updating results for year %d week %d..." % (year,week_number)
-
-        excel = PoolSpreadsheet(year,self.__excel_full_path())
-        week_winner_name = excel.get_week_winner(week_number)
-        excel_games = excel.get_games(week_number)
-
-        try:
-            fbpool_api = FBPoolAPI(url=self.url)
-            week = fbpool_api.getWeek(year,week_number)
-
-            # update the week winner
-            if week_winner_name == None and week['winner'] != None:
-                edit_data = dict()
-                edit_data['winner'] = None
-                fbpool_api.editWeekByKey(week['key'],edit_data)
-            elif week_winner_name != None:
-                player = fbpool_api.getPlayer(week_winner_name)
-                winner_key = player['key']
-                winner_changed = winner_key != week['winner']
-                if winner_changed:
-                    edit_data = dict()
-                    edit_data['winner'] = winner_key
-                    fbpool_api.editWeekByKey(week['key'],edit_data)
-
-            # update the game info
-            for game_key in week['games']:
-                game = fbpool_api.getGameByKey(game_key)
-                excel_game = excel_games.get(game['number'])
-                if excel_game == None:
-                    continue
-
-                edit_data = dict()
-                edit_data['team1_score'] = excel_game.team1_score
-                edit_data['team2_score'] = excel_game.team2_score
-                edit_data['state'] = excel_game.state
-
-                fbpool_api.editGameByKey(game_key,edit_data)
-
-
-        except FBAPIException as e:
-            self.__update_week_error(e)
 
         if self.verbose:
             print ""
@@ -283,78 +236,6 @@ class FBPool:
 
         print ""
 
-    def list_all_teams(self):
-        if self.verbose:
-            print ""
-            print "reading teams from database..."
-
-        try:
-            fbpool_api = FBPoolAPI(url=self.url)
-            teams = fbpool_api.getAllTeams()
-        except FBAPIException as e:
-            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
-            sys.exit(1)
-
-        teams_sorted = sorted(teams,key=lambda team:team['name'])
-
-        print ""
-        print "Teams: (%d)" % (len(teams_sorted))
-        print "----------------------------------------------------------------------------------"
-        for team in teams_sorted:
-            print "%-40s %s" % (team['name'],team['conference'])
-        print "----------------------------------------------------------------------------------"
-        print ""
-
-    def list_all_players(self):
-        if self.verbose:
-            print ""
-            print "reading players from database..."
-
-        try:
-            fbpool_api = FBPoolAPI(url=self.url)
-            players = fbpool_api.getAllPlayers()
-        except FBAPIException as e:
-            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
-            sys.exit(1)
-
-        players_sorted = sorted(players,key=lambda player:player['name'])
-
-        print ""
-        print "Players:"
-        print "----------------------------------------------------------------------------------"
-        for player in players_sorted:
-            print "%-40s %s" % (player['name'],self.__array_str(player['years']))
-        print "----------------------------------------------------------------------------------"
-        print ""
-
-    def list_all_weeks(self):
-        if self.verbose:
-            print ""
-            print "reading weeks from database..."
-
-        try:
-            fbpool_api = FBPoolAPI(url=self.url)
-            weeks = fbpool_api.getAllWeeks()
-        except FBAPIException as e:
-            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
-            sys.exit(1)
-
-        years = sorted(set([week['year'] for week in weeks ]))
-
-        print ""
-        print "Weeks:"
-        print "----------------------------------------------------------------------------------"
-        for year in years:
-            numbers = sorted([ week['number'] for week in weeks if week['year'] == year])
-
-            for week_number in numbers:
-                print "%d Week %d" % (year,week_number)
-
-            print ""
-
-        print "----------------------------------------------------------------------------------"
-        print ""
-
     def __array_str(self,a):
         s = ""
         last = len(a)-1
@@ -447,8 +328,7 @@ if __name__ == "__main__":
 
     elif action == "update_week":
         excel_file = fbpool_args.get_excel_file(args.year)
-        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file)
-        fbpool.supress_output(args.quiet)
+        fbpool = FBPoolUpdate(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file,quiet=args.quiet)
         fbpool.update_week(args.year,args.week)
 
     elif action == "delete_year":
@@ -511,18 +391,15 @@ if __name__ == "__main__":
         pass
 
     elif action == "list_teams":
-        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=None)
-        fbpool.supress_output(args.quiet)
+        fbpool = FBPoolList(url=url,excel_dir=args.excel_dir,excel_workbook=None,quiet=args.quiet)
         fbpool.list_all_teams()
 
     elif action == "list_players":
-        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=None)
-        fbpool.supress_output(args.quiet)
+        fbpool = FBPoolList(url=url,excel_dir=args.excel_dir,excel_workbook=None,quiet=args.quiet)
         fbpool.list_all_players()
 
     elif action == "list_weeks":
-        fbpool = FBPool(url=url,excel_dir=args.excel_dir,excel_workbook=None)
-        fbpool.supress_output(args.quiet)
+        fbpool = FBPoolList(url=url,excel_dir=args.excel_dir,excel_workbook=None,quiet=args.quiet)
         fbpool.list_all_weeks()
 
     elif action == "list_picks":

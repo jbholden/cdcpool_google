@@ -17,8 +17,6 @@ class FBPoolDelete:
         self.url = url
         self.excel_dir = excel_dir
         self.excel_workbook = excel_workbook
-        self.verbose = True
-        self.__modify_player_name = FBPoolPlayerName("hide_lastname")
         self.__verbose = FBPoolVerbose(quiet)
 
     def delete_year(self,year):

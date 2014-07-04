@@ -78,13 +78,13 @@ class FBPoolList:
         print "----------------------------------------------------------------------------------"
         print ""
 
-    def list_player_picks(self,year,week,player_name):
+    def list_player_picks(self,year,week_number,player_name):
         self.__verbose.start("reading player picks from database...")
 
         # get the picks
         try:
             fbpool_api = FBPoolAPI(url=self.url)
-            picks = fbpool_api.getPlayerPicks(year,week,player_name)
+            picks = fbpool_api.getPlayerPicks(year,week_number,player_name)
         except FBAPIException as e:
             FBPoolError.exit_with_error("list player picks",e,"error getting picks")
 
@@ -112,24 +112,24 @@ class FBPoolList:
             FBPoolError.exit_with_error("list player picks",e,"error getting games")
 
         print ""
-        print "%s Picks for %d Week %d:" % (player_name,year,week)
+        print "%s Picks for %d Week %d:" % (player_name,year,week_number)
         print "----------------------------------------------------------------------------------"
         game_numbers = sorted(game_picks.keys())
         for game_number in game_numbers:
             if game_number < 10:
-                print "Game  %d: %s" % (game_picks[game_number])
+                print "Game  %d: %s" % (game_number,game_picks[game_number])
             else:
-                print "Game %d: %s" % (game_picks[game_number])
+                print "Game %d: %s" % (game_number,game_picks[game_number])
 
         print "----------------------------------------------------------------------------------"
         print ""
 
-    def list_week_games(self,year,week):
+    def list_week_games(self,year,week_number):
         self.__verbose.start("reading week games from database...")
 
         try:
             fbpool_api = FBPoolAPI(url=self.url)
-            week = fbpool_api.getWeek(year,week)
+            week = fbpool_api.getWeek(year,week_number)
 
             game_teams = dict()
             for game_key in week['games']:
@@ -142,20 +142,25 @@ class FBPoolList:
                 team2_key = game['team2']
                 team2 = fbpool_api.getTeamByKey(team2_key)
 
-                game_teams[game_number] = (team1.name,team2.name)
+                game_teams[game_number] = (team1['name'],team2['name'])
 
         except FBAPIException as e:
             FBPoolError.exit_with_error("list week games",e)
 
         print ""
-        print "%d Week %d Games:" % (year,week)
+        print "%d Week %d Games:" % (year,week_number)
         print "----------------------------------------------------------------------------------"
         game_numbers = sorted(game_teams.keys())
         for game_number in game_numbers:
+
+            teams = game_teams[game_number]
+            team1 = teams[0]
+            team2 = teams[1]
+
             if game_number < 10:
-                print "Game  %d: %s vs. %s" % (game_teams[0],game_teams[1])
+                print "Game  %d: %s vs. %s" % (game_number,team1,team2)
             else:
-                print "Game %d: %s vs. %s" % (game_teams[0],game_teams[1])
+                print "Game %d: %s vs. %s" % (game_number,team1,team2)
 
         print "----------------------------------------------------------------------------------"
         print ""

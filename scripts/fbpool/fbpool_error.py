@@ -23,10 +23,19 @@ class FBPoolError:
         FBPoolError.exit_with_error(operation,fbapi_exception,additional_message)
 
     @staticmethod
+    def __print_line(length):
+        s = ""
+        for i in range(length):
+            s += "-"
+        print s
+
+    @staticmethod
     def __print_error(operation,fbapi_exception=None,additional_message=None):
+        title = "**ERROR** Encountered error when %s" % (operation)
+
         print ""
-        print "**ERROR** Encountered error when %s" % (operation)
-        print "---------------------------------------------"
+        print title
+        FBPoolError.__print_line(len(title))
 
         if fbapi_exception:
             print "FBAPIException: code=%d, msg=%s" % (fbapi_exception.http_code,fbapi_exception.errmsg)

@@ -179,6 +179,24 @@ python -p 10090 --clean api
 
 ```
 
+List examples
+```
+# list all teams in database
+python -p 10090 --list teams
+
+# list all players in database
+python -p 10090 --list players
+
+# list all weeks in database
+python -p 10090 --list weeks
+
+# list a particular player picks for a week
+python -p 10090 --list picks --year 2013 --week 1 --player "Brent H."
+
+# list the games in a given week
+python -p 10090 --list games --year 2013 --week 1
+```
+
 ### Implementation Details
 
 `/scripts/fbpool`<br>

@@ -67,19 +67,19 @@ if __name__ == "__main__":
         fbpool.delete_week(args.year,args.week)
 
     elif action == "delete_all":
-        fbpool = FBPoolDelete(url=url,args.quiet)
+        fbpool = FBPoolDelete(url=url,quiet=args.quiet)
         fbpool.delete_all()
 
     elif action == "delete_all_players":
-        fbpool = FBPoolDelete(url=url,args.quiet)
+        fbpool = FBPoolDelete(url=url,quiet=args.quiet)
         fbpool.delete_players()
 
     elif action == "delete_players_from_year":
-        fbpool = FBPoolDelete(url=url,args.quiet)
+        fbpool = FBPoolDelete(url=url,quiet=args.quiet)
         fbpool.delete_players_from_year(args.year)
 
     elif action == "delete_teams":
-        fbpool = FBPoolDelete(url=url,args.quiet)
+        fbpool = FBPoolDelete(url=url,quiet=args.quiet)
         fbpool.delete_teams()
 
     elif action == "flush_memcache":
@@ -103,23 +103,23 @@ if __name__ == "__main__":
         fbpool.cleanup_api()
 
     elif action == "list_teams":
-        fbpool = FBPoolList(url=url,args.quiet)
+        fbpool = FBPoolList(url=url,quiet=args.quiet)
         fbpool.list_all_teams()
 
     elif action == "list_players":
-        fbpool = FBPoolList(url=url,args.quiet)
+        fbpool = FBPoolList(url=url,quiet=args.quiet)
         fbpool.list_all_players()
 
     elif action == "list_weeks":
-        fbpool = FBPoolList(url=url,args.quiet)
+        fbpool = FBPoolList(url=url,quiet=args.quiet)
         fbpool.list_all_weeks()
 
     elif action == "list_player_picks":
-        fbpool = FBPoolList(url=url,args.quiet)
+        fbpool = FBPoolList(url=url,quiet=args.quiet)
         fbpool.list_player_picks(args.year,args.week,args.player)
 
     elif action == "list_week_games":
-        fbpool = FBPoolList(url=url,args.quiet)
+        fbpool = FBPoolList(url=url,quiet=args.quiet)
         fbpool.list_week_games(args.year,args.week)
 
     else:

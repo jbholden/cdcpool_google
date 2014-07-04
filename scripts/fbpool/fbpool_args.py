@@ -50,6 +50,10 @@ class FBPoolArgs:
             return "list_players"
         elif self.args.list == "weeks":
             return "list_weeks"
+        elif self.args.list == "picks" and self.args.year and self.args.week and self.args.player:
+            return "list_player_picks"
+        elif self.args.list == "games" and self.args.year and self.args.week:
+            return "list_week_games"
 
     def get_url(self):
         if self.args.port != None:
@@ -117,6 +121,11 @@ class FBPoolArgs:
                             action="store_true",
                             default=False,
                             help="supress printing out extra information for a command")
+
+        parser.add_argument("-n","--player",
+                            type=str,
+                            action="store",
+                            help="specify the player name")
 
         self.args = parser.parse_args()
 

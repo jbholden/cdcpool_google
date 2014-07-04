@@ -13,10 +13,8 @@ import string
 
 class FBPoolDelete:
 
-    def __init__(self,url,excel_dir,excel_workbook,quiet=False):
+    def __init__(self,url,quiet=False):
         self.url = url
-        self.excel_dir = excel_dir
-        self.excel_workbook = excel_workbook
         self.__verbose = FBPoolVerbose(quiet)
 
     def delete_year(self,year):

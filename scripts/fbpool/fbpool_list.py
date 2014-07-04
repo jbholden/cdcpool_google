@@ -4,18 +4,14 @@ sys.path.append(ROOT_PATH)
 
 from scripts.api.fbpool_api import *
 from scripts.api.fbpool_api_exception import *
-from scripts.excel.pool_spreadsheet import *
-from scripts.excel.team import *
 from fbpool_error import *
 from fbpool_verbose import *
 import string
 
 class FBPoolList:
 
-    def __init__(self,url,excel_dir,excel_workbook,quiet=False):
+    def __init__(self,url,quiet=False):
         self.url = url
-        self.excel_dir = excel_dir
-        self.excel_workbook = excel_workbook
         self.__verbose = FBPoolVerbose(quiet)
 
     def list_all_teams(self):
@@ -78,6 +74,88 @@ class FBPoolList:
                 print "%d Week %d" % (year,week_number)
 
             print ""
+
+        print "----------------------------------------------------------------------------------"
+        print ""
+
+    def list_player_picks(self,year,week,player_name):
+        self.__verbose.start("reading player picks from database...")
+
+        # get the picks
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            picks = fbpool_api.getPlayerPicks(year,week,player_name)
+        except FBAPIException as e:
+            FBPoolError.exit_with_error("list player picks",e,"error getting picks")
+
+
+        # get team name for each game pick
+        try:
+            game_picks = dict()
+            for pick in picks:
+                game_key = pick['game']
+                game = fbpool_api.getGameByKey(game_key)
+                game_number = game['number']
+
+                if pick['winner'] == "team1":
+                    team1_key = game['team1']
+                    team1 = fbpool_api.getTeamByKey(team1_key)
+                    game_picks[game_number] = team1['name']
+                elif pick['winner'] == "team2":
+                    team2_key = game['team2']
+                    team2 = fbpool_api.getTeamByKey(team2_key)
+                    game_picks[game_number] = team2['name']
+                else:
+                    game_picks[game_number] = "No Pick Made."
+
+        except FBAPIException as e:
+            FBPoolError.exit_with_error("list player picks",e,"error getting games")
+
+        print ""
+        print "%s Picks for %d Week %d:" % (player_name,year,week)
+        print "----------------------------------------------------------------------------------"
+        game_numbers = sorted(game_picks.keys())
+        for game_number in game_numbers:
+            if game_number < 10:
+                print "Game  %d: %s" % (game_picks[game_number])
+            else:
+                print "Game %d: %s" % (game_picks[game_number])
+
+        print "----------------------------------------------------------------------------------"
+        print ""
+
+    def list_week_games(self,year,week):
+        self.__verbose.start("reading week games from database...")
+
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            week = fbpool_api.getWeek(year,week)
+
+            game_teams = dict()
+            for game_key in week['games']:
+                game = fbpool_api.getGameByKey(game_key)
+                game_number = game['number']
+
+                team1_key = game['team1']
+                team1 = fbpool_api.getTeamByKey(team1_key)
+
+                team2_key = game['team2']
+                team2 = fbpool_api.getTeamByKey(team2_key)
+
+                game_teams[game_number] = (team1.name,team2.name)
+
+        except FBAPIException as e:
+            FBPoolError.exit_with_error("list week games",e)
+
+        print ""
+        print "%d Week %d Games:" % (year,week)
+        print "----------------------------------------------------------------------------------"
+        game_numbers = sorted(game_teams.keys())
+        for game_number in game_numbers:
+            if game_number < 10:
+                print "Game  %d: %s vs. %s" % (game_teams[0],game_teams[1])
+            else:
+                print "Game %d: %s vs. %s" % (game_teams[0],game_teams[1])
 
         print "----------------------------------------------------------------------------------"
         print ""

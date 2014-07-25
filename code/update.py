@@ -5,6 +5,7 @@ from calculator import *
 from code.week_results import *
 from code.player_results import *
 from code.overall_results import *
+from code.game_data import *
 import logging
 
 # TODO:  create test to simulate start of a pool
@@ -115,6 +116,14 @@ class Update:
         summary = player_results[0]  # redundant but makes code clearer
         results = player_results[1]  # redundant but makes code clearer
         return summary,results
+
+    def get_week_games(self,year,week_number,update=False):
+        key = "week_games_%d_%d" % (year,week_number)
+        week_games = memcache.get(key)
+        if update or not(week_games):
+            week_games = self.__calculate_week_games(year,week_number)
+            memcache.set(key,week_games)
+        return week_games
 
     def __setup_overall_results(self,database,year,update=False):
         players = database.load_players(year,update)
@@ -258,6 +267,26 @@ class Update:
         game_results = self.__calculate_player_game_results_sorted_by_game_number(player_key,calc,week_data)
 
         return summary,game_results
+
+    def __calculate_week_games(self,year,week_number):
+        database = Database()
+        week_data = database.load_week_data(year,week_number)
+
+        games = []
+        for game in week_data.games.values():
+            data = GameData()
+            data.number = game.number
+            data.team1 = week_data.teams[game.team1].name
+            data.team2 = week_data.teams[game.team2].name
+            data.team1_score = game.team1_score
+            data.team2_score = game.team2_score
+            data.state = game.state
+            data.quarter = game.quarter
+            data.time_left = game.time_left
+            data.date = game.date
+            games.append(data)
+
+        return sorted(games,key=lambda game:game.number)
 
 
     def __calculate_player_summary(self,player_id,player_key,calc,week_data):

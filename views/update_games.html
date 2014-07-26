@@ -2,10 +2,16 @@
 
 {% block head_content %}
     <link href="/stylesheets/update_games.css" rel="stylesheet" type="text/css" media="all">
+    <script src="/javascript/instructions.js"></script>
 {% endblock %}
 
 {% block content %}
     <form action="games" method="post">
+    <br>
+    <a id="instr-link" href="#" onclick="expand_instr()">[+]</a>
+    <span id="instr-title">Instructions</span>
+    <br><br>
+    <span id="instr-content"></span>
     {% for game in games %}
         <table>
             <thead class="game-header">
@@ -19,10 +25,10 @@
                 <td id="vs"></td>
                 <td id="team-name">{{game.team1}}</td>
                 <td id="team-score">
-                    <input type="text" name="temporary" size="2" value="{{game.team1_score}}"></input>
+                    <input type="text" name="team1_score_{{game.number}}" size="2" value="{{game.team1_score}}"></input>
                 </td>
                 <td id="game-qtr">Qtr
-                    <input type="text" name="temporary" size="7" value="{{game.quarter}}"></input>
+                    <input type="text" name="quarter_{{game.number}}" size="7" value="{{game.quarter}}"></input>
                 </td>
                 <td id="game-status"></td>
             </tr>
@@ -30,12 +36,18 @@
                 <td id="vs">vs.</td>
                 <td id="team-name">{{game.team2}}</td>
                 <td id="team-score">
-                    <input type="text" name="temporary" size="2" value="{{game.team2_score}}"></input>
+                    <input type="text" name="team2_score_{{game.number}}" size="2" value="{{game.team2_score}}"></input>
                 </td>
                 <td id="game-time">Time
-                    <input type="text" name="temporary" size="7" value="{{game.time}}"></input>
+                    <input type="text" name="quarter_{{game.number}}" size="7" value="{{game.time}}"></input>
                 </td>
-                <td id="game-status"></td>
+                <td id="game-status">
+                {% if game.state == "final" %}
+                <input type="checkbox" name="final_{{game.number}}" checked="checked" value="checked"></input> Final
+                {% else %}
+                <input type="checkbox" name="final_{{game.number}}" value="checked"></input> Final
+                {% endif %}
+                </td>
             </tr>
         </table>
         <br>

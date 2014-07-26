@@ -278,11 +278,11 @@ class Update:
             data.number = game.number
             data.team1 = week_data.teams[game.team1].name
             data.team2 = week_data.teams[game.team2].name
-            data.team1_score = game.team1_score
-            data.team2_score = game.team2_score
+            data.team1_score = game.team1_score if game.team1_score != None else ""
+            data.team2_score = game.team2_score if game.team2_score != None else ""
             data.state = game.state
-            data.quarter = game.quarter
-            data.time_left = game.time_left
+            data.quarter = game.quarter if game.quarter != None else ""
+            data.time_left = game.time_left if game.time_left != None else ""
             data.date = game.date
             games.append(data)
 

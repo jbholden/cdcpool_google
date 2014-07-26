@@ -123,7 +123,157 @@ class Update:
         if update or not(week_games):
             week_games = self.__calculate_week_games(year,week_number)
             memcache.set(key,week_games)
+
         return week_games
+
+    def __update_games_cache(self,year,week_number,week_games):
+        d = Database()
+        week_data = d.load_week_data(year,week_number)
+        cached_games = week_data.games
+
+        # track what changed in order to determine if results need to be recalculated or not
+        changes = dict()
+        changes['something_changed'] = False
+        changes['score_changed'] = False
+        changes['state_changed'] = False
+        changes['quarter_or_time_changed'] = False
+
+        something_changed = False
+        for game_key in cached_games:
+            new_game_data = self.__find_game_number(cached_games[game_key].number,week_games)
+
+            if cached_games[game_key].team1_score != new_game_data.team1_score:
+                cached_games[game_key].team1_score = new_game_data.team1_score if new_game_data.team1_score != "" else None
+                changes['something_changed'] = True
+                changes['score_changed'] = True
+
+            if cached_games[game_key].team2_score != new_game_data.team2_score:
+                cached_games[game_key].team2_score = new_game_data.team2_score if new_game_data.team2_score != "" else None
+                changes['something_changed'] = True
+                changes['score_changed'] = True
+
+            if cached_games[game_key].state != new_game_data.state:
+                cached_games[game_key].state = new_game_data.state
+                changes['something_changed'] = True
+                changes['state_changed'] = True
+
+            if cached_games[game_key].quarter != new_game_data.quarter:
+                cached_games[game_key].quarter = new_game_data.quarter
+                changes['something_changed'] = True
+                changes['quarter_or_time_changed'] = True
+
+            if cached_games[game_key].time_left != new_game_data.time_left:
+                cached_games[game_key].time_left = new_game_data.time_left
+                changes['something_changed'] = True
+                changes['quarter_or_time_changed'] = True
+
+        if changes['something_changed']:
+            d.update_games_cache(year,week_number,cached_games)
+            key = "week_games_%d_%d" % (year,week_number)
+            memcache.set(key,week_games)
+
+        return changes
+
+    def __update_games_in_database(self,year,week_number,week_games):
+        d = Database()
+        week_data = d.load_week_data(year,week_number)
+        cached_games = week_data.games
+
+        something_changed = False
+        for game_key in cached_games:
+            game = db.get(game_key)
+            cached_game = cached_games[game_key]
+            new_game_data = self.__find_game_number(game.number,week_games)
+
+            this_game_changed = False
+
+            if cached_game.team1_score != new_game_data.team1_score:
+                game.team1_score = new_game_data.team1_score
+                something_changed = True
+                this_game_changed = True
+
+            if cached_game.team2_score != new_game_data.team2_score:
+                game.team2_score = new_game_data.team2_score
+                something_changed = True
+                this_game_changed = True
+
+            if cached_game.state != new_game_data.state:
+                game.state = new_game_data.state
+                something_changed = True
+                this_game_changed = True
+
+            if cached_game.quarter != new_game_data.quarter:
+                game.quarter = new_game_data.quarter
+                something_changed = True
+                this_game_changed = True
+
+            if cached_game.time_left != new_game_data.time_left:
+                game.time_left = new_game_data.time_left
+                something_changed = True
+                this_game_changed = True
+
+            if this_game_changed:
+                game.put()
+
+        if something_changed:
+            d.update_games(year,week_number)
+
+        self.get_week_games(year,week_number,update=True)
+
+        return something_changed
+
+
+    def __find_game_number(self,number,games):
+        game_match = [ game for game in games if game.number == number ]
+        assert len(game_match) == 1
+        return game_match[0]
+
+    def update_week_games(self,year,week_number,week_games):
+        recalculate_week_results = False
+        recalculate_overall_results = False
+        recalculate_player_results = False
+
+        # only update the game data in the database if all
+        # games have been completed and something has changed
+        if self.__week_games_all_final(week_games):
+            something_changed = self.__update_games_in_database(year,week_number,week_games)
+            if something_changed:
+                recalculate_week_results = True
+                recalculate_overall_results = True
+                recalculate_player_results = True
+
+        # if all games not completed, just update the memcache data
+        # the intention is to reduce the number of writes to the database when
+        # the games are being updated frequently
+        else:
+            changes = self.__update_games_cache(year,week_number,week_games)
+
+            # this code optimizes what to recalculate based on what changed.
+            if changes['score_changed'] or changes['state_changed']:
+                recalculate_week_results = True
+                recalculate_overall_results = True
+                recalculate_player_results = True
+
+            # if only the quarter or time changed, just recalculate the players page
+            # since the other pages don't use this information
+            elif changes['quarter_or_time_changed']:
+                recalculate_player_results = True
+
+        if recalculate_week_results:
+            self.update_week_results(year,week_number)
+
+        if recalculate_week_results:
+            self.update_player_results(year,week_number)
+
+        if recalculate_week_results:
+            self.update_overall_results(year)
+
+    def __week_games_all_final(self,week_games):
+        final_games = 0
+        for game in week_games:
+            if game.state == "final":
+                final_games += 1
+        return final_games == 10
 
     def __setup_overall_results(self,database,year,update=False):
         players = database.load_players(year,update)

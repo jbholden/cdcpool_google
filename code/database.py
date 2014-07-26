@@ -266,6 +266,14 @@ class Database:
             return False
         return get_current_time_in_utc() <= week.lock_picks
 
+    def update_games_cache(self,year,week_number,data):
+        key = "games_%d_%d" % (year,week_number)
+        games = memcache.set(key,data)
+
+    def update_games(self,year,week_number):
+        week = self.__get_week_in_database(year,week_number,update=False)
+        games = self.__get_week_games_in_database(week,update=True)
+
     def add_team_to_memcache(self,team):
         team_key = str(team.key())
 

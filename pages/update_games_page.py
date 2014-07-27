@@ -31,6 +31,7 @@ class UpdateGamesPage(Handler):
         params['week_number'] = week_number
         params['weeks_in_year'] = weeks_in_year
         params['games'] = u.get_week_games(year,week_number)
+        params['locked'] = self.__is_week_scores_locked(year,week_number)
 
         self.render("update_games.html",**params)
 
@@ -53,6 +54,12 @@ class UpdateGamesPage(Handler):
         if not submit_clicked:
             self.error(400)
             errmsg = "Unexpected Error!  Expected submit button to be clicked but wasn't"
+            self.render("error_message.html",message=errmsg)
+            return
+
+        if self.__is_week_scores_locked(year,week_number):
+            self.error(400)
+            errmsg = "The scores for %d Week %d are locked." % (year,week_number)
             self.render("error_message.html",message=errmsg)
             return
 
@@ -80,6 +87,18 @@ class UpdateGamesPage(Handler):
 
         u.update_week_games(year,week_number,week_games)
         self.redirect("results")
+
+    def __is_week_scores_locked(self,year,week_number):
+        d = Database()
+        data = d.load_week_data(year,week_number)
+        lock_date_utc = data.week.lock_scores
+        if lock_date_utc == None:
+            return False
+
+        current_time = get_current_time_in_utc()
+
+        return current_time >= lock_date_utc
+
 
     def __get_game_input_data(self,game_number):
         team1_score_input = "team1_score_%d" % (game_number)

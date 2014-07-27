@@ -274,6 +274,9 @@ class Database:
         week = self.__get_week_in_database(year,week_number,update=False)
         games = self.__get_week_games_in_database(week,update=True)
 
+    def update_week_cache(self,year,week_number):
+        week = self.__get_week_in_database(year,week_number,update=True)
+
     def add_team_to_memcache(self,team):
         team_key = str(team.key())
 

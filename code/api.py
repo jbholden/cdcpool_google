@@ -621,6 +621,9 @@ class API:
     def edit_week_by_key(self,week_key,data):
         week = db.get(week_key)
 
+        changed_year = False
+        changed_number = False
+
         if 'year' in data:
             changed_year = True
             week.year = data['year']

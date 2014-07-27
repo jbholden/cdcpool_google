@@ -12,6 +12,9 @@
     <span id="instr-title">Instructions</span>
     <br><br>
     <span id="instr-content"></span>
+    {% if locked %}
+        <div id="locked-text">The scores are locked and cannot be edited. </div><br>
+    {% endif %}
     {% for game in games %}
         <table>
             <thead class="game-header">
@@ -52,15 +55,28 @@
         </table>
         <br>
     {% endfor %}
-    <table>
-        <tr>
-            <td>
-                <input type="submit" name="submit_form" value="Submit">
-            </td>
-            <td>
-                <input type="submit" name="cancel_form" value="Cancel">
-            </td>
-        </tr>
-    </table>
+    {% if locked %}
+        <table>
+            <tr>
+                <td>
+                    <input type="submit" name="cancel_form" value="Cancel">
+                </td>
+                <td id="locked-text">
+                    The scores are locked and cannot be edited.
+                </td>
+            </tr>
+        </table>
+    {% else %}
+        <table>
+            <tr>
+                <td>
+                    <input type="submit" name="submit_form" value="Submit">
+                </td>
+                <td>
+                    <input type="submit" name="cancel_form" value="Cancel">
+                </td>
+            </tr>
+        </table>
+    {% endif %}
     </form>
 {% endblock %}

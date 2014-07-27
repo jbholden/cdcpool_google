@@ -12,6 +12,14 @@
    background-color: lightyellow;
 }
 
+#locked-text {
+   color: red;
+   text-align: left;
+   padding: 1px 4px;
+   font-family: Helvetica;
+   font-weight: 100;
+}
+
 #teams-header {
    text-align: left;
    padding: 1px 4px;

@@ -75,8 +75,11 @@ class TestUpdateGames(unittest.TestCase):
             if changed:
                 game_key = game.key()
                 api.edit_game_by_key(game_key,data)
-                d = Database()
-                d.update_games(2013,1)
+
+        d = Database()
+        d.update_games(2013,1)
+        memcache.delete("week_games_2013_1")
+        api.delete_games_cache()
 
 
     def __find_game(self,games,number):
@@ -439,7 +442,9 @@ class TestUpdateGames(unittest.TestCase):
 
     def __get_week_games(self,year,week_number):
         api = API()
+        api.delete_games_cache()
         week = api.get_week_in_year(year,week_number)
+        api.delete_games_cache()  # ensure reading directly from database
         games = []
         for game_key in week.games:
             games.append(api.get_game_by_key(game_key))
@@ -447,7 +452,6 @@ class TestUpdateGames(unittest.TestCase):
 
     def __http_post(self,address,data=None):
         url = "http://%s%s" % (self.hostname,address)
-        logging.info("host=%s, url=%s" % (self.hostname,url))
         data_encoded = urllib.urlencode(data)
         try:
             req = urllib2.Request(url,data_encoded)

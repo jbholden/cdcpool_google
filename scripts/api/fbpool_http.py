@@ -241,6 +241,9 @@ class FBPoolHTTP:
     def httpPostPickCreate(self,data):
         return self.httpPost('/api/pick',data)
 
+    def httpPostMultiplePicksCreate(self,year,week,data):
+        return self.httpPost('/api/%d/week/%d/picks' % (year,week),data)
+
     def httpGetPickByKey(self,pick_key):
         return self.httpGet('/api/pick/key/%s' % (pick_key))
 

@@ -682,6 +682,32 @@ class API:
 
         return pick
 
+    def create_multiple_picks(self,year,week_number,data):
+        models = []
+        for pick in data:
+            model = Pick()
+            model.week = pick['week']
+            model.player = pick['player']
+            model.game = pick['game']
+            model.winner = pick['winner']
+            model.team1_score = pick['team1_score']
+            model.team2_score = pick['team2_score']
+            models.append(model)
+
+        model_keys = db.put(models)
+
+        # store temporarily in memcache for subsequent get calls
+        # once done with API calls, can delete this with DELETE /api/picks/cache
+        picks = []
+        for model_key in model_keys:
+            pick = db.get(model_key)
+            self.__add_to_memcache_dict("picks_id",pick.key().id(),pick)
+            self.__add_to_memcache_dict("picks_key",str(pick.key()),pick)
+            picks.append(pick)
+
+        return picks
+
+
     def delete_pick_by_id(self,pick_id):
         try:
             pick_key = db.Key.from_path('Pick',pick_id)

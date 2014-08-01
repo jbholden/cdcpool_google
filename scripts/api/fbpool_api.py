@@ -328,6 +328,13 @@ class FBPoolAPI:
             return data
         raise FBAPIException(response.code,response.read())
 
+    def createMultiplePicks(self,year,week,data):
+        response = self.__fbpool.httpPostMultiplePicksCreate(year,week,data)
+        if response.code == 200:
+            data = json.loads(response.read())
+            return data
+        raise FBAPIException(response.code,response.read())
+
     def getPickByKey(self,pick_key):
         response = self.__fbpool.httpGetPickByKey(pick_key)
         if response.code != 200:

@@ -251,6 +251,36 @@ class TestPick(unittest.TestCase):
             self.assertTrue(False)
             return
 
+    def test_create_multiple_picks(self):
+        week,game,player = self.__setup_pick_data(1984,1,"Player1")
+
+        pick = dict()
+        pick['week'] = week['key']
+        pick['player'] = player['key']
+        pick['game'] = game['key']
+        pick['winner'] = "team1"
+        pick['team1_score'] = None
+        pick['team2_score'] = None
+
+        data = [ dict(pick), dict(pick), dict(pick) ]
+
+        try:
+            picks = self.fbpool.createMultiplePicks(year=1984,week=1,data=data)
+        except FBAPIException as e:
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+            self.assertTrue(False)
+            return
+
+        self.assertIsNotNone(picks)
+        self.assertEquals(len(picks),3)
+
+        for pick_returned in picks:
+            self.__verify_pick(pick_returned,pick)
+            self.__cleanup_pick(pick_returned)
+
+        self.__cleanup_pick(week=week,game=game,player=player)
+
+
     def __setup_pick(self,year=1984,week_number=1,player="Player1"):
         week,game,player = self.__setup_pick_data(year,week_number,player)
 

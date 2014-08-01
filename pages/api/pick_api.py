@@ -17,6 +17,29 @@ class PickAPIDeleteAll(APIHandler):
             self.write(e.errmsg)
             return
 
+class PickAPIMultipleCreate(APIHandler):
+
+    def post(self,year,week_number):
+        data = json.loads(self.request.body) 
+
+        required_fields = ['week','player','game','winner','team1_score','team2_score']
+
+        for pick in data:
+            for field in required_fields:
+                if self.is_field_missing(field,pick):
+                    return
+
+        try:
+            api = API()
+            picks = api.create_multiple_picks(int(year),int(week_number),data)
+        except APIException as e:
+            self.error(e.http_code)
+            self.write(e.errmsg)
+            return
+
+        return_data = [ self.build_pick_object(pick) for pick in picks ]
+        self.render_json(return_data)
+
 
 class PickAPIGetById(APIHandler):
 

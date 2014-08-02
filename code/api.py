@@ -127,6 +127,33 @@ class API:
 
         return game
 
+    def create_multiple_games(self,year,week_number,data):
+        models = []
+        for game in data:
+            model = Game()
+            model.number = game['number']
+            model.team1 = game['team1']
+            model.team2 = game['team2']
+            model.team1_score = game['team1_score']
+            model.team2_score = game['team2_score']
+            model.favored = game['favored']
+            model.spread = game['spread']
+            model.state = game['state']
+            model.quarter = game['quarter']
+            model.time_left = game['time_left']
+            model.date = game['date']
+            models.append(model)
+
+        model_keys = db.put(models)
+
+        # store temporarily in memcache for subsequent get calls
+        # once done with API calls, can delete this with DELETE /api/games/cache
+        for game in models:
+            self.__add_to_memcache_dict("games_id",game.key().id(),game)
+            self.__add_to_memcache_dict("games_key",str(game.key()),game)
+
+        return models
+
     def delete_game_by_id(self,game_id):
         try:
             game_key = db.Key.from_path('Game',game_id)

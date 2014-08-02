@@ -97,6 +97,9 @@ class FBPoolHTTP:
     def httpPostGameCreate(self,data):
         return self.httpPost('/api/game',data)
 
+    def httpPostMultipleGamesCreate(self,year,week,data):
+        return self.httpPost('/api/%d/week/%d/games' % (year,week),data)
+
     def httpDeleteGameByKey(self,game_key):
         data = dict()
         data['key'] = game_key

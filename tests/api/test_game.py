@@ -275,6 +275,41 @@ class TestGame(unittest.TestCase):
             self.assertTrue(False)
             return
 
+    def test_create_multiple_games(self):
+        team1 = self.fbpool.createTeamIfDoesNotExist("Team1","Conference1")
+        team2 = self.fbpool.createTeamIfDoesNotExist("Team2","Conference1")
+
+        game = dict()
+        game['number'] = 2
+        game['team1'] = team1['key']
+        game['team2'] = team2['key']
+        game['team1_score'] = 21
+        game['team2_score'] = 20 
+        game['favored'] = "team2"
+        game['spread'] = 0.5
+        game['state'] = "final"
+        game['quarter'] = None
+        game['time_left'] = None
+        game['date'] = "09/05/2014 19:00"
+
+        data = [ dict(game), dict(game), dict(game) ]
+
+        try:
+            games = self.fbpool.createMultipleGames(year=1984,week=1,data=data)
+        except FBAPIException as e:
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+            self.assertTrue(False)
+            return
+
+        self.assertIsNotNone(games)
+        self.assertEquals(len(games),3)
+
+        for game_returned in games:
+            self.__verify_game(game_returned,**game)
+            self.fbpool.deleteGameByID(game_returned['id'])
+
+        self.__cleanup_created_game_teams()
+
     def __create_game_for_test(self):
         team1 = self.fbpool.createTeamIfDoesNotExist("Team1","Conference1")
         team2 = self.fbpool.createTeamIfDoesNotExist("Team2","Conference1")

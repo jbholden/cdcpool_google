@@ -95,6 +95,13 @@ class FBPoolAPI:
             return data
         raise FBAPIException(response.code,response.read())
 
+    def createMultipleGames(self,year,week,data):
+        response = self.__fbpool.httpPostMultipleGamesCreate(year,week,data)
+        if response.code == 200:
+            data = json.loads(response.read())
+            return data
+        raise FBAPIException(response.code,response.read())
+
     def deleteGameByKey(self,game_key):
         response = self.__fbpool.httpDeleteGameByKey(game_key)
         if response.code != 200:

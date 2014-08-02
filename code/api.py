@@ -698,14 +698,11 @@ class API:
 
         # store temporarily in memcache for subsequent get calls
         # once done with API calls, can delete this with DELETE /api/picks/cache
-        picks = []
-        for model_key in model_keys:
-            pick = db.get(model_key)
+        for pick in models:
             self.__add_to_memcache_dict("picks_id",pick.key().id(),pick)
             self.__add_to_memcache_dict("picks_key",str(pick.key()),pick)
-            picks.append(pick)
 
-        return picks
+        return models
 
 
     def delete_pick_by_id(self,pick_id):

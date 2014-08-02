@@ -31,10 +31,10 @@ class WeekAPIGetDeleteAll(APIHandler):
 
 class WeekAPIGetById(APIHandler):
 
-    def get(self,week_id):
+    def get(self,year,week_number,week_id):
         try:
             api = API()
-            week = api.get_week_by_id(int(week_id))
+            week = api.get_week_by_id(int(year),int(week_number),int(week_id))
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)

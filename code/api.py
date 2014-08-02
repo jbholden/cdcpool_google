@@ -588,7 +588,7 @@ class API:
             return
         return week
 
-    def get_week_by_id(self,week_id):
+    def get_week_by_id(self,year,week_number,week_id):
         weeks = memcache.get("weeks_id")
         if weeks and week_id in weeks:
             return weeks[week_id]

@@ -112,7 +112,7 @@ class TestWeek(unittest.TestCase):
         try:
             self.fbpool.deleteWeekIfExists(year=1978,week_number=1)
             created_week = self.__create_test_week(1978,1)
-            week = self.fbpool.getWeekByID(created_week['id'])
+            week = self.fbpool.getWeekByID(1978,1,created_week['id'])
             self.fbpool.deleteWeekByID(created_week['id'])
         except FBAPIException as e:
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
@@ -203,7 +203,7 @@ class TestWeek(unittest.TestCase):
             return
 
         try:
-            week = self.fbpool.getWeekByID(week['id'])
+            week = self.fbpool.getWeekByID(1980,1,week['id'])
             self.assertTrue(False)
         except FBAPIException as e:
             if e.http_code != 404 or e.errmsg != "could not find week":
@@ -221,7 +221,7 @@ class TestWeek(unittest.TestCase):
             return
 
         try:
-            week = self.fbpool.getWeekByID(week['id'])
+            week = self.fbpool.getWeekByID(1980,1,week['id'])
             self.assertTrue(False)
         except FBAPIException as e:
             if e.http_code != 404 or e.errmsg != "could not find week":
@@ -270,7 +270,7 @@ class TestWeek(unittest.TestCase):
             self.fbpool.deleteWeekIfExists(year=1981,week_number=2)
             week = self.__create_test_week(1980,1)
             self.fbpool.editWeekByID(week['id'],edit)
-            edited_week = self.fbpool.getWeekByID(week['id'])
+            edited_week = self.fbpool.getWeekByID(1980,1,week['id'])
 
             # cleanup
             self.fbpool.deleteWeekByID(week['id'])
@@ -309,7 +309,7 @@ class TestWeek(unittest.TestCase):
             self.fbpool.deleteWeekIfExists(year=1981,week_number=2)
             week = self.__create_test_week(1980,1)
             self.fbpool.editWeekByKey(week['key'],edit)
-            edited_week = self.fbpool.getWeekByID(week['id'])
+            edited_week = self.fbpool.getWeekByID(1980,1,week['id'])
 
             # cleanup
             self.fbpool.deleteWeekByID(week['id'])

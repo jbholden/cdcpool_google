@@ -95,10 +95,10 @@ class FBPoolHTTP:
         return self.httpGet('/api/teams')
 
     def httpPostGameCreate(self,year,week,data):
-        return self.httpPost('/api/%d/week/%d/game' % (year,week),data)
+        return self.httpPost('/api/%d/%d/game' % (year,week),data)
 
     def httpPostMultipleGamesCreate(self,year,week,data):
-        return self.httpPost('/api/%d/week/%d/games' % (year,week),data)
+        return self.httpPost('/api/%d/%d/games' % (year,week),data)
 
     def httpDeleteGameByKey(self,game_key):
         data = dict()
@@ -111,7 +111,7 @@ class FBPoolHTTP:
         return self.httpDelete('/api/game',data)
 
     def httpGetGameByID(self,year,week_number,game_id):
-        return self.httpGet('/api/%d/week/%d/game/id/%d' % (year,week_number,game_id))
+        return self.httpGet('/api/%d/%d/game/id/%d' % (year,week_number,game_id))
 
     def httpGetGameByKey(self,game_key):
         return self.httpGet('/api/game/key/%s' % (game_key))
@@ -216,8 +216,8 @@ class FBPoolHTTP:
     def httpGetWeekByKey(self,week_key):
         return self.httpGet('/api/week/key/%s' % (week_key))
 
-    def httpGetWeekByID(self,week_id):
-        return self.httpGet('/api/week/id/%d' % (week_id))
+    def httpGetWeekByID(self,year,week_number,week_id):
+        return self.httpGet('/api/%d/%d/week/id/%d' % (year,week_number,week_id))
 
     def httpDeleteAllWeeks(self):
         return self.httpDelete('/api/weeks')
@@ -245,7 +245,7 @@ class FBPoolHTTP:
         return self.httpPost('/api/pick',data)
 
     def httpPostMultiplePicksCreate(self,year,week,data):
-        return self.httpPost('/api/%d/week/%d/picks' % (year,week),data)
+        return self.httpPost('/api/%d/%d/picks' % (year,week),data)
 
     def httpGetPickByKey(self,pick_key):
         return self.httpGet('/api/pick/key/%s' % (pick_key))

@@ -285,8 +285,8 @@ class FBPoolAPI:
         data = json.loads(response.read())
         return data
 
-    def getWeekByID(self,week_id):
-        response = self.__fbpool.httpGetWeekByID(week_id)
+    def getWeekByID(self,year,week_number,week_id):
+        response = self.__fbpool.httpGetWeekByID(year,week_number,week_id)
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
         data = json.loads(response.read())

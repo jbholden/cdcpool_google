@@ -121,7 +121,7 @@ class WeekAPICreateEditDelete(APIHandler):
         data = json.loads(self.request.body) 
 
         num_params = 0
-        if 'id' in data: 
+        if 'id' in data and 'year' in data and 'week_number' in data: 
             num_params += 1
         if 'key' in data: 
             num_params += 1
@@ -136,10 +136,13 @@ class WeekAPICreateEditDelete(APIHandler):
         try:
             api = API()
             if 'key' in data:
+                # use key to delete
                 api.delete_week_by_key(data['key'])
             elif 'id' in data:
-                api.delete_week_by_id(data['id'])
+                # use information to create a key and then delete
+                api.delete_week_by_id(data['year'],data['week_number'],data['id'])
             elif 'year' in data and 'number' in data:
+                # least performance, must search for week with year and number 
                 api.delete_week(data['year'],data['number'])
             else:
                 raise AssertionError,"should not get here"
@@ -153,7 +156,7 @@ class WeekAPICreateEditDelete(APIHandler):
         data = json.loads(self.request.body) 
 
         num_params = 0
-        if 'id' in data: 
+        if 'id' in data and 'year_id' in data and 'week_id' in data: 
             num_params += 1
         if 'key' in data: 
             num_params += 1
@@ -174,7 +177,7 @@ class WeekAPICreateEditDelete(APIHandler):
             if 'key' in data:
                 api.edit_week_by_key(data['key'],data)
             elif 'id' in data:
-                api.edit_week_by_id(data['id'],data)
+                api.edit_week_by_id(data['year_id'],data['week_id'],data['id'],data)
             else:
                 raise AssertionError,"should not get here"
 

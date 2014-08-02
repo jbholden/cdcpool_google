@@ -105,9 +105,11 @@ class FBPoolHTTP:
         data['key'] = game_key
         return self.httpDelete('/api/game',data)
 
-    def httpDeleteGameByID(self,game_id):
+    def httpDeleteGameByID(self,year,week_number,game_id):
         data = dict()
         data['id'] = game_id
+        data['year'] = year
+        data['week_number'] = week_number
         return self.httpDelete('/api/game',data)
 
     def httpGetGameByID(self,year,week_number,game_id):
@@ -127,9 +129,11 @@ class FBPoolHTTP:
         put_data['key'] = game_key
         return self.httpPut('/api/game',put_data)
 
-    def httpPutGameByID(self,game_id,data):
+    def httpPutGameByID(self,year,week_number,game_id,data):
         put_data = dict(data)
         put_data['id'] = game_id
+        put_data['year'] = year
+        put_data['week_number'] = week_number
         return self.httpPut('/api/game',put_data)
 
     def httpDeleteGamesCache(self):
@@ -208,9 +212,11 @@ class FBPoolHTTP:
         data['key'] = week_key
         return self.httpDelete('/api/week',data)
 
-    def httpDeleteWeekByID(self,week_id):
+    def httpDeleteWeekByID(self,year,week_number,week_id):
         data = dict()
         data['id'] = week_id
+        data['year'] = year
+        data['week_number'] = week_number
         return self.httpDelete('/api/week',data)
 
     def httpGetWeekByKey(self,week_key):
@@ -236,9 +242,11 @@ class FBPoolHTTP:
         put_data['key'] = week_key
         return self.httpPut('/api/week',put_data)
 
-    def httpPutWeekByID(self,week_id,data):
+    def httpPutWeekByID(self,year,week_number,week_id,data):
         put_data = dict(data)
         put_data['id'] = week_id
+        put_data['year_id'] = year
+        put_data['week_id'] = week_number
         return self.httpPut('/api/week',put_data)
 
     def httpPostPickCreate(self,data):
@@ -250,17 +258,19 @@ class FBPoolHTTP:
     def httpGetPickByKey(self,pick_key):
         return self.httpGet('/api/pick/key/%s' % (pick_key))
 
-    def httpGetPickByID(self,pick_id):
-        return self.httpGet('/api/pick/id/%d' % (pick_id))
+    def httpGetPickByID(self,year,week_number,pick_id):
+        return self.httpGet('/api/%d/%d/pick/id/%d' % (year,week_number,pick_id))
 
     def httpDeletePickByKey(self,pick_key):
         data = dict()
         data['key'] = pick_key
         return self.httpDelete('/api/pick',data)
 
-    def httpDeletePickByID(self,pick_id):
+    def httpDeletePickByID(self,year,week_number,pick_id):
         data = dict()
         data['id'] = pick_id
+        data['year'] = year
+        data['week_number'] = week_number
         return self.httpDelete('/api/pick',data)
 
     def httpGetWeekPicks(self,year,week_number):
@@ -275,9 +285,11 @@ class FBPoolHTTP:
         put_data['key'] = pick_key
         return self.httpPut('/api/pick',put_data)
 
-    def httpPutPickByID(self,pick_id,data):
+    def httpPutPickByID(self,year,week_number,pick_id,data):
         put_data = dict(data)
         put_data['id'] = pick_id
+        put_data['year'] = year
+        put_data['week_number'] = week_number
         return self.httpPut('/api/pick',put_data)
 
     def httpDeleteAllPicks(self):

@@ -154,7 +154,7 @@ class API:
 
         return models
 
-    def delete_game_by_id(self,game_id):
+    def delete_game_by_id(self,year,week_number,game_id):
         try:
             game_key = db.Key.from_path('Game',game_id)
         except:
@@ -212,7 +212,7 @@ class API:
         results = list(games_query)
         return [ result for result in results ]
 
-    def edit_game_by_id(self,game_id,data):
+    def edit_game_by_id(self,year,week_number,game_id,data):
         try:
             game_key = db.Key.from_path('Game',game_id)
         except:
@@ -421,7 +421,7 @@ class API:
         self.__delete_from_memcache_dict("players",player_key)
         self.__add_to_memcache_dict("players",player_key,player)
 
-    def delete_week_by_id(self,week_id):
+    def delete_week_by_id(self,year,week_number,week_id):
         try:
             week_key = db.Key.from_path('Week',week_id)
         except:
@@ -636,7 +636,7 @@ class API:
             return
         return week
 
-    def edit_week_by_id(self,week_id,data):
+    def edit_week_by_id(self,year,week_number,week_id,data):
         try:
             week_key = db.Key.from_path('Week',week_id)
         except:
@@ -675,7 +675,7 @@ class API:
 
         if 'games' in data:
             if data['games'] == None:
-                week.games = None
+                week.games = []
             else:
                 week.games = [db.Key(game_key) for game_key in data['games'] ]
 
@@ -732,7 +732,7 @@ class API:
         return models
 
 
-    def delete_pick_by_id(self,pick_id):
+    def delete_pick_by_id(self,year,week_number,pick_id):
         try:
             pick_key = db.Key.from_path('Pick',pick_id)
         except:
@@ -768,7 +768,7 @@ class API:
             return
         return pick
 
-    def get_pick_by_id(self,pick_id):
+    def get_pick_by_id(self,year,week_number,pick_id):
         picks = memcache.get("picks_id")
         if picks and pick_id in picks:
             return picks[pick_id]
@@ -817,7 +817,7 @@ class API:
 
         return picks
 
-    def edit_pick_by_id(self,pick_id,data):
+    def edit_pick_by_id(self,year,week_number,pick_id,data):
         try:
             pick_key = db.Key.from_path('Pick',pick_id)
         except:

@@ -107,8 +107,8 @@ class FBPoolAPI:
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
-    def deleteGameByID(self,game_id):
-        response = self.__fbpool.httpDeleteGameByID(game_id)
+    def deleteGameByID(self,year,week_number,game_id):
+        response = self.__fbpool.httpDeleteGameByID(year,week_number,game_id)
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
@@ -143,8 +143,8 @@ class FBPoolAPI:
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
-    def editGameByID(self,game_id,data):
-        response = self.__fbpool.httpPutGameByID(game_id,data)
+    def editGameByID(self,year,week_number,game_id,data):
+        response = self.__fbpool.httpPutGameByID(year,week_number,game_id,data)
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
@@ -266,8 +266,8 @@ class FBPoolAPI:
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
-    def deleteWeekByID(self,week_id):
-        response = self.__fbpool.httpDeleteWeekByID(week_id)
+    def deleteWeekByID(self,year,week_number,week_id):
+        response = self.__fbpool.httpDeleteWeekByID(year,week_number,week_id)
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
@@ -323,8 +323,8 @@ class FBPoolAPI:
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
-    def editWeekByID(self,week_id,data):
-        response = self.__fbpool.httpPutWeekByID(week_id,data)
+    def editWeekByID(self,year,week_number,week_id,data):
+        response = self.__fbpool.httpPutWeekByID(year,week_number,week_id,data)
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
@@ -349,8 +349,8 @@ class FBPoolAPI:
         data = json.loads(response.read())
         return data
 
-    def getPickByID(self,pick_id):
-        response = self.__fbpool.httpGetPickByID(pick_id)
+    def getPickByID(self,year,week_number,pick_id):
+        response = self.__fbpool.httpGetPickByID(year,week_number,pick_id)
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
         data = json.loads(response.read())
@@ -361,8 +361,8 @@ class FBPoolAPI:
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
-    def deletePickByID(self,pick_id):
-        response = self.__fbpool.httpDeletePickByID(pick_id)
+    def deletePickByID(self,year,week_number,pick_id):
+        response = self.__fbpool.httpDeletePickByID(year,week_number,pick_id)
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
@@ -385,8 +385,8 @@ class FBPoolAPI:
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 
-    def editPickByID(self,pick_id,data):
-        response = self.__fbpool.httpPutPickByID(pick_id,data)
+    def editPickByID(self,year,week_number,pick_id,data):
+        response = self.__fbpool.httpPutPickByID(year,week_number,pick_id,data)
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
 

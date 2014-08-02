@@ -38,13 +38,13 @@ class TestPick(unittest.TestCase):
         pick,week,game,player = self.__setup_pick(1984,1,"Player1")
 
         try:
-            self.fbpool.deletePickByID(pick['id'])
+            self.fbpool.deletePickByID(1984,1,pick['id'])
         except FBAPIException as e:
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
             self.assertTrue(False)
             return
 
-        self.assertFalse(self.__does_pick_exist(pick['id']))
+        self.assertFalse(self.__does_pick_exist(1984,1,pick['id']))
         self.__cleanup_pick(week=week,game=game,player=player)
 
     def test_delete_pick_by_key(self):
@@ -57,7 +57,7 @@ class TestPick(unittest.TestCase):
             self.assertTrue(False)
             return
 
-        self.assertFalse(self.__does_pick_exist(pick['id']))
+        self.assertFalse(self.__does_pick_exist(1984,1,pick['id']))
         self.__cleanup_pick(week=week,game=game,player=player)
 
     def test_delete_all_picks(self):
@@ -85,9 +85,9 @@ class TestPick(unittest.TestCase):
             self.assertTrue(False)
             return
 
-        self.assertFalse(self.__does_pick_exist(pick1['id']))
-        self.assertFalse(self.__does_pick_exist(pick2['id']))
-        self.assertFalse(self.__does_pick_exist(pick3['id']))
+        self.assertFalse(self.__does_pick_exist(1980,1,pick1['id']))
+        self.assertFalse(self.__does_pick_exist(1980,1,pick2['id']))
+        self.assertFalse(self.__does_pick_exist(1980,1,pick3['id']))
 
         self.__cleanup_pick(week=week,game=game)
         self.__cleanup_pick(player=player1)
@@ -98,7 +98,7 @@ class TestPick(unittest.TestCase):
         pick,week,game,player = self.__setup_pick(1984,1,"Player1")
 
         try:
-            pick_get = self.fbpool.getPickByID(pick['id'])
+            pick_get = self.fbpool.getPickByID(1984,1,pick['id'])
         except FBAPIException as e:
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
             self.assertTrue(False)
@@ -209,8 +209,8 @@ class TestPick(unittest.TestCase):
         data['team2_score'] = 30
 
         try:
-            self.fbpool.editPickByID(pick['id'],data)
-            pick_edit = self.fbpool.getPickByID(pick['id'])
+            self.fbpool.editPickByID(1984,1,pick['id'],data)
+            pick_edit = self.fbpool.getPickByID(1984,1,pick['id'])
         except FBAPIException as e:
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
             self.assertTrue(False)
@@ -233,7 +233,7 @@ class TestPick(unittest.TestCase):
 
         try:
             self.fbpool.editPickByKey(pick['key'],data)
-            pick_edit = self.fbpool.getPickByID(pick['id'])
+            pick_edit = self.fbpool.getPickByID(1984,1,pick['id'])
         except FBAPIException as e:
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
             self.assertTrue(False)
@@ -367,16 +367,16 @@ class TestPick(unittest.TestCase):
     def __cleanup_pick(self,pick=None,week=None,game=None,player=None):
         try:
             if pick != None:
-                self.fbpool.deletePickByID(pick['id'])
+                self.fbpool.deletePickByKey(pick['key'])
 
             if week != None:
-                self.fbpool.deleteWeekByID(week['id'])
+                self.fbpool.deleteWeekByKey(week['key'])
 
             if game != None:
-                self.fbpool.deleteGameByID(game['id'])
+                self.fbpool.deleteGameByKey(game['key'])
 
             if player != None:
-                self.fbpool.deletePlayerByID(player['id'])
+                self.fbpool.deletePlayerByKey(player['key'])
 
         except FBAPIException as e:
             print e
@@ -422,9 +422,9 @@ class TestPick(unittest.TestCase):
         for field in fields:
             self.assertEquals(pick[field],expected[field])
 
-    def __does_pick_exist(self,pick_id):
+    def __does_pick_exist(self,year,week_number,pick_id):
         try:
-            pick = self.fbpool.getPickByID(pick_id)
+            pick = self.fbpool.getPickByID(year,week_number,pick_id)
             return True
         except FBAPIException as e:
             if e.http_code == 404 and e.errmsg == "could not find pick":

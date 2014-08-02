@@ -37,7 +37,7 @@ class TestGame(unittest.TestCase):
             game['date'] = None
 
             created_game = self.fbpool.createGame(self.year,self.week_number,game)
-            self.fbpool.deleteGameByID(created_game['id'])
+            self.fbpool.deleteGameByID(self.year,self.week_number,created_game['id'])
             self.fbpool.deleteTeamIfExists("Team1")
             self.fbpool.deleteTeamIfExists("Team2")
 
@@ -69,7 +69,7 @@ class TestGame(unittest.TestCase):
             game['date'] = "09/05/2014 19:00"
 
             created_game = self.fbpool.createGame(self.year,self.week_number,game)
-            self.fbpool.deleteGameByID(created_game['id'])
+            self.fbpool.deleteGameByID(self.year,self.week_number,created_game['id'])
             self.fbpool.deleteTeamIfExists("Team1")
             self.fbpool.deleteTeamIfExists("Team2")
 
@@ -102,7 +102,7 @@ class TestGame(unittest.TestCase):
             game['date'] = "09/05/2014 19:00"
 
             created_game = self.fbpool.createGame(self.year,self.week_number,game)
-            self.fbpool.deleteGameByID(created_game['id'])
+            self.fbpool.deleteGameByID(self.year,self.week_number,created_game['id'])
             self.fbpool.deleteTeamIfExists("Team1")
             self.fbpool.deleteTeamIfExists("Team2")
 
@@ -115,7 +115,7 @@ class TestGame(unittest.TestCase):
     def test_delete_game_by_id(self):
         try:
             created_game = self.__create_game_for_test()
-            self.fbpool.deleteGameByID(created_game['id'])
+            self.fbpool.deleteGameByID(self.year,self.week_number,created_game['id'])
         except FBAPIException as e:
             print e
             self.assertTrue(False)
@@ -169,7 +169,7 @@ class TestGame(unittest.TestCase):
         try:
             created_game = self.__create_game_for_test()
             game = self.fbpool.getGameByID(self.year,self.week_number,created_game['id'])
-            self.fbpool.deleteGameByID(created_game['id'])
+            self.fbpool.deleteGameByID(self.year,self.week_number,created_game['id'])
         except FBAPIException as e:
             print e
             self.assertTrue(False)
@@ -183,7 +183,7 @@ class TestGame(unittest.TestCase):
         try:
             created_game = self.__create_game_for_test()
             game = self.fbpool.getGameByKey(created_game['key'])
-            self.fbpool.deleteGameByID(created_game['id'])
+            self.fbpool.deleteGameByID(self.year,self.week_number,created_game['id'])
         except FBAPIException as e:
             print e
             self.assertTrue(False)
@@ -231,10 +231,10 @@ class TestGame(unittest.TestCase):
             game['time_left'] = "10:10"
             game['date'] = "09/06/2014 19:00"
 
-            self.fbpool.editGameByID(created_game['id'],game)
+            self.fbpool.editGameByID(self.year,self.week_number,created_game['id'],game)
 
             edited_game = self.fbpool.getGameByID(self.year,self.week_number,created_game['id'])
-            self.fbpool.deleteGameByID(created_game['id'])
+            self.fbpool.deleteGameByID(self.year,self.week_number,created_game['id'])
         except FBAPIException as e:
             print e
             self.assertTrue(False)
@@ -262,7 +262,7 @@ class TestGame(unittest.TestCase):
             self.fbpool.editGameByKey(created_game['key'],game)
 
             edited_game = self.fbpool.getGameByID(self.year,self.week_number,created_game['id'])
-            self.fbpool.deleteGameByID(created_game['id'])
+            self.fbpool.deleteGameByID(self.year,self.week_number,created_game['id'])
         except FBAPIException as e:
             print e
             self.assertTrue(False)
@@ -309,13 +309,9 @@ class TestGame(unittest.TestCase):
 
         for game_returned in games:
             self.__verify_game(game_returned,**game)
-            self.fbpool.deleteGameByID(game_returned['id'])
+            self.fbpool.deleteGameByID(1984,1,game_returned['id'])
 
         self.__cleanup_created_game_teams()
-
-    def test_year_week_number(self):
-        # TODO:  test create/get/delete based on year and week number
-        self.assertTrue(False)
 
     def __create_game_for_test(self):
         team1 = self.fbpool.createTeamIfDoesNotExist("Team1","Conference1")

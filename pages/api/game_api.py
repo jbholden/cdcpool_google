@@ -114,20 +114,14 @@ class GameAPICreate(APIHandler):
         self.render_json(return_data)
 
 
-class GameAPICreateEditDelete(APIHandler):
-
-    # this creates a new game
-    # TODO:  deprecated
-    def post(self):
-        self.error(404)
-        self.write("This method has been deprecated")
+class GameAPIEditDelete(APIHandler):
 
     # this deletes a game object
     def delete(self):
         data = json.loads(self.request.body) 
 
         num_params = 0
-        if 'id' in data: 
+        if 'id' in data and 'year' in data and 'week_number' in data: 
             num_params += 1
         if 'key' in data: 
             num_params += 1
@@ -142,7 +136,7 @@ class GameAPICreateEditDelete(APIHandler):
             if 'key' in data:
                 api.delete_game_by_key(data['key'])
             elif 'id' in data:
-                api.delete_game_by_id(data['id'])
+                api.delete_game_by_id(data['year'],data['week_number'],data['id'])
             else:
                 raise AssertionError,"should not get here"
 
@@ -155,7 +149,7 @@ class GameAPICreateEditDelete(APIHandler):
         data = json.loads(self.request.body) 
 
         num_params = 0
-        if 'id' in data: 
+        if 'id' in data and 'year' in data and 'week_number' in data: 
             num_params += 1
         if 'key' in data: 
             num_params += 1
@@ -173,7 +167,7 @@ class GameAPICreateEditDelete(APIHandler):
             if 'key' in data:
                 api.edit_game_by_key(data['key'],data)
             elif 'id' in data:
-                api.edit_game_by_id(data['id'],data)
+                api.edit_game_by_id(data['year'],data['week_number'],data['id'],data)
             else:
                 raise AssertionError,"should not get here"
 

@@ -27,7 +27,7 @@ class TestWeek(unittest.TestCase):
         try:
             self.fbpool.deleteWeekIfExists(year=1980,week_number=1)
             week = self.fbpool.createWeek(data)
-            self.fbpool.deleteWeekByID(week['id'])
+            self.fbpool.deleteWeekByID(1980,1,week['id'])
         except FBAPIException as e:
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
             self.assertTrue(False)
@@ -58,7 +58,7 @@ class TestWeek(unittest.TestCase):
         try:
             self.fbpool.deleteWeekIfExists(year=1980,week_number=1)
             week = self.fbpool.createWeek(data)
-            self.fbpool.deleteWeekByID(week['id'])
+            self.fbpool.deleteWeekByID(1980,1,week['id'])
             self.fbpool.deletePlayerByID(winner['id'])
             for game_key in game_keys:
                 self.fbpool.deleteGameByKey(game_key)
@@ -89,7 +89,7 @@ class TestWeek(unittest.TestCase):
                 return
 
         try:
-            self.fbpool.deleteWeekByID(week['id'])
+            self.fbpool.deleteWeekByID(1980,1,week['id'])
         except FBAPIException as e:
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
             self.assertTrue(False)
@@ -100,7 +100,7 @@ class TestWeek(unittest.TestCase):
             self.fbpool.deleteWeekIfExists(year=1978,week_number=1)
             created_week = self.__create_test_week(1978,1)
             week = self.fbpool.getWeekByKey(created_week['key'])
-            self.fbpool.deleteWeekByID(created_week['id'])
+            self.fbpool.deleteWeekByID(1978,1,created_week['id'])
         except FBAPIException as e:
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
             self.assertTrue(False)
@@ -113,7 +113,7 @@ class TestWeek(unittest.TestCase):
             self.fbpool.deleteWeekIfExists(year=1978,week_number=1)
             created_week = self.__create_test_week(1978,1)
             week = self.fbpool.getWeekByID(1978,1,created_week['id'])
-            self.fbpool.deleteWeekByID(created_week['id'])
+            self.fbpool.deleteWeekByID(1978,1,created_week['id'])
         except FBAPIException as e:
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
             self.assertTrue(False)
@@ -214,7 +214,7 @@ class TestWeek(unittest.TestCase):
         try:
             self.fbpool.deleteWeekIfExists(year=1980,week_number=1)
             week = self.__create_test_week(1980,1)
-            self.fbpool.deleteWeekByID(week['id'])
+            self.fbpool.deleteWeekByID(1980,1,week['id'])
         except FBAPIException as e:
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
             self.assertTrue(False)
@@ -269,11 +269,11 @@ class TestWeek(unittest.TestCase):
             self.fbpool.deleteWeekIfExists(year=1980,week_number=1)
             self.fbpool.deleteWeekIfExists(year=1981,week_number=2)
             week = self.__create_test_week(1980,1)
-            self.fbpool.editWeekByID(week['id'],edit)
-            edited_week = self.fbpool.getWeekByID(1980,1,week['id'])
+            self.fbpool.editWeekByID(1980,1,week['id'],edit)
+            edited_week = self.fbpool.getWeekByID(1981,2,week['id'])
 
             # cleanup
-            self.fbpool.deleteWeekByID(week['id'])
+            self.fbpool.deleteWeekByID(1981,2,week['id'])
             self.fbpool.deletePlayerByID(winner['id'])
             for game_key in game_keys:
                 self.fbpool.deleteGameByKey(game_key)
@@ -312,7 +312,7 @@ class TestWeek(unittest.TestCase):
             edited_week = self.fbpool.getWeekByID(1980,1,week['id'])
 
             # cleanup
-            self.fbpool.deleteWeekByID(week['id'])
+            self.fbpool.deleteWeekByID(1980,1,week['id'])
             self.fbpool.deletePlayerByID(winner['id'])
             for game_key in game_keys:
                 self.fbpool.deleteGameByKey(game_key)
@@ -338,16 +338,17 @@ class TestWeek(unittest.TestCase):
             self.fbpool.deleteWeekIfExists(year=1981,week_number=2)
             week_1980_1 = self.__create_test_week(1980,1)
             week_1981_2 = self.__create_test_week(1981,2)
-            self.fbpool.editWeekByID(week_1980_1['id'],edit)
+            self.fbpool.editWeekByID(1980,1,week_1980_1['id'],edit)
             self.assertTrue(False)
         except FBAPIException as e:
             if e.http_code != 409 or e.errmsg != "week already exists":
+                print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
                 self.assertTrue(False)
                 return
 
         try:
-            self.fbpool.deleteWeekByID(week_1980_1['id'])
-            self.fbpool.deleteWeekByID(week_1981_2['id'])
+            self.fbpool.deleteWeekByID(1980,1,week_1980_1['id'])
+            self.fbpool.deleteWeekByID(1981,2,week_1981_2['id'])
         except FBAPIException as e:
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
             self.assertTrue(False)

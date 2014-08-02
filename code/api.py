@@ -660,9 +660,8 @@ class API:
             week.number = data['number']
 
         if changed_year or changed_number:
-            if self.__does_week_exist(week.year,week.number):
-                raise APIException(409,"week already exists")
-                return
+            raise APIException(400,"the week year and number cannot be edited")
+            return
 
         if 'winner' in data:
             week.winner = data['winner']

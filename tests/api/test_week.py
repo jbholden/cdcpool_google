@@ -258,8 +258,6 @@ class TestWeek(unittest.TestCase):
             return
 
         edit = dict()
-        edit['year'] = 1981
-        edit['number'] = 2 
         edit['winner'] = winner['key']
         edit['games'] = game_keys
         edit['lock_picks'] = "05/05/2014 19:00"
@@ -267,13 +265,12 @@ class TestWeek(unittest.TestCase):
 
         try:
             self.fbpool.deleteWeekIfExists(year=1980,week_number=1)
-            self.fbpool.deleteWeekIfExists(year=1981,week_number=2)
             week = self.__create_test_week(1980,1)
             self.fbpool.editWeekByID(1980,1,week['id'],edit)
-            edited_week = self.fbpool.getWeekByID(1981,2,week['id'])
+            edited_week = self.fbpool.getWeekByID(1980,1,week['id'])
 
             # cleanup
-            self.fbpool.deleteWeekByID(1981,2,week['id'])
+            self.fbpool.deleteWeekByID(1980,1,week['id'])
             self.fbpool.deletePlayerByID(winner['id'])
             for game_key in game_keys:
                 self.fbpool.deleteGameByKey(game_key)
@@ -283,6 +280,8 @@ class TestWeek(unittest.TestCase):
             self.assertTrue(False)
             return
 
+        edit['year'] = 1980
+        edit['number'] = 1
         self.__verify_week(edited_week,edit)
 
     def test_edit_week_by_key(self):
@@ -297,8 +296,6 @@ class TestWeek(unittest.TestCase):
             return
 
         edit = dict()
-        edit['year'] = 1981
-        edit['number'] = 2 
         edit['winner'] = winner['key']
         edit['games'] = game_keys
         edit['lock_picks'] = "05/05/2014 19:00"
@@ -306,7 +303,6 @@ class TestWeek(unittest.TestCase):
 
         try:
             self.fbpool.deleteWeekIfExists(year=1980,week_number=1)
-            self.fbpool.deleteWeekIfExists(year=1981,week_number=2)
             week = self.__create_test_week(1980,1)
             self.fbpool.editWeekByKey(week['key'],edit)
             edited_week = self.fbpool.getWeekByID(1980,1,week['id'])
@@ -322,12 +318,13 @@ class TestWeek(unittest.TestCase):
             self.assertTrue(False)
             return
 
+        edit['year'] = 1980
+        edit['number'] = 1
         self.__verify_week(edited_week,edit)
 
-    def test_edit_week_to_one_already_existing(self):
+    def test_edit_week_year(self):
         edit = dict()
         edit['year'] = 1981
-        edit['number'] = 2 
         edit['winner'] = None
         edit['games'] = None
         edit['lock_picks'] = "05/05/2014 19:00"
@@ -335,20 +332,43 @@ class TestWeek(unittest.TestCase):
 
         try:
             self.fbpool.deleteWeekIfExists(year=1980,week_number=1)
-            self.fbpool.deleteWeekIfExists(year=1981,week_number=2)
             week_1980_1 = self.__create_test_week(1980,1)
-            week_1981_2 = self.__create_test_week(1981,2)
             self.fbpool.editWeekByID(1980,1,week_1980_1['id'],edit)
             self.assertTrue(False)
         except FBAPIException as e:
-            if e.http_code != 409 or e.errmsg != "week already exists":
+            if e.http_code != 400 or e.errmsg != "the week year and number cannot be edited":
                 print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
                 self.assertTrue(False)
                 return
 
         try:
-            self.fbpool.deleteWeekByID(1980,1,week_1980_1['id'])
-            self.fbpool.deleteWeekByID(1981,2,week_1981_2['id'])
+            self.fbpool.deleteWeekByKey(week_1980_1['key'])
+        except FBAPIException as e:
+            print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+            self.assertTrue(False)
+            return
+
+    def test_edit_week_number(self):
+        edit = dict()
+        edit['number'] = 10
+        edit['winner'] = None
+        edit['games'] = None
+        edit['lock_picks'] = "05/05/2014 19:00"
+        edit['lock_scores'] = "05/10/2014 21:00"
+
+        try:
+            self.fbpool.deleteWeekIfExists(year=1980,week_number=1)
+            week_1980_1 = self.__create_test_week(1980,1)
+            self.fbpool.editWeekByID(1980,1,week_1980_1['id'],edit)
+            self.assertTrue(False)
+        except FBAPIException as e:
+            if e.http_code != 400 or e.errmsg != "the week year and number cannot be edited":
+                print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
+                self.assertTrue(False)
+                return
+
+        try:
+            self.fbpool.deleteWeekByKey(week_1980_1['key'])
         except FBAPIException as e:
             print "FBAPIException: code=%d, msg=%s" % (e.http_code,e.errmsg)
             self.assertTrue(False)

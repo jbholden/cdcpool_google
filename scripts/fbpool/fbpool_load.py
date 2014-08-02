@@ -71,7 +71,7 @@ class FBPoolLoad:
 
         self.__verbose.done("load players")
 
-    def __load_week_games(self,excel,week_number):
+    def __load_week_games(self,excel,year,week_number):
         excel_games = excel.get_games(week_number)
         week_games = []
 
@@ -97,7 +97,7 @@ class FBPoolLoad:
                 data['time_left'] = None
                 data['date'] = None
 
-                game = fbpool_api.createGame(data)
+                game = fbpool_api.createGame(year,week_number,data)
                 week_games.append(game)
 
         except FBAPIException as e:
@@ -178,7 +178,7 @@ class FBPoolLoad:
 
         excel = PoolSpreadsheet(year,self.__excel_full_path())
 
-        week_games = self.__load_week_games(excel,week)
+        week_games = self.__load_week_games(excel,year,week)
         winner_key = self.__get_week_winner(excel,week)
 
         week_data = dict()

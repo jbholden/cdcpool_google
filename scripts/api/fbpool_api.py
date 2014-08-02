@@ -88,8 +88,8 @@ class FBPoolAPI:
     def createTeams(self):
         pass
 
-    def createGame(self,data):
-        response = self.__fbpool.httpPostGameCreate(data)
+    def createGame(self,year,week_number,data):
+        response = self.__fbpool.httpPostGameCreate(year,week_number,data)
         if response.code == 200:
             data = json.loads(response.read())
             return data
@@ -119,8 +119,8 @@ class FBPoolAPI:
         data = json.loads(response.read())
         return data
 
-    def getGameByID(self,game_id):
-        response = self.__fbpool.httpGetGameByID(game_id)
+    def getGameByID(self,year,week_number,game_id):
+        response = self.__fbpool.httpGetGameByID(year,week_number,game_id)
         if response.code != 200:
             raise FBAPIException(response.code,response.read())
         data = json.loads(response.read())

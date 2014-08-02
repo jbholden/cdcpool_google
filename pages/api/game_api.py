@@ -60,10 +60,10 @@ class GameAPIGetDeleteAll(APIHandler):
 
 class GameAPIGetById(APIHandler):
 
-    def get(self,game_id):
+    def get(self,year,week_number,game_id):
         try:
             api = API()
-            game = api.get_game_by_id(int(game_id))
+            game = api.get_game_by_id(int(year),int(week_number),int(game_id))
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
@@ -86,11 +86,10 @@ class GameAPIGetByKey(APIHandler):
         data = self.build_game_object(game)
         self.render_json(data)
 
-
-class GameAPICreateEditDelete(APIHandler):
+class GameAPICreate(APIHandler):
 
     # this creates a new game
-    def post(self):
+    def post(self,year,week_number):
         data = json.loads(self.request.body) 
 
         required_fields = ['number','team1','team2','team1_score','team2_score','favored','spread','state','quarter','time_left','date']
@@ -105,7 +104,7 @@ class GameAPICreateEditDelete(APIHandler):
 
         try:
             api = API()
-            game = api.create_game(data)
+            game = api.create_game(int(year),int(week_number),data)
         except APIException as e:
             self.error(e.http_code)
             self.write(e.errmsg)
@@ -113,6 +112,15 @@ class GameAPICreateEditDelete(APIHandler):
 
         return_data = self.build_game_object(game)
         self.render_json(return_data)
+
+
+class GameAPICreateEditDelete(APIHandler):
+
+    # this creates a new game
+    # TODO:  deprecated
+    def post(self):
+        self.error(404)
+        self.write("This method has been deprecated")
 
     # this deletes a game object
     def delete(self):

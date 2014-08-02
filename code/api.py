@@ -104,7 +104,7 @@ class API:
         teams = d.load_teams("teams").values()
         return teams
 
-    def create_game(self,data):
+    def create_game(self,year,week_number,data):
         game = Game()
         game.number = data['number']
         game.team1 = data['team1']
@@ -182,7 +182,7 @@ class API:
 
         return game
 
-    def get_game_by_id(self,game_id):
+    def get_game_by_id(self,year,week_number,game_id):
         games = memcache.get("games_id")
         if games != None and game_id in games:
             return games[game_id]

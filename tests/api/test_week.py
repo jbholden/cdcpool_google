@@ -403,7 +403,7 @@ class TestWeek(unittest.TestCase):
         data['quarter'] = ""
         data['time_left'] = ""
         data['date'] = None
-        return self.fbpool.createGame(data)
+        return self.fbpool.createGame(1978,1,data)  # just use a dummy year and week number
 
     def __create_10_test_games(self):
         game1 = self.__create_test_game(1)

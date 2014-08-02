@@ -409,7 +409,7 @@ class TestPick(unittest.TestCase):
         data['quarter'] = ""
         data['time_left'] = ""
         data['date'] = None
-        return self.fbpool.createGame(data)
+        return self.fbpool.createGame(1978,1,data)  # just use a dummy week and year
 
     def __verify_pick(self,pick,expected):
         self.assertIn('id',pick)

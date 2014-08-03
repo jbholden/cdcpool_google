@@ -10,6 +10,7 @@ from fbpool_player_name import *
 from fbpool_error import *
 from fbpool_verbose import *
 import string
+import datetime
 
 class FBPoolLoad:
 
@@ -19,6 +20,7 @@ class FBPoolLoad:
         self.excel_workbook = excel_workbook
         self.__modify_player_name = FBPoolPlayerName("hide_lastname")
         self.__verbose = FBPoolVerbose(quiet)
+        self.__start_times = dict()
 
     def __excel_full_path(self):
         return "%s/%s" % (self.excel_dir,self.excel_workbook)
@@ -179,6 +181,7 @@ class FBPoolLoad:
 
 
     def load_week(self,year,week,load_teams_and_players=True,update_memcache=True):
+        self.__record_start_time("load week")
         self.__verbose.start("loading year %d week %d..." % (year,week))
 
         if load_teams_and_players:
@@ -229,9 +232,12 @@ class FBPoolLoad:
                 FBPoolError.error_no_exit("updating memcache",e,additional_message)
 
         self.__verbose.done("load week %d" % (week))
+        self.__display_duration("load week")
 
 
     def load_year(self,year,load_teams_in_year=True,load_players_in_year=True):
+        self.__record_start_time("load year")
+
         self.__verbose.start("loading year %d..." % (year))
 
         excel = PoolSpreadsheet(year,self.__excel_full_path())
@@ -266,9 +272,20 @@ class FBPoolLoad:
             FBPoolError.error_no_exit("updating memcache",e,additional_message)
 
         self.__verbose.done("load year")
+        self.__display_duration("load year")
 
 
     def __add_year_to_player_if_missing(self,fbpool_api,year,player):
         if year not in player['years']:
             data = { "years":player['years'] + [year] }
             fbpool_api.editPlayerByKey(player['key'],data)
+
+    def __record_start_time(self,name):
+        self.__start_times[name] = datetime.datetime.now()
+
+    def __display_duration(self,name):
+        end_time = datetime.datetime.now()
+        duration = end_time - self.__start_times[name]
+        del self.__start_times[name]
+        print "%s duration %s" % (name,duration)
+

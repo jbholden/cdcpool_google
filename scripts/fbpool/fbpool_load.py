@@ -231,8 +231,8 @@ class FBPoolLoad:
                 additional_message = "Not stopping because of exception..."
                 FBPoolError.error_no_exit("updating memcache",e,additional_message)
 
-        self.__verbose.done("load week %d" % (week))
         self.__display_duration("load week")
+        self.__verbose.done("load week %d" % (week))
 
 
     def load_year(self,year,load_teams_in_year=True,load_players_in_year=True):
@@ -271,8 +271,8 @@ class FBPoolLoad:
             additional_message = "Not stopping because of exception..."
             FBPoolError.error_no_exit("updating memcache",e,additional_message)
 
-        self.__verbose.done("load year")
         self.__display_duration("load year")
+        self.__verbose.done("load year")
 
 
     def __add_year_to_player_if_missing(self,fbpool_api,year,player):

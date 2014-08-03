@@ -171,7 +171,7 @@ class FBPoolLoad:
 
                 # creating a batch of picks is faster than creating one pick at a time
                 batch_size_reached = (len(batch) % batch_size) == 0
-                if batch_size_reached or last_pick:
+                if batch_size_reached or i == last_pick:
                     picks = fbpool_api.createMultiplePicks(week['year'],week['number'],batch)
                     self.__verbose.update_every("week picks...",i,batch_size,number_of_picks)
                     batch = []

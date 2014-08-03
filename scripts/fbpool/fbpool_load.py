@@ -73,10 +73,10 @@ class FBPoolLoad:
 
     def __load_week_games(self,excel,year,week_number):
         excel_games = excel.get_games(week_number)
-        week_games = []
 
         self.__verbose.update("week games...")
 
+        batch = []
         try:
             fbpool_api = FBPoolAPI(url=self.url)
 
@@ -97,8 +97,10 @@ class FBPoolLoad:
                 data['time_left'] = None
                 data['date'] = None
 
-                game = fbpool_api.createGame(year,week_number,data)
-                week_games.append(game)
+                batch.append(data)
+
+            # creating all games at once is faster than creating one at a time
+            week_games = fbpool_api.createMultipleGames(year,week_number,batch)
 
         except FBAPIException as e:
             FBPoolError.exit_with_error("week games",e)
@@ -129,7 +131,7 @@ class FBPoolLoad:
         FBPoolError.exit_with_error("loading games",additional_message)
 
 
-    def __load_week_picks(self,excel,week,week_games):
+    def __load_week_picks(self,excel,week,week_games,batch_size=50):
         excel_picks = excel.get_picks(week['number'])
 
         self.__verbose.update("week picks...")
@@ -140,10 +142,10 @@ class FBPoolLoad:
             players = fbpool_api.getPlayersInYear(week['year'])
             player_lookup = { player['name']:player for player in players }
 
+            batch = []
             number_of_picks = len(excel_picks)
+            last_pick = number_of_picks - 1
             for i,excel_pick in enumerate(excel_picks):
-
-                self.__verbose.update_every("week picks...",i,50,number_of_picks)
 
                 name = self.__modify_player_name.get_name(excel_pick.player_name)
                 player = player_lookup[name]
@@ -163,7 +165,15 @@ class FBPoolLoad:
                     data['team1_score'] = excel_pick.team1_score
                     data['team2_score'] = excel_pick.team2_score
 
-                pick = fbpool_api.createPick(data)
+                batch.append(data)
+
+                # creating a batch of picks is faster than creating one pick at a time
+                batch_size_reached = (len(batch) % batch_size) == 0
+                if batch_size_reached or last_pick:
+                    picks = fbpool_api.createMultiplePicks(week['year'],week['number'],batch)
+                    self.__verbose.update_every("week picks...",i,batch_size,number_of_picks)
+                    batch = []
+
         except FBAPIException as e:
             FBPoolError.exit_with_error("week picks",e)
 

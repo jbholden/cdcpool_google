@@ -55,6 +55,7 @@ class PlayerResultsWeekInProgress(PlayerResultTestData):
 
 
     def __not_started_game(self,number,team1,team2,favored,spread,start_date):
+        # use self.year and self.week_number
         team1_key = self.find_team_key(team1)
         team2_key = self.find_team_key(team2)
         if start_date:
@@ -65,12 +66,14 @@ class PlayerResultsWeekInProgress(PlayerResultTestData):
         return game
 
     def __final_game(self,number,team1,team2,favored,spread,team1_score,team2_score):
+        # use self.year and self.week_number
         team1_key = self.find_team_key(team1)
         team2_key = self.find_team_key(team2)
         game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="final",quarter=None,time_left=None,date=None)
         return game
 
     def __in_progress_game(self,number,team1,team2,favored,spread,team1_score,team2_score,quarter,time_left):
+        # use self.year and self.week_number
         team1_key = self.find_team_key(team1)
         team2_key = self.find_team_key(team2)
         game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="in_progress",quarter=quarter,time_left=time_left,date=None)

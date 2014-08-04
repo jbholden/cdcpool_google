@@ -93,6 +93,7 @@ class ResultTestData:
         self.week = week_key
 
     def setup_pick(self,pick,player_name=None,game_number=None):
+        # use self.year, self.week_number
         if player_name:
             pick.player = str(self.players[player_name])
 

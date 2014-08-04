@@ -691,6 +691,8 @@ class API:
 
 
     def create_pick(self,data):
+        week = self.get_week_by_key(data['week'])
+
         pick = Pick()
         pick.week = data['week']
         pick.player = data['player']

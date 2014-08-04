@@ -44,6 +44,7 @@ class WeekNotStarted(ResultTestData):
 
 
     def __not_started_game(self,number):
+        # use self.year and self.week_number
         team1_key = self.team_keys[0]
         team2_key = self.team_keys[1]
         game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=None,team2_score=None,favored="team2",spread=0.5,state="not_started",quarter=None,time_left=None,date=None)

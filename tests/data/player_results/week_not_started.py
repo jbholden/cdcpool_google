@@ -80,6 +80,7 @@ class PlayerResultsWeekNotStarted(PlayerResultTestData):
                         team1_tiebreak=game_pick.team1_score,team2_tiebreak=game_pick.team2_score)
 
     def __not_started_game(self,number,team1,team2,favored,spread,start_date):
+        # use self.year and self.week_number
         team1_key = self.find_team_key(team1)
         team2_key = self.find_team_key(team2)
         if start_date:

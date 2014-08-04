@@ -79,6 +79,7 @@ class PlayerResultsWeekNotStartedDefaulter(PlayerResultTestData):
         self.__saved_picks[10] = self.__create_pick_default(10,team1_score=10,team2_score=15)
 
     def __not_started_game(self,number,team1,team2,favored,spread,start_date):
+        # use self.year and self.week_number
         team1_key = self.find_team_key(team1)
         team2_key = self.find_team_key(team2)
         if start_date:

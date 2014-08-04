@@ -48,12 +48,14 @@ class WeekInProgressGamesInProgress(ResultTestData):
         return self.results
 
     def __not_started_game(self,number):
+        # use self.year and self.week_number
         team1_key = self.team_keys[0]
         team2_key = self.team_keys[1]
         game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=None,team2_score=None,favored="team2",spread=0.5,state="not_started",quarter=None,time_left=None,date=None)
         return game
 
     def __final_game(self,number,winner):
+        # use self.year and self.week_number
         team1_key = self.team_keys[0]
         team2_key = self.team_keys[1]
         favored,spread,team1_score,team2_score = self.__compute_game_winner(winner)
@@ -61,6 +63,7 @@ class WeekInProgressGamesInProgress(ResultTestData):
         return game
 
     def __game_in_progress(self,number,ahead):
+        # use self.year and self.week_number
         team1_key = self.team_keys[0]
         team2_key = self.team_keys[1]
         favored,spread,team1_score,team2_score = self.__compute_game_winner(ahead)

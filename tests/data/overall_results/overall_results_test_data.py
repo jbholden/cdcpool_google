@@ -120,7 +120,8 @@ class OverallResultsTestData:
         game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="in_progress",quarter=quarter,time_left=time_left,date=None)
         self.setup_game(game)
 
-    def setup_pick(self,year,week_number,player_name=None,week_number=None,game_number=None,winner=None,team1_score=None,team2_score=None):
+    def setup_pick(self,player_name=None,week_number=None,game_number=None,winner=None,team1_score=None,team2_score=None):
+        # use self.year and passed in week_number
         pick = Pick()
 
         if player_name:

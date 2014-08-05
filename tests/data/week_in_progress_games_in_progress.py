@@ -1,5 +1,6 @@
 from result_test_data import *
 from google.appengine.api import memcache
+from models.root import *
 
 class WeekInProgressGamesInProgress(ResultTestData):
 
@@ -48,26 +49,26 @@ class WeekInProgressGamesInProgress(ResultTestData):
         return self.results
 
     def __not_started_game(self,number):
-        # use self.year and self.week_number
         team1_key = self.team_keys[0]
         team2_key = self.team_keys[1]
-        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=None,team2_score=None,favored="team2",spread=0.5,state="not_started",quarter=None,time_left=None,date=None)
+        parent = root_games(self.year,self.week_number)
+        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=None,team2_score=None,favored="team2",spread=0.5,state="not_started",quarter=None,time_left=None,date=None,parent=parent)
         return game
 
     def __final_game(self,number,winner):
-        # use self.year and self.week_number
         team1_key = self.team_keys[0]
         team2_key = self.team_keys[1]
         favored,spread,team1_score,team2_score = self.__compute_game_winner(winner)
-        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="final",quarter=None,time_left=None,date=None)
+        parent = root_games(self.year,self.week_number)
+        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="final",quarter=None,time_left=None,date=None,parent=parent)
         return game
 
     def __game_in_progress(self,number,ahead):
-        # use self.year and self.week_number
         team1_key = self.team_keys[0]
         team2_key = self.team_keys[1]
         favored,spread,team1_score,team2_score = self.__compute_game_winner(ahead)
-        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="in_progress",quarter="2nd",time_left="7:30",date=None)
+        parent = root_games(self.year,self.week_number)
+        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="in_progress",quarter="2nd",time_left="7:30",date=None,parent=parent)
         return game
 
 
@@ -191,14 +192,14 @@ class WeekInProgressGamesInProgress(ResultTestData):
         self.setup_pick(self.__create_pick(),player_name,10)
 
     def __create_pick(self):
-        p = Pick()
+        p = Pick(parent=root_picks(self.year,self.week_number))
         p.winner = "team1"
         p.team1_score = None
         p.team2_score = None
         return p
 
     def __create_winning_pick(self,winner):
-        p = Pick()
+        p = Pick(parent=root_picks(self.year,self.week_number))
         p.winner = winner
         p.team1_score = None
         p.team2_score = None
@@ -206,14 +207,14 @@ class WeekInProgressGamesInProgress(ResultTestData):
 
     def __create_losing_pick(self,winner):
         winner_value = "team2" if winner == "team1" else "team1"
-        p = Pick()
+        p = Pick(parent=root_picks(self.year,self.week_number))
         p.winner = winner_value
         p.team1_score = None
         p.team2_score = None
         return p
 
     def __create_missing_pick(self):
-        p = Pick()
+        p = Pick(parent=root_picks(self.year,self.week_number))
         p.winner = None
         p.team1_score = None
         p.team2_score = None

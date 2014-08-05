@@ -1,6 +1,7 @@
 from player_result_test_data import *
 import datetime
 from utils.utils import *
+from models.root import *
 
 
 class PlayerResultsWeekInProgress(PlayerResultTestData):
@@ -55,32 +56,32 @@ class PlayerResultsWeekInProgress(PlayerResultTestData):
 
 
     def __not_started_game(self,number,team1,team2,favored,spread,start_date):
-        # use self.year and self.week_number
         team1_key = self.find_team_key(team1)
         team2_key = self.find_team_key(team2)
         if start_date:
             start_date_utc = get_datetime_in_utc(start_date,'US/Eastern')
         else:
             start_date_utc = None
-        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=None,team2_score=None,favored=favored,spread=spread,state="not_started",quarter=None,time_left=None,date=start_date_utc)
+        parent = root_games(self.year,self.week_number)
+        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=None,team2_score=None,favored=favored,spread=spread,state="not_started",quarter=None,time_left=None,date=start_date_utc,parent=parent)
         return game
 
     def __final_game(self,number,team1,team2,favored,spread,team1_score,team2_score):
-        # use self.year and self.week_number
         team1_key = self.find_team_key(team1)
         team2_key = self.find_team_key(team2)
-        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="final",quarter=None,time_left=None,date=None)
+        parent = root_games(self.year,self.week_number)
+        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="final",quarter=None,time_left=None,date=None,parent=parent)
         return game
 
     def __in_progress_game(self,number,team1,team2,favored,spread,team1_score,team2_score,quarter,time_left):
-        # use self.year and self.week_number
         team1_key = self.find_team_key(team1)
         team2_key = self.find_team_key(team2)
-        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="in_progress",quarter=quarter,time_left=time_left,date=None)
+        parent = root_games(self.year,self.week_number)
+        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="in_progress",quarter=quarter,time_left=time_left,date=None,parent=parent)
         return game
 
     def __create_pick(self,winner,game_number,team1_score=None,team2_score=None):
-        p = Pick()
+        p = Pick(parent=root_picks(self.year,self.week_number))
         p.winner = winner
         p.team1_score = team1_score
         p.team2_score = team2_score

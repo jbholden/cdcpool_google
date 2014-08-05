@@ -9,6 +9,7 @@ from models.games import *
 from models.players import *
 from models.picks import *
 from models.saved_keys import *
+from models.root import *
 
 class ResultTestData:
 
@@ -38,7 +39,7 @@ class ResultTestData:
         pass
 
     def save_keys_to_database(self):
-        s = SavedKeys()
+        s = SavedKeys(parent=root_savedkeys())
         s.name = self.data_name
         s.key_list = [ str(key) for key in self.__saved_keys ]
         s.put()
@@ -87,7 +88,8 @@ class ResultTestData:
         self.games[game.number] = game_key
 
     def setup_week(self):
-        w = Week(year=self.year,number=self.week_number,winner=None,games=self.games.values(),lock_picks=None,lock_scores=None)
+        parent = root_weeks(self.year,self.week_number)
+        w = Week(year=self.year,number=self.week_number,winner=None,games=self.games.values(),lock_picks=None,lock_scores=None,parent=parent)
         week_key = w.put()
         self.__saved_keys.append(week_key)
         self.week = week_key
@@ -142,7 +144,7 @@ class ResultTestData:
         return player.key().id()
 
     def __create_player(self,name):
-        p = Player(name=name,years=[self.year])
+        p = Player(name=name,years=[self.year],parent=root_players())
         player_key = p.put()
         self.__saved_keys.append(player_key)
         return player_key

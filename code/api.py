@@ -3,6 +3,7 @@ from google.appengine.api import memcache
 import logging
 from models.teams import *
 from models.picks import *
+from models.root import *
 from api_exception import *
 from database import *
 from update import *
@@ -18,7 +19,7 @@ class API:
             raise APIException(409,"team already exists")
             return
 
-        team = Team(name=name,conference=conference)
+        team = Team(name=name,conference=conference,parent=root_teams())
         team.put()
         d.add_team_to_memcache(team)
         return team
@@ -38,7 +39,7 @@ class API:
 
     def delete_team_by_id(self,team_id):
         try:
-            team_key = db.Key.from_path('Team',team_id)
+            team_key = db.Key.from_path('Team',team_id,parent=root_teams())
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -93,7 +94,7 @@ class API:
 
     def get_team_by_id(self,team_id):
         try:
-            team_key = db.Key.from_path('Team',team_id)
+            team_key = db.Key.from_path('Team',team_id,parent=root_teams())
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -105,7 +106,7 @@ class API:
         return teams
 
     def create_game(self,year,week_number,data):
-        game = Game()
+        game = Game(parent=root_games(year,week_number))
         game.number = data['number']
         game.team1 = data['team1']
         game.team2 = data['team2']
@@ -130,7 +131,7 @@ class API:
     def create_multiple_games(self,year,week_number,data):
         models = []
         for game in data:
-            model = Game()
+            model = Game(parent=root_games(year,week_number))
             model.number = game['number']
             model.team1 = game['team1']
             model.team2 = game['team2']
@@ -156,7 +157,7 @@ class API:
 
     def delete_game_by_id(self,year,week_number,game_id):
         try:
-            game_key = db.Key.from_path('Game',game_id)
+            game_key = db.Key.from_path('Game',game_id,parent=root_games(year,week_number))
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -188,7 +189,7 @@ class API:
             return games[game_id]
 
         try:
-            game_key = db.Key.from_path('Game',game_id)
+            game_key = db.Key.from_path('Game',game_id,parent=root_games(year,week_number))
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -214,7 +215,7 @@ class API:
 
     def edit_game_by_id(self,year,week_number,game_id,data):
         try:
-            game_key = db.Key.from_path('Game',game_id)
+            game_key = db.Key.from_path('Game',game_id,parent=root_games(year,week_number))
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -292,7 +293,7 @@ class API:
                 raise APIException(409,"player already exists")
                 return
 
-        player = Player(name=name,years=years)
+        player = Player(name=name,years=years,parent=root_players())
         player.put()
 
         self.__add_to_memcache_dict("players",player.key().id(),player)
@@ -318,7 +319,7 @@ class API:
 
     def delete_player_by_id(self,player_id):
         try:
-            player_key = db.Key.from_path('Player',player_id)
+            player_key = db.Key.from_path('Player',player_id,parent=root_players())
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -381,7 +382,7 @@ class API:
 
     def get_player_by_id(self,player_id):
         try:
-            player_key = db.Key.from_path('Player',player_id)
+            player_key = db.Key.from_path('Player',player_id,parent=root_players())
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -389,7 +390,7 @@ class API:
 
     def edit_player_by_id(self,player_id,data):
         try:
-            player_key = db.Key.from_path('Player',player_id)
+            player_key = db.Key.from_path('Player',player_id,parent=root_players())
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -423,7 +424,7 @@ class API:
 
     def delete_week_by_id(self,year,week_number,week_id):
         try:
-            week_key = db.Key.from_path('Week',week_id)
+            week_key = db.Key.from_path('Week',week_id,parent=root_weeks(year,week_number))
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -511,7 +512,8 @@ class API:
             raise APIException(409,"week already exists")
             return
 
-        week = Week(year=data['year'],number=data['number'])
+        parent = root_weeks(data['year'],data['number'])
+        week = Week(year=data['year'],number=data['number'],parent=parent)
         week.winner = data['winner']
         week.lock_picks = data['lock_picks']
         week.lock_scores = data['lock_scores']
@@ -594,7 +596,7 @@ class API:
             return weeks[week_id]
 
         try:
-            week_key = db.Key.from_path('Week',week_id)
+            week_key = db.Key.from_path('Week',week_id,parent=root_weeks(year,week_number))
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -638,7 +640,7 @@ class API:
 
     def edit_week_by_id(self,year,week_number,week_id,data):
         try:
-            week_key = db.Key.from_path('Week',week_id)
+            week_key = db.Key.from_path('Week',week_id,parent=root_weeks(year,week_number))
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -693,7 +695,7 @@ class API:
     def create_pick(self,data):
         week = self.get_week_by_key(data['week'])
 
-        pick = Pick()
+        pick = Pick(parent=root_picks(week.year,week.number))
         pick.week = data['week']
         pick.player = data['player']
         pick.game = data['game']
@@ -713,7 +715,7 @@ class API:
     def create_multiple_picks(self,year,week_number,data):
         models = []
         for pick in data:
-            model = Pick()
+            model = Pick(parent=root_picks(year,week_number))
             model.week = pick['week']
             model.player = pick['player']
             model.game = pick['game']
@@ -735,7 +737,7 @@ class API:
 
     def delete_pick_by_id(self,year,week_number,pick_id):
         try:
-            pick_key = db.Key.from_path('Pick',pick_id)
+            pick_key = db.Key.from_path('Pick',pick_id,parent=root_picks(year,week_number))
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -775,7 +777,7 @@ class API:
             return picks[pick_id]
 
         try:
-            pick_key = db.Key.from_path('Pick',pick_id)
+            pick_key = db.Key.from_path('Pick',pick_id,parent=root_picks(year,week_number))
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -820,7 +822,7 @@ class API:
 
     def edit_pick_by_id(self,year,week_number,pick_id,data):
         try:
-            pick_key = db.Key.from_path('Pick',pick_id)
+            pick_key = db.Key.from_path('Pick',pick_id,parent=root_picks(year,week_number))
         except:
             raise APIException(500,"exception when getting key")
             return

@@ -6,6 +6,7 @@ from code.week_results import *
 from code.player_results import *
 from code.overall_results import *
 from code.game_data import *
+from models.root import *
 import logging
 
 # TODO:  create test to simulate start of a pool
@@ -407,7 +408,7 @@ class Update:
 
 
     def __calculate_player_results(self,player_id,year,week_number):
-        player_key = str(db.Key.from_path('Player',player_id))
+        player_key = str(db.Key.from_path('Player',player_id,parent=root_players()))
 
         database = Database()
         week_data = database.load_week_data(year,week_number)

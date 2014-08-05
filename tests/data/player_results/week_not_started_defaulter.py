@@ -1,6 +1,7 @@
 from player_result_test_data import *
 import datetime
 from utils.utils import *
+from models.root import *
 
 class PlayerResultsWeekNotStartedDefaulter(PlayerResultTestData):
 
@@ -79,18 +80,18 @@ class PlayerResultsWeekNotStartedDefaulter(PlayerResultTestData):
         self.__saved_picks[10] = self.__create_pick_default(10,team1_score=10,team2_score=15)
 
     def __not_started_game(self,number,team1,team2,favored,spread,start_date):
-        # use self.year and self.week_number
         team1_key = self.find_team_key(team1)
         team2_key = self.find_team_key(team2)
         if start_date:
             start_date_utc = get_datetime_in_utc(start_date,'US/Eastern')
         else:
             start_date_utc = None
-        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=None,team2_score=None,favored=favored,spread=spread,state="not_started",quarter=None,time_left=None,date=start_date_utc)
+        parent = root_games(self.year,self.week_number)
+        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=None,team2_score=None,favored=favored,spread=spread,state="not_started",quarter=None,time_left=None,date=start_date_utc,parent=parent)
         return game
 
     def __create_pick_default(self,game_number,team1_score=None,team2_score=None):
-        p = Pick()
+        p = Pick(parent=root_picks(self.year,self.week_number))
         p.winner = None
         p.team1_score = team1_score
         p.team2_score = team2_score

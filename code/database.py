@@ -8,6 +8,7 @@ from week_data import *
 from calculator import *
 from models.games import *
 from models.weeks import *
+from models.root import *
 
 # TODO:  test load teams, load players
 
@@ -17,7 +18,7 @@ class Database:
     def put_games_week_in_database(self,games,week):
         gamekeys = list()
         for index in games:
-            g = Game()
+            g = Game(parent=root_games(week['year'],week['number']))
             g.number = games[index]['number']
             g.team1 = games[index]['team1']
             g.team2 = games[index]['team2']
@@ -27,7 +28,8 @@ class Database:
             g.date = games[index]['date']
             gamekeys.append(g.put())
 
-        w = Week(year=week['year'],number=week['number'])
+        parent = root_weeks(week['year'],week['number'])
+        w = Week(year=week['year'],number=week['number'],parent=parent)
         w.winner = None
         w.games = gamekeys
         weekkey = w.put()

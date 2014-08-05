@@ -6,6 +6,7 @@ from handler import *
 import string
 import re
 from pytz.gae import pytz
+from models.root import *
 
 # TODO:  define base player results and fill in blocks with another html
 # TODO: tests
@@ -19,7 +20,7 @@ from pytz.gae import pytz
 class PlayerResultsPage(Handler):
 
     def __get_player_key(self,player_id):
-        return db.Key.from_path('Player',player_id)
+        return db.Key.from_path('Player',player_id,parent=root_players())
 
     def __is_player_id_valid(self,player_key):
         return player_key != None

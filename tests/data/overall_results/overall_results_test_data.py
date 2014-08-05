@@ -10,6 +10,7 @@ from models.games import *
 from models.players import *
 from models.picks import *
 from models.saved_keys import *
+from models.root import *
 import logging
 from utils.utils import *
 
@@ -39,7 +40,7 @@ class OverallResultsTestData:
         pass
 
     def save_keys_to_database(self):
-        s = SavedKeys()
+        s = SavedKeys(parent=root_savedkeys())
         s.name = self.data_name
         s.key_list = [ str(key) for key in self.__saved_keys ]
         s.put()
@@ -93,7 +94,7 @@ class OverallResultsTestData:
         u.update_players(self.year)
 
     def __create_player(self,name):
-        p = Player(name=name,years=[self.year])
+        p = Player(name=name,years=[self.year],parent=root_players())
         player_key = p.put()
         self.__saved_keys.append(player_key)
         return player_key
@@ -101,7 +102,8 @@ class OverallResultsTestData:
     def setup_final_game(self,year,week_number,number,team1,team2,favored,spread,team1_score,team2_score):
         team1_key = self.find_team_key(team1)
         team2_key = self.find_team_key(team2)
-        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="final",quarter=None,time_left=None,date=None)
+        parent = root_games(year,week_number)
+        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="final",quarter=None,time_left=None,date=None,parent=parent)
         self.setup_game(game)
 
     def setup_not_started_game(self,year,week_number,number,team1,team2,favored,spread,start_date):
@@ -111,18 +113,19 @@ class OverallResultsTestData:
             start_date_utc = get_datetime_in_utc(start_date,'US/Eastern')
         else:
             start_date_utc = None
-        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=None,team2_score=None,favored=favored,spread=spread,state="not_started",quarter=None,time_left=None,date=start_date_utc)
+        parent = root_games(year,week_number)
+        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=None,team2_score=None,favored=favored,spread=spread,state="not_started",quarter=None,time_left=None,date=start_date_utc,parent=parent)
         self.setup_game(game)
 
     def setup_in_progress_game(self,year,week_number,number,team1,team2,favored,spread,team1_score,team2_score,quarter,time_left):
         team1_key = self.find_team_key(team1)
         team2_key = self.find_team_key(team2)
-        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="in_progress",quarter=quarter,time_left=time_left,date=None)
+        parent = root_games(year,week_number)
+        game = Game(number=number,team1=team1_key,team2=team2_key,team1_score=team1_score,team2_score=team2_score,favored=favored,spread=spread,state="in_progress",quarter=quarter,time_left=time_left,date=None,parent=parent)
         self.setup_game(game)
 
     def setup_pick(self,player_name=None,week_number=None,game_number=None,winner=None,team1_score=None,team2_score=None):
-        # use self.year and passed in week_number
-        pick = Pick()
+        pick = Pick(parent=root_picks(self.year,self.week_number))
 
         if player_name:
             pick.player = str(self.players[player_name])

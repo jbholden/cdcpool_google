@@ -28,7 +28,7 @@ class Database:
             g.date = games[index]['date']
             gamekeys.append(g.put())
 
-        parent = root_weeks(week['year'],week['number'])
+        parent = root_weeks()
         w = Week(year=week['year'],number=week['number'],parent=parent)
         w.winner = None
         w.games = gamekeys
@@ -148,7 +148,7 @@ class Database:
         key = "players_%d" % (year)
         players = memcache.get(key)
         if update or not(players):
-            players_query = db.GqlQuery('select * from Player where years IN :year',year=[year])
+            players_query = db.GqlQuery('select * from Player where years IN :year and ANCESTOR IS :ancestor',year=[year],ancestor=root_players())
             assert players_query != None
             results = list(players_query)
             players = { str(player.key()):player for player in results }
@@ -166,7 +166,7 @@ class Database:
         #key = "teams"
         teams = memcache.get(key)
         if update or not(teams):
-            teams_query = db.GqlQuery('select * from Team')
+            teams_query = db.GqlQuery('select * from Team where ANCESTOR IS :ancestor',ancestor=root_teams())
             assert teams_query != None
             results = list(teams_query)
             if key == "teams":
@@ -196,7 +196,7 @@ class Database:
         key = "week_%d_%d" % (year,week_number)
         week = memcache.get(key)
         if update or not(week):
-            weeks_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year and number=:week',year=year,week=week_number)
+            weeks_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year and number=:week and ANCESTOR IS :ancestor',year=year,week=week_number,ancestor=root_weeks())
             assert weeks_query != None
             weeks = list(weeks_query)
             assert len(weeks) == 1,"Found %d weeks for %d week %d" % (len(weeks),year,week_number)
@@ -218,7 +218,7 @@ class Database:
         player_picks = memcache.get(key)
         week_key = str(week.key())
         if update or not(player_picks):
-            picks_query = db.GqlQuery('select * from Pick where week=:week',week=week_key)
+            picks_query = db.GqlQuery('select * from Pick where week=:week and ANCESTOR IS :ancestor',week=week_key,ancestor=root_picks(week.year,week.number))
             assert picks_query != None
             picks = list(picks_query) 
 
@@ -237,7 +237,7 @@ class Database:
         week_picks = memcache.get(key)
         week_key = str(week.key())
         if update or not(week_picks):
-            picks_query = db.GqlQuery('select * from Pick where week=:week',week=week_key)
+            picks_query = db.GqlQuery('select * from Pick where week=:week and ANCESTOR IS :ancestor',week=week_key,ancestor=root_picks(week.year,week.number))
             assert picks_query != None
             picks = list(picks_query) 
 
@@ -247,7 +247,7 @@ class Database:
         return week_picks
 
     def __load_week_numbers_and_years(self):
-        weeks_query = db.GqlQuery('select * from Week')
+        weeks_query = db.GqlQuery('select * from Week where ANCESTOR IS :ancestor',ancestor=root_weeks())
         assert weeks_query != None
         weeks = list(weeks_query)
 

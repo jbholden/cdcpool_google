@@ -25,7 +25,7 @@ class EnterPicksWeek1(OverallResultsTestData):
         self.setup_not_started_game(self.year,1,8,"Kansas State", "Oklahoma","team2",0.5,datetime.datetime(1982,8,1,12,0))
         self.setup_not_started_game(self.year,1,9,"Texas", "Texas Tech","team1",0.5,datetime.datetime(1982,8,1,12,0))
         self.setup_not_started_game(self.year,1,10,"West Virginia", "Cincinnati","team2",0.5,datetime.datetime(1982,8,1,12,0))
-        w = Week(year=self.year,number=1,games=[],parent=root_weeks(self,year,1))
+        w = Week(year=self.year,number=1,games=[],parent=root_weeks())
         w.lock_picks = self.__get_time_now_plus_1_day()
         self.setup_week(w)
 

@@ -3,6 +3,7 @@ from google.appengine.ext import db
 import logging
 import datetime
 from code.database import *
+from models.root import *
 
 class TestPicks(unittest.TestCase):
 
@@ -34,14 +35,16 @@ class TestPicks(unittest.TestCase):
         self.assertEqual(len(picks),0)
 
     def __test_week_picks_query(self,week_key):
-        picks_query = db.GqlQuery('select * from Pick where week=:week',week=week_key)
+        week = db.get(week_key)
+        parent = root_picks(week.year,week.number) 
+        picks_query = db.GqlQuery('select * from Pick where week=:week and ANCESTOR IS :ancestor',week=week_key,ancestor=parent)
         self.assertIsNotNone(picks_query)
         picks = list(picks_query)
         self.assertGreater(len(picks),0)
         return picks
 
     def __load_week(self,year,week_number):
-        weeks_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year and number=:week',year=year,week=week_number)
+        weeks_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year and number=:week and ANCESTOR IS :ancestor',year=year,week=week_number,ancestor=root_weeks())
         assert weeks_query != None
         weeks = list(weeks_query)
         assert len(weeks) == 1

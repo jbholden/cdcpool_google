@@ -3,6 +3,7 @@ from google.appengine.ext import db
 import logging
 import datetime
 from code.database import *
+from models.root import *
 
 class TestPlayers(unittest.TestCase):
 
@@ -44,27 +45,27 @@ class TestPlayers(unittest.TestCase):
         self.__test_invalid_player_year_query(year=None)
 
     def __test_player_by_name_query(self,name):
-        players_query = db.GqlQuery('select * from Player where name=:name',name=name)
+        players_query = db.GqlQuery('select * from Player where name=:name and ANCESTOR IS :ancestor',name=name,ancestor=root_players())
         self.assertIsNotNone(players_query)
         players = list(players_query)
         self.assertEquals(len(players),1)
         return players[0]
 
     def __test_invalid_player_name_query(self,name):
-        players_query = db.GqlQuery('select * from Player where name=:name',name=name)
+        players_query = db.GqlQuery('select * from Player where name=:name and ANCESTOR IS :ancestor',name=name,ancestor=root_players())
         self.assertIsNotNone(players_query)
         players = list(players_query)
         self.assertEqual(len(players),0)
 
     def __test_players_in_a_year_query(self,year):
-        players_query = db.GqlQuery('select * from Player where years IN :year',year=[year])
+        players_query = db.GqlQuery('select * from Player where years IN :year and ANCESTOR IS :ancestor',year=[year],ancestor=root_players())
         self.assertIsNotNone(players_query)
         players = list(players_query)
         self.assertGreater(len(players),0)
         return players
 
     def __test_invalid_player_year_query(self,year):
-        players_query = db.GqlQuery('select * from Player where years IN :year',year=[year])
+        players_query = db.GqlQuery('select * from Player where years IN :year and ANCESTOR IS :ancestor',year=[year],ancestor=root_players())
         self.assertIsNotNone(players_query)
         players = list(players_query)
         self.assertEqual(len(players),0)

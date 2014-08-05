@@ -3,6 +3,7 @@ from google.appengine.ext import db
 import logging
 import datetime
 from code.database import *
+from models.root import *
 
 class TestGames(unittest.TestCase):
 
@@ -33,7 +34,7 @@ class TestGames(unittest.TestCase):
         self.assertEqual(len(games),self.__count_week_games())
 
     def __count_week_games(self):
-        weeks_query = db.GqlQuery('select * from Week')
+        weeks_query = db.GqlQuery('select * from Week where ANCESTOR IS :ancestor',parent=root_weeks())
         self.assertIsNotNone(weeks_query)
         weeks = list(weeks_query)
         count = 0

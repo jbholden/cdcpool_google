@@ -88,7 +88,7 @@ class ResultTestData:
         self.games[game.number] = game_key
 
     def setup_week(self):
-        parent = root_weeks(self.year,self.week_number)
+        parent = root_weeks()
         w = Week(year=self.year,number=self.week_number,winner=None,games=self.games.values(),lock_picks=None,lock_scores=None,parent=parent)
         week_key = w.put()
         self.__saved_keys.append(week_key)

@@ -3,6 +3,7 @@ from google.appengine.ext import db
 import logging
 import datetime
 from code.database import *
+from models.root import *
 
 class TestWeeks(unittest.TestCase):
 
@@ -31,7 +32,7 @@ class TestWeeks(unittest.TestCase):
         self.__test_invalid_week_query(year=1900,week_number=1)
 
     def __test_week_query(self,year,week_number):
-        week_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year and number=:number',year=year,number=week_number)
+        week_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year and number=:number and ANCESTOR IS :ancestor',year=year,number=week_number,ancestor=root_weeks())
         self.assertIsNotNone(week_query)
         weeks = list(week_query)
         self.assertEqual(len(weeks),1)
@@ -62,7 +63,7 @@ class TestWeeks(unittest.TestCase):
         self.assertEqual(game.kind(),'Game')
 
     def __test_invalid_week_query(self,year,week_number):
-        week_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year and number=:number',year=year,number=week_number)
+        week_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year and number=:number and ANCESTOR IS :ancestor',year=year,number=week_number,ancestor=root_weeks())
         self.assertIsNotNone(week_query)
         weeks = list(week_query)
         self.assertEqual(len(weeks),0)

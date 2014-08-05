@@ -2,13 +2,14 @@ import unittest
 from google.appengine.ext import db
 import logging
 import datetime
+from models.root import *
 
 # TODO:  handle teams changing conferences
 
 class TestTeams(unittest.TestCase):
 
     def test_all_teams_query(self):
-        teams_query = db.GqlQuery('select * from Team')
+        teams_query = db.GqlQuery('select * from Team where ANCESTOR IS :ancestor',ancestor=root_teams())
         self.assertIsNotNone(teams_query)
         teams = list(teams_query)
         self.assertEquals(len(teams),128)
@@ -38,14 +39,14 @@ class TestTeams(unittest.TestCase):
         self.__test_invalid_team_name_query(team=None)
 
     def __test_team_name_query(self,team):
-        teams_query = db.GqlQuery('select * from Team where name=:name',name=team)
+        teams_query = db.GqlQuery('select * from Team where name=:name where ANCESTOR IS :ancestor',name=team,ancestor=root_teams())
         self.assertIsNotNone(teams_query)
         teams = list(teams_query)
         self.assertEquals(len(teams),1)
         self.__check_team_state(teams[0])
 
     def __test_team_conference_query(self,conference,num_teams):
-        teams_query = db.GqlQuery('select * from Team where conference=:conference',conference=conference)
+        teams_query = db.GqlQuery('select * from Team where conference=:conference where ANCESTOR IS :ancestor',conference=conference,ancestor=root_teams())
         self.assertIsNotNone(teams_query)
         teams = list(teams_query)
         self.assertEquals(len(teams),num_teams)
@@ -53,7 +54,7 @@ class TestTeams(unittest.TestCase):
             self.__check_team_state(team)
 
     def __test_invalid_team_name_query(self,team):
-        teams_query = db.GqlQuery('select * from Team where name=:name',name=team)
+        teams_query = db.GqlQuery('select * from Team where name=:name where ANCESTOR IS :ancestor',name=team,ancestor=root_teams())
         self.assertIsNotNone(teams_query)
         teams = list(teams_query)
         self.assertEqual(len(teams),0)

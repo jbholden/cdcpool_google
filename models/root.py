@@ -9,9 +9,8 @@ def root_teams():
 def root_players():
     return db.Key.from_path("FBPoolRoot","root_players")
 
-def root_weeks(year,week_number):
-    week_key = "root_weeks_%d" % (year)
-    return db.Key.from_path("FBPoolRoot",week_key)
+def root_weeks():
+    return db.Key.from_path("FBPoolRoot","root_weeks")
 
 def root_games(year,week_number):
     game_key = "root_games_%d_%d" % (year,week_number)

@@ -335,7 +335,7 @@ class API:
         self.__delete_from_memcache_dict("players",player_key)
 
     def delete_players(self):
-        players_query = db.GqlQuery('select * from Player')
+        players_query = db.GqlQuery('select * from Player where ANCESTOR is :ancestor',ancestor=root_players())
         if players_query != None:
             for player in players_query:
                 db.delete(player)
@@ -424,7 +424,7 @@ class API:
 
     def delete_week_by_id(self,year,week_number,week_id):
         try:
-            week_key = db.Key.from_path('Week',week_id,parent=root_weeks(year,week_number))
+            week_key = db.Key.from_path('Week',week_id,parent=root_weeks())
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -482,7 +482,7 @@ class API:
 
     def __load_players_in_memcache(self):
         players = dict()
-        players_query = db.GqlQuery('select * from Player')
+        players_query = db.GqlQuery('select * from Player where ANCESTOR is :ancestor',ancestor=root_players())
         if players_query != None:
             players = {str(player.key()):player for player in players_query}
         memcache.set("players",players)
@@ -500,7 +500,7 @@ class API:
         return None
 
     def __find_player_in_database(self,name):
-        players_query = db.GqlQuery('select * from Player')
+        players_query = db.GqlQuery('select * from Player where ANCESTOR is :ancestor',ancestor=root_players())
         if players_query != None:
             for player in players_query:
                 if player.name == name:
@@ -512,7 +512,7 @@ class API:
             raise APIException(409,"week already exists")
             return
 
-        parent = root_weeks(data['year'],data['number'])
+        parent = root_weeks()
         week = Week(year=data['year'],number=data['number'],parent=parent)
         week.winner = data['winner']
         week.lock_picks = data['lock_picks']
@@ -556,7 +556,7 @@ class API:
         return None
 
     def __check_db_for_week(self,year,week_number):
-        weeks_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year and number=:week',year=year,week=week_number)
+        weeks_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year and number=:week and ANCESTOR is :ancestor',year=year,week=week_number,ancestor=root_weeks())
         if weeks_query == None:
             return None
 
@@ -596,7 +596,7 @@ class API:
             return weeks[week_id]
 
         try:
-            week_key = db.Key.from_path('Week',week_id,parent=root_weeks(year,week_number))
+            week_key = db.Key.from_path('Week',week_id,parent=root_weeks())
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -604,14 +604,14 @@ class API:
 
     def get_weeks(self):
         weeks = []
-        weeks_query = db.GqlQuery('select * from Week')
+        weeks_query = db.GqlQuery('select * from Week where ANCESTOR IS :ancestor',ancestor=root_weeks())
         if weeks_query != None:
             for week in weeks_query:
                 weeks.append(week)
         return weeks
 
     def delete_weeks(self):
-        weeks_query = db.GqlQuery('select * from Week')
+        weeks_query = db.GqlQuery('select * from Week where ANCESTOR IS :ancestor',ancestor=root_weeks())
         if weeks_query != None:
             for week in weeks_query:
                 db.delete(week)
@@ -621,7 +621,7 @@ class API:
 
     def get_weeks_in_year(self,year):
         weeks = []
-        weeks_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year',year=year)
+        weeks_query = db.GqlQuery('SELECT * FROM Week WHERE year=:year and ANCESTOR IS :ancestor',year=year,ancestor=root_weeks())
         for week in weeks_query:
             weeks.append(week)
 
@@ -640,7 +640,7 @@ class API:
 
     def edit_week_by_id(self,year,week_number,week_id,data):
         try:
-            week_key = db.Key.from_path('Week',week_id,parent=root_weeks(year,week_number))
+            week_key = db.Key.from_path('Week',week_id,parent=root_weeks())
         except:
             raise APIException(500,"exception when getting key")
             return
@@ -790,7 +790,7 @@ class API:
             return
 
         picks = []
-        picks_query = db.GqlQuery('SELECT * FROM Pick WHERE week=:week',week=str(week.key()))
+        picks_query = db.GqlQuery('SELECT * FROM Pick WHERE week=:week and ANCESTOR IS :ancestor',week=str(week.key()),ancestor=root_picks(year,week_number))
         for pick in picks_query:
             picks.append(pick)
 
@@ -810,7 +810,7 @@ class API:
         player_key = str(player.key())
 
         picks = []
-        picks_query = db.GqlQuery('SELECT * FROM Pick WHERE week=:week AND player=:player ',week=str(week.key()),player=player_key)
+        picks_query = db.GqlQuery('SELECT * FROM Pick WHERE week=:week AND player=:player and ANCESTOR IS :ancestor',week=str(week.key()),player=player_key,ancestor=root_picks(year,week_number))
         for pick in picks_query:
             picks.append(pick)
 

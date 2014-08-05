@@ -29,7 +29,7 @@ class TestPicks(unittest.TestCase):
                     self.__check_pick_state(pick,week_key)
 
     def test_invalid_week_key(self):
-        picks_query = db.GqlQuery('select * from Pick where week=:week',week="garbage")
+        picks_query = db.GqlQuery('select * from Pick where week=:week and ANCESTOR IS :ancestor',week="garbage",ancestor=root_picks_master())
         self.assertIsNotNone(picks_query)
         picks = list(picks_query)
         self.assertEqual(len(picks),0)

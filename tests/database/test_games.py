@@ -20,7 +20,7 @@ class TestGames(unittest.TestCase):
             self.weeks = weeks_to_test
 
     def test_all_games_query(self):
-        games_query = db.GqlQuery('select * from Game')
+        games_query = db.GqlQuery('select * from Game where ANCESTOR IS :ancestor',ancestor=root_games_master())
         self.assertIsNotNone(games_query)
         games = list(games_query)
         self.assertGreater(len(games),0)
@@ -28,7 +28,7 @@ class TestGames(unittest.TestCase):
             self.__check_game_state(game)
 
     def test_games_not_linked_to_a_week(self):
-        games_query = db.GqlQuery('select * from Game')
+        games_query = db.GqlQuery('select * from Game where ANCESTOR IS :ancestor',ancestor=root_games_master())
         self.assertIsNotNone(games_query)
         games = list(games_query)
         self.assertEqual(len(games),self.__count_week_games())

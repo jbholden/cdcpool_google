@@ -196,22 +196,27 @@ class API:
         return self.get_game_by_key(str(game_key))
 
     def delete_games(self):
-        games_query = db.GqlQuery('select * from Game where ANCESTOR IS :ancestor',ancestor=root_games_master())
-        if games_query != None:
-            for game in games_query:
-                db.delete(game)
+        raise APIException(500,"not implemented")
+        return
 
-        memcache.delete("games_key")
-        memcache.delete("games_id")
+        #games_query = db.GqlQuery('select * from Game where ANCESTOR IS :ancestor',ancestor=root_games_master())
+        #if games_query != None:
+            #for game in games_query:
+                #db.delete(game)
+
+        #memcache.delete("games_key")
+        #memcache.delete("games_id")
 
         # TODO:  weekly games still in memcache?
 
     def get_games(self):
-        games_query = db.GqlQuery('select * from Game where ANCESTOR IS :ancestor',ancestor=root_games_master())
-        if games_query == None:
-            return []
-        results = list(games_query)
-        return [ result for result in results ]
+        raise APIException(500,"not implemented")
+        return
+        #games_query = db.GqlQuery('select * from Game where ANCESTOR IS :ancestor',ancestor=root_games_master())
+        #if games_query == None:
+            #return []
+        #results = list(games_query)
+        #return [ result for result in results ]
 
     def edit_game_by_id(self,year,week_number,game_id,data):
         try:
@@ -752,13 +757,15 @@ class API:
         self.__delete_from_memcache_dict("picks_key",pick_key)
 
     def delete_picks(self):
-        picks_query = db.GqlQuery('select * from Pick where ANCESTOR IS :ancestor',ancestor=root_picks_master())
-        if picks_query != None:
-            for pick in picks_query:
-                db.delete(pick)
+        raise APIException(500,"not implemented")
+        return
+        #picks_query = db.GqlQuery('select * from Pick where ANCESTOR IS :ancestor',ancestor=root_picks_master())
+        #if picks_query != None:
+            #for pick in picks_query:
+                #db.delete(pick)
 
-        memcache.delete("picks_key")
-        memcache.delete("picks_id")
+        #memcache.delete("picks_key")
+        #memcache.delete("picks_id")
 
     def get_pick_by_key(self,pick_key):
         picks = memcache.get("picks_key")

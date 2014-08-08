@@ -412,6 +412,25 @@ class CalculateResults:
         win_pct = self.get_win_percent(player_key)
         return "%0.3f" % (win_pct)
 
+    def get_player_pick_for_game(self,player_key,game_key):
+        picks = self.__data.get_player_picks(player_key)
+        pick = self.__find_player_pick_for_game(picks,game_key)
+        assert pick != None,"Could not find a pick that matches the passed in game"
+        return pick
+
+    def get_player_submit_time(self,player_key,week=None):
+        picks = self.__data.get_player_picks(player_key)
+        latest_time = None
+        for pick in picks:
+            pick_entry_time = max(pick.created,pick.modified)
+
+            if latest_time == None or pick_entry_time > latest_time:
+                latest_time = pick_entry_time
+
+        if self.__submit_time_invalid(week,latest_time):
+            return None
+
+        return latest_time
 
     def __find_player_pick_for_game(self,picks,game_key):
         for pick in picks:
@@ -425,4 +444,22 @@ class CalculateResults:
     def __player_key_valid(self,player_key):
         player = self.__data.get_player(player_key)
         return player != None
+
+    def __submit_time_invalid(self,week,submit_time):
+        if week == None:
+            return False
+
+        pick_deadline_not_set = week.lock_picks == None
+        if pick_deadline_not_set:
+            return True
+
+        picks_entered_after_pick_deadline = submit_time > week.lock_picks
+        if picks_entered_after_pick_deadline:
+            return True
+
+        submit_time_in_wrong_year = submit_time.year != week.year
+        if submit_time_in_wrong_year:
+            return True
+
+        return False
 

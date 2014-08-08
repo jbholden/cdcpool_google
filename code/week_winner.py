@@ -21,17 +21,16 @@ class WeekWinnerCalculationData:
     week = None  # TODO unsure if needed
 
 class WeekWinner:
-
     calculated_winner = None
     players_tied_for_first = None
-    players_win_tiebreak0 = None
-    players_loss_tiebreak0 = None
-    players_win_tiebreak1 = None
-    players_loss_tiebreak1 = None
-    players_win_tiebreak2 = None
-    players_loss_tiebreak2 = None
-    players_win_tiebreak3 = None
-    players_loss_tiebreak3 = None
+    players_won_tiebreak0 = None
+    players_lost_tiebreak0 = None
+    players_won_tiebreak1 = None
+    players_lost_tiebreak1 = None
+    players_won_tiebreak2 = None
+    players_lost_tiebreak2 = None
+    players_won_tiebreak3 = None
+    players_lost_tiebreak3 = None
 
     def __init__(self,year,week_number):
         self.__data = self.__setup_data_to_use(year,week_number)
@@ -364,6 +363,9 @@ class WeekWinner:
         w.num_tied_for_first = len(self.players_tied_for_first)
         return w
 
+    def get_week_winner_data(self):
+        return self.__data
+
     def __setup_data_to_use(self,year,week_number):
         database = Database()
         week_data = database.load_week_data(year,week_number)
@@ -378,7 +380,7 @@ class WeekWinner:
         data.featured_game = calc.get_featured_game()
         data.week = week_data.week
 
-        featured_game_key = data.featured_game.key()
+        featured_game_key = str(data.featured_game.key())
 
         if data.featured_game.state == "not_started":
             data.featured_game_winner = None

@@ -9,10 +9,17 @@ class Tiebreak:
         self.__week_data = database.load_week_data(year,week_number)
         self.__calc = Calculator(self.__week_data)
 
+        self.__calculate_tiebreak_summary_details()
         self.__calculate_tiebreaker0_details()
         self.__calculate_tiebreaker1_details()
         self.__calculate_tiebreaker2_details()
         self.__calculate_tiebreaker3_details()
+
+    def was_able_to_determine_winner(self):
+        return self.__winners.is_winner_valid()
+
+    def get_tiebreaker_summary(self):
+        return self.__tiebreak_summary
 
     def get_tiebreaker0_details(self):
         return self.__tiebreak0_details
@@ -32,6 +39,67 @@ class Tiebreak:
     def get_tiebreaker2_summary(self):
         return self.__tiebreak2_summary
 
+    def get_tiebreaker3_summary(self):
+        return self.__tiebreak3_summary
+
+    def __calculate_tiebreak_summary_details(self):
+        details = dict()
+        players = self.__winners.get_players_tied_for_first()
+        for player_key in players:
+            d = TiebreakSummary()
+            d.player_key = player_key
+            d.player_name = self.__get_player_name(player_key)
+            details[player_key] = d
+
+            number_of_tiebreaks = 0
+            tiebreak0 = None
+            tiebreak1 = None
+            tiebreak2 = None
+            tiebreak3 = None
+
+        t0_players_won = self.__winners.get_players_that_won_tiebreak_0()
+        t0_players_lost = self.__winners.get_players_that_lost_tiebreak_0()
+        t1_players_won = self.__winners.get_players_that_won_tiebreak_1()
+        t1_players_lost = self.__winners.get_players_that_lost_tiebreak_1()
+        t2_players_won = self.__winners.get_players_that_won_tiebreak_2()
+        t2_players_lost = self.__winners.get_players_that_lost_tiebreak_2()
+        t3_players_won = self.__winners.get_players_that_won_tiebreak_3()
+        t3_players_lost = self.__winners.get_players_that_lost_tiebreak_3()
+
+        for player_key in t0_players_won:
+            details[player_key].tiebreak0 = self.__get_tiebreak_result("win")
+            details[player_key].number_of_tiebreaks += 1
+
+        for player_key in t0_players_lost:
+            details[player_key].tiebreak0 = self.__get_tiebreak_result("loss")
+            details[player_key].number_of_tiebreaks += 1
+
+        for player_key in t1_players_won:
+            details[player_key].tiebreak1 = self.__get_tiebreak_result("win")
+            details[player_key].number_of_tiebreaks += 1
+
+        for player_key in t1_players_lost:
+            details[player_key].tiebreak1 = self.__get_tiebreak_result("loss")
+            details[player_key].number_of_tiebreaks += 1
+
+        for player_key in t2_players_won:
+            details[player_key].tiebreak2 = self.__get_tiebreak_result("win")
+            details[player_key].number_of_tiebreaks += 1
+
+        for player_key in t2_players_lost:
+            details[player_key].tiebreak2 = self.__get_tiebreak_result("loss")
+            details[player_key].number_of_tiebreaks += 1
+
+        for player_key in t3_players_won:
+            details[player_key].tiebreak3 = self.__get_tiebreak_result("win")
+            details[player_key].number_of_tiebreaks += 1
+
+        for player_key in t3_players_lost:
+            details[player_key].tiebreak3 = self.__get_tiebreak_result("loss")
+            details[player_key].number_of_tiebreaks += 1
+
+        self.__tiebreak_summary = details.values()
+
     def __calculate_tiebreaker0_details(self):
         details = []
 
@@ -44,19 +112,8 @@ class Tiebreak:
             d.player_key = player_key
             d.player_name = self.__get_player_name(player_key)
             d.player_pick = self.__calc.get_team_name_player_picked_to_win(player_key,featured_game_key)
-
-            if winner_data.featured_game.state == "not_started":
-                d.result = ""
-                d.featured_game_winner = ""
-            elif winner_data.featured_game.state == "in_progress":
-                d.result = "ahead"
-                d.featured_game_winner = self.__calc.get_team_name_winning_pool_game(featured_game_key)
-            elif winner_data.featured_game.state == "final":
-                d.result = "won"
-                d.featured_game_winner = self.__calc.get_pool_game_winner_team_name(featured_game_key)
-            else:
-                raise AssertionError,"Bad state value %s" % (winner_data.featured_game.state)
-
+            d.result = self.__get_tiebreak_result("win")
+            d.featured_game_winner = self.__get_featured_game_winner()
             details.append(d)
 
         players = self.__winners.get_players_that_lost_tiebreak_0()
@@ -65,18 +122,8 @@ class Tiebreak:
             d.player_key = player_key
             d.player_name = self.__get_player_name(player_key)
             d.player_pick = self.__calc.get_team_name_player_picked_to_win(player_key,featured_game_key)
-
-            if winner_data.featured_game.state == "not_started":
-                d.result = ""
-                d.featured_game_winner = ""
-            elif winner_data.featured_game.state == "in_progress":
-                d.result = "behind"
-                d.featured_game_winner = self.__calc.get_team_name_winning_pool_game(featured_game_key)
-            elif winner_data.featured_game.state == "final":
-                d.result = "lost"
-                d.featured_game_winner = self.__calc.get_pool_game_winner_team_name(featured_game_key)
-            else:
-                raise AssertionError,"Bad state value %s" % (winner_data.featured_game.state)
+            d.result = self.__get_tiebreak_result("loss")
+            d.featured_game_winner = self.__get_featured_game_winner()
             details.append(d)
 
         self.__tiebreak0_details = details
@@ -100,15 +147,7 @@ class Tiebreak:
             d = Tiebreak1Data()
             d.player_key = player_key
             d.player_name = self.__get_player_name(player_key)
-
-            if winner_data.featured_game.state == "not_started":
-                d.result = ""
-            elif winner_data.featured_game.state == "in_progress":
-                d.result = "ahead"
-            elif winner_data.featured_game.state == "final":
-                d.result = "won"
-            else:
-                raise AssertionError,"Bad state value %s" % (winner_data.featured_game.state)
+            d.result = self.__get_tiebreak_result("win")
 
             pick = self.__calc.get_player_pick_for_game(player_key,featured_game_key)
 
@@ -125,15 +164,7 @@ class Tiebreak:
             d = Tiebreak1Data()
             d.player_key = player_key
             d.player_name = self.__get_player_name(player_key)
-
-            if winner_data.featured_game.state == "not_started":
-                d.result = ""
-            elif winner_data.featured_game.state == "in_progress":
-                d.result = "behind"
-            elif winner_data.featured_game.state == "final":
-                d.result = "lost"
-            else:
-                raise AssertionError,"Bad state value %s" % (winner_data.featured_game.state)
+            d.result = self.__get_tiebreak_result("loss")
 
             pick = self.__calc.get_player_pick_for_game(player_key,featured_game_key)
 
@@ -166,15 +197,7 @@ class Tiebreak:
             d = Tiebreak2Data()
             d.player_key = player_key
             d.player_name = self.__get_player_name(player_key)
-
-            if winner_data.featured_game.state == "not_started":
-                d.result = ""
-            elif winner_data.featured_game.state == "in_progress":
-                d.result = "ahead"
-            elif winner_data.featured_game.state == "final":
-                d.result = "won"
-            else:
-                raise AssertionError,"Bad state value %s" % (winner_data.featured_game.state)
+            d.result = self.__get_tiebreak_result("win")
 
             pick = self.__calc.get_player_pick_for_game(player_key,featured_game_key)
 
@@ -191,15 +214,7 @@ class Tiebreak:
             d = Tiebreak2Data()
             d.player_key = player_key
             d.player_name = self.__get_player_name(player_key)
-
-            if winner_data.featured_game.state == "not_started":
-                d.result = ""
-            elif winner_data.featured_game.state == "in_progress":
-                d.result = "behind"
-            elif winner_data.featured_game.state == "final":
-                d.result = "lost"
-            else:
-                raise AssertionError,"Bad state value %s" % (winner_data.featured_game.state)
+            d.result = self.__get_tiebreak_result("loss")
 
             pick = self.__calc.get_player_pick_for_game(player_key,featured_game_key)
 
@@ -214,7 +229,103 @@ class Tiebreak:
         self.__tiebreak2_details = details
 
     def __calculate_tiebreaker3_details(self):
-        pass
+        details = []
+
+        summary = Tiebreak3Summary()
+        summary.valid = self.__winners.is_tiebreaker_3_valid()
+
+        players = self.__winners.get_players_that_won_tiebreak_3()
+        for player_key in players:
+            d = Tiebreak3Data()
+            d.player_key = player_key
+            d.player_name = self.__get_player_name(player_key)
+            d.result = self.__get_tiebreak_result("win")
+            d.pick_entry_time = self.__get_player_submit_time(player_key)
+            details.append(d)
+
+        players = self.__winners.get_players_that_lost_tiebreak_3()
+        for player_key in players:
+            d = Tiebreak3Data()
+            d.player_key = player_key
+            d.player_name = self.__get_player_name(player_key)
+            d.result = self.__get_tiebreak_result("loss")
+            d.pick_entry_time = self.__get_player_submit_time(player_key)
+            details.append(d)
+
+        self.__tiebreak3_summary = summary
+        self.__tiebreak3_details = details
 
     def __get_player_name(self,player_key):
         return self.__week_data.players[player_key].name
+
+    def __get_tiebreak_result(self,win_loss):
+        winner_data = self.__winners.get_week_winner_data()
+        featured_game = winner_data.featured_game
+
+        if featured_game.state == "not_started":
+            return ""
+
+        if featured_game.state == "in_progress" and win_loss == "win":
+            return "ahead"
+
+        if featured_game.state == "in_progress" and win_loss == "loss":
+            return "behind"
+
+        if featured_game.state == "final" and win_loss == "win":
+            return "won"
+
+        if featured_game.state == "final" and win_loss == "loss":
+            return "lost"
+
+        if win_loss != "win" or win_loss != "loss":
+            raise AssertionError,"Bad win_loss value %s" % (win_loss)
+            return
+
+        raise AssertionError,"Bad state value %s" % (featured_game.state)
+
+    def __get_featured_game_winner(self):
+        winner_data = self.__winners.get_week_winner_data()
+        featured_game = winner_data.featured_game
+
+        if featured_game.state == "not_started":
+            return ""
+
+        if featured_game.state == "in_progress":
+            return self.__calc.get_team_name_winning_pool_game(featured_game_key)
+
+        if featured_game.state == "final":
+            return self.__calc.get_pool_game_winner_team_name(featured_game_key)
+
+        raise AssertionError,"Bad state value %s" % (featured_game.state)
+
+    def __get_player_submit_time(self,player_key):
+        winner_data = self.__winners.get_week_winner_data()
+        pick_entry_time = winner_data.player_submit_times[player_key]
+
+        if pick_entry_time == None:
+            return "indeterminate"
+
+        return pick_entry_time.strftime("%m/%d/%y %I:%M:%S %p UTC")
+
+    def __sort_tiebreak_summary(self):
+        # sort by name
+        # sort by tiebreak0
+        # sort by tiebreak1
+        # sort by tiebreak2
+        # sort by tiebreak3
+        pass
+
+    def __sort_tiebreak0(self):
+        pass
+
+    def __sort_tiebreak1(self):
+        pass
+
+    def __sort_tiebreak2(self):
+        pass
+
+    def __sort_tiebreak3(self):
+        pass
+
+
+

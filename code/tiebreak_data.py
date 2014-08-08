@@ -21,6 +21,9 @@ class Tiebreak2Summary:
     team2_score = None
     result_total = None
 
+class Tiebreak3Summary:
+    valid = None
+
 class Tiebreak0Data:
     player_key = None
     player_name = None

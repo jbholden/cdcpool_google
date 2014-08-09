@@ -13,6 +13,7 @@
             <td id="header">Win Pct.</td>
             <td id="header"><a id="link-header" href="javascript:void" onclick="change_content('projected_wins')">Projected</a></td>
             <td id="header"><a id="link-header" href="javascript:void" onclick="change_content('possible_wins')">Possible</a></td>
+            <td id="winner-header"></td>
         </thead>
         {% for result in results %}
             <tr>
@@ -27,7 +28,12 @@
                 <td id="content">{{result.win_pct}}</td>
                 <td id="{{projected_id}}">{{result.projected_wins}}</td>
                 <td id="{{possible_id}}">{{result.possible_wins}}</td>
+                {% if winner.num_tied_for_first == 1 %}
+                    <td id="winner">{{result.winner}}</td>
+                {% else %}
+                    <td id="winner"><a id="winner-link" href="tiebreak">{{result.winner}}</a></td>
+                {% endif %}
             </tr>
-            <tr><td id="table-line" colspan="7"></td></tr>
+            <tr><td id="table-line" colspan="8"></td></tr>
         {% endfor %}
     </table>

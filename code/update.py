@@ -680,6 +680,10 @@ class Update:
     def __convert_overall_results_to_list(self,overall_results_dict):
         return overall_results_dict.values()
 
+    def get_winner_info(self,year,week_number):
+        winner = WeekWinner(year,week_number)
+        return winner.get_winner_data_object()
+
     def __get_winner_message(self,player_key,winner,week_state):
         winning_player = winner.get_winner()
 

@@ -196,3 +196,24 @@
    text-align: center;
    text-decoration: underline;
 }
+#winner-link {
+   color: red;
+   background-color: white;
+   font-size: 8pt;
+   padding: 0px 4px;
+   font-family: Helvetica;
+   font-weight: 500;
+   white-space: nowrap;
+   text-align: center;
+   text-decoration: underline;
+}
+#winner {
+   color: red;
+   background-color: white;
+   font-size: 8pt;
+   padding: 0px 4px;
+   font-family: Helvetica;
+   font-weight: 500;
+   white-space: nowrap;
+   text-align: center;
+}

@@ -98,7 +98,7 @@ class Tiebreak:
             details[player_key].tiebreak3 = self.__get_tiebreak_result("loss")
             details[player_key].number_of_tiebreaks += 1
 
-        self.__tiebreak_summary = details.values()
+        self.__tiebreak_summary = self.__sort_tiebreak_summary(details.values())
 
     def __calculate_tiebreaker0_details(self):
         details = []
@@ -126,7 +126,7 @@ class Tiebreak:
             d.featured_game_winner = self.__get_featured_game_winner()
             details.append(d)
 
-        self.__tiebreak0_details = details
+        self.__tiebreak0_details = self.__sort_tiebreak0(details)
 
     def __calculate_tiebreaker1_details(self):
         details = []
@@ -176,7 +176,7 @@ class Tiebreak:
             details.append(d)
 
         self.__tiebreak1_summary = summary
-        self.__tiebreak1_details = details
+        self.__tiebreak1_details = self.__sort_tiebreak1(details)
 
     def __calculate_tiebreaker2_details(self):
         details = []
@@ -226,7 +226,7 @@ class Tiebreak:
             details.append(d)
 
         self.__tiebreak2_summary = summary
-        self.__tiebreak2_details = details
+        self.__tiebreak2_details = self.__sort_tiebreak2(details)
 
     def __calculate_tiebreaker3_details(self):
         details = []
@@ -253,7 +253,7 @@ class Tiebreak:
             details.append(d)
 
         self.__tiebreak3_summary = summary
-        self.__tiebreak3_details = details
+        self.__tiebreak3_details = self.__sort_tiebreak3(details)
 
     def __get_player_name(self,player_key):
         return self.__week_data.players[player_key].name
@@ -307,25 +307,34 @@ class Tiebreak:
 
         return pick_entry_time.strftime("%m/%d/%y %I:%M:%S %p UTC")
 
-    def __sort_tiebreak_summary(self):
-        # sort by name
-        # sort by tiebreak0
-        # sort by tiebreak1
-        # sort by tiebreak2
-        # sort by tiebreak3
-        pass
+    def __sort_tiebreak_summary(self,summary):
+        sort_by_name = sorted(summary,key=lambda item:item.player_name)
+        sort_by_wins = sorted(sort_by_name,key=lambda item:item.result == "won",reverse=True)
+        sort_by_ahead = sorted(sort_by_wins,key=lambda item:item.result == "ahead",reverse=True)
+        sort_by_tie = sorted(sort_by_ahead,key=lambda item:item.number_of_tiebreaks,reverse=True)
+        return sort_by_tie
 
-    def __sort_tiebreak0(self):
-        pass
+    def __sort_tiebreak0(self,details):
+        sort_by_name = sorted(details,key=lambda item:item.player_name)
+        sort_by_wins = sorted(sort_by_name,key=lambda item:item.result == "won",reverse=True)
+        sort_by_ahead = sorted(sort_by_wins,key=lambda item:item.result == "ahead",reverse=True)
+        return sort_by_ahead
 
-    def __sort_tiebreak1(self):
-        pass
+    def __sort_tiebreak1(self,details):
+        sort_by_name = sorted(details,key=lambda item:item.player_name)
+        sort_by_difference = sorted(sort_by_name,key=lambda item:item.difference)
+        return sort_by_difference
 
-    def __sort_tiebreak2(self):
-        pass
+    def __sort_tiebreak2(self,details):
+        sort_by_name = sorted(details,key=lambda item:item.player_name)
+        sort_by_difference = sorted(sort_by_name,key=lambda item:item.difference)
+        return sort_by_difference
 
-    def __sort_tiebreak3(self):
-        pass
+    def __sort_tiebreak3(self,details):
+        sort_by_name = sorted(details,key=lambda item:item.player_name)
+        sort_by_submit_time = sorted(sort_by_name,key=lambda item:item.pick_entry_time)
+        move_none_to_end = sorted(sort_by_submit_time,key=lambda item:item != None,reverse=True)
+        return move_none_to_end
 
 
 

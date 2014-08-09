@@ -49,7 +49,7 @@ class WeekWinner:
 
     def get_winner(self):
         if self.__data.week.winner != None:
-            return self.__data.week_winner
+            return self.__data.week.winner
 
         if self.__data.featured_game.state == "not_started":
             return None
@@ -323,9 +323,9 @@ class WeekWinner:
         if tiebreaker_number == 0:
             return self.players_tied_for_first
 
-        no_tiebreak_0_players =  self.players_won_tiebreak0 == None or len(self.players_won_tiebreak0) == 0:
-        no_tiebreak_1_players =  self.players_won_tiebreak1 == None or len(self.players_won_tiebreak1) == 0:
-        no_tiebreak_2_players =  self.players_won_tiebreak2 == None or len(self.players_won_tiebreak2) == 0:
+        no_tiebreak_0_players =  self.players_won_tiebreak0 == None or len(self.players_won_tiebreak0) == 0
+        no_tiebreak_1_players =  self.players_won_tiebreak1 == None or len(self.players_won_tiebreak1) == 0
+        no_tiebreak_2_players =  self.players_won_tiebreak2 == None or len(self.players_won_tiebreak2) == 0
 
         if tiebreaker_number == 1:
             if no_tiebreak_0_players:
@@ -393,7 +393,7 @@ class WeekWinner:
             data.featured_game_winner = calc.get_pool_game_winner(featured_game_key)
             data.featured_game_ahead = None
 
-        for player_key in self.__week_data.players:
+        for player_key in week_data.players:
             data.player_wins[player_key] = calc.get_number_of_wins(player_key)
             data.player_projected_wins[player_key] = calc.get_number_of_projected_wins(player_key)
             data.player_featured_game_picks[player_key] = calc.get_player_pick_for_game(player_key,featured_game_key)

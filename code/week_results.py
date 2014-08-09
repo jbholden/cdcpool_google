@@ -2,6 +2,7 @@ class WeekResults:
     rank = None
     projected_rank = None
     player_id = None
+    player_key = None
     player_name = None
     wins = None
     losses = None
@@ -15,6 +16,7 @@ class WeekResults:
         d['rank'] = self.rank
         d['projected_rank'] = self.projected_rank
         d['player_id'] = self.player_id
+        d['player_key'] = self.player_key
         d['player_name'] = self.player_name
         d['wins'] = self.wins
         d['losses'] = self.losses

@@ -6,6 +6,7 @@ from code.week_results import *
 from code.player_results import *
 from code.overall_results import *
 from code.game_data import *
+from code.week_winner import *
 from models.root import *
 import logging
 
@@ -391,6 +392,7 @@ class Update:
             player_results.rank = 1
             player_results.projected_rank = 1
             player_results.player_id = week_data.players[player_key].key().id()
+            player_results.player_key = str(week_data.players[player_key].key())
             player_results.player_name = week_data.players[player_key].name
             player_results.wins = calc.get_number_of_wins(player_key)
             player_results.losses = calc.get_number_of_losses(player_key)

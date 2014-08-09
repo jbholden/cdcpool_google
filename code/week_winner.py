@@ -67,7 +67,7 @@ class WeekWinner:
     def verify_winner(self):
         if self.__data.featured_game.state != "final":
             return None
-        return self.calculated_winner == self.__data.week.winner
+        return self.calculated_winner != None and len(self.calculated_winner) == 1 and self.calculated_winner[0] == self.__data.week.winner
 
     def get_players_tied_for_first(self):
         return self.players_tied_for_first
@@ -113,8 +113,9 @@ class WeekWinner:
             self.calculated_winner = self.players_won_tiebreak3[0]
             return
         else:
-            if self.players_won_tiebreak2 != None and len(self.players_won_tiebreak2) > 1:
-                self.calculated_winner = None  # unexpected error
+            unable_to_determine_winner = self.players_won_tiebreak2 != None and len(self.players_won_tiebreak2) > 1
+            if unable_to_determine_winner:
+                self.calculated_winner = self.players_won_tiebreak3
                 self.__winner_valid = False
                 return
 
@@ -290,18 +291,18 @@ class WeekWinner:
             else:
                 self.players_lost_tiebreak3.append(player_key)
 
-    def tiebreaker_0_unncessary(self):
+    def tiebreaker_0_unnecessary(self):
         return len(self.players_tied_for_first) == 1
 
-    def tiebreaker_1_unncessary(self):
+    def tiebreaker_1_unnecessary(self):
         one_player_won_tiebreak0 = self.players_won_tiebreak0 != None and len(self.players_won_tiebreak0) == 1
         return self.tiebreaker_0_unnecessary() or one_player_won_tiebreak0
 
-    def tiebreaker_2_unncessary(self):
+    def tiebreaker_2_unnecessary(self):
         one_player_won_tiebreak1 = self.players_won_tiebreak1 != None and len(self.players_won_tiebreak1) == 1
         return self.tiebreaker_1_unnecessary() or one_player_won_tiebreak1
 
-    def tiebreaker_3_unncessary(self):
+    def tiebreaker_3_unnecessary(self):
         one_player_won_tiebreak2 = self.players_won_tiebreak2 != None and len(self.players_won_tiebreak2) == 1
         return self.tiebreaker_2_unnecessary() or one_player_won_tiebreak2
 

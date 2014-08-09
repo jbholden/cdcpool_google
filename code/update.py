@@ -382,6 +382,8 @@ class Update:
         week_data = database.load_week_data(year,week_number)
 
         calc = CalculateResults(week_data)
+        winner = WeekWinner(year,week_number)
+        week_state = calc.get_summary_state_of_all_games()
 
         results = []
         for player_key in week_data.players:
@@ -395,12 +397,15 @@ class Update:
             player_results.win_pct = calc.get_win_percent_string(player_key)
             player_results.projected_wins = calc.get_number_of_projected_wins(player_key)
             player_results.possible_wins = calc.get_number_of_possible_wins(player_key)
-            player_results.winner = None
+            player_results.winner = self.__get_winner_message(player_key,winner,week_state)
 
             results.append(player_results)
 
         if len(results) > 0:
-            results = self.assign_rank(results)
+            if winner.is_winner_official():
+                results = self.assign_rank(results,winner=winner.get_winner())
+            else:
+                results = self.assign_rank(results)
             results = self.assign_projected_rank(results)
             results = self.__sort_by_rank(results)
 
@@ -515,7 +520,7 @@ class Update:
 
         assigned_results = []
 
-        if winner:
+        if winner != None:
             self.__move_winner_to_top_of_results(sorted_results,winner)
             self.__winner_sanity_check(sorted_results)
             next_rank = 2   # no ties for first place
@@ -675,5 +680,38 @@ class Update:
     def __convert_overall_results_to_list(self,overall_results_dict):
         return overall_results_dict.values()
 
+    def __get_winner_message(self,player_key,winner,week_state):
+        winning_player = winner.get_winner()
 
+        if winning_player == None:
+            return ""
+
+        # official winner, return week.winner
+        if winner.is_winner_official(): 
+            if player_key == winning_player:
+                return "WINNER"
+            else:
+                return ""
+
+        win_message = "UNOFFICIAL WINNER" if week_state == "final" else "PROJECTED WINNER"
+
+        if winner.tiebreaker_3_unnecessary():
+            if player_key == winning_player:
+                return win_message
+            else:
+                return ""
+
+        if winner.is_tiebreaker_3_valid():
+            if player_key == winning_player:
+                return win_message
+            else:
+                return ""
+
+        # in this case, was unable to determine the winner of tiebreak 3
+        # this is the case where the pick submit time is unavailable or invalid
+        players_in_tiebreak3 = winning_player  # this will be an array in this case only
+        if player_key in players_in_tiebreak3:
+            return "POSSIBLE WINNER"
+        else:
+            return ""
 

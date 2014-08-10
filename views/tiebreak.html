@@ -1,0 +1,49 @@
+{% extends "week_base.html" %}
+
+{% block title %}Week {{week_number}} Tiebreaker{% endblock %}
+{% block page_title %}Tiebreaker{% endblock %}
+
+{% block head_content %}
+    <link href="/stylesheets/tiebreaker.css" rel="stylesheet" type="text/css" media="all">
+{% endblock %}
+
+{% block content %}
+    <table class="tiebreaker-title">
+        <tr>
+            <td id="tiebreaker-number">Summary</td>
+            <td id="tiebreaker-description"></td>
+        </tr>
+        <tr><td id="table-line-gray" colspan="2"></td></tr>
+    </table>
+    <table>
+        <thead class="tiebreaker-header">
+            <td id="header">Player</td>
+            <td id="header">Tiebreak 0</td>
+            <td id="header">Tiebreak 1</td>
+            <td id="header">Tiebreak 2</td>
+            <td id="header">Tiebreak 3</td>
+        </thead>
+        {% for entry in summary %}
+            <tr>
+                <td id="player-content">{{entry.player_name}}</td>
+                <td id="{{entry.tiebreak0_id}}">{{entry.tiebreak0}}</td>
+                <td id="{{entry.tiebreak1_id}}">{{entry.tiebreak1}}</td>
+                <td id="{{entry.tiebreak2_id}}">{{entry.tiebreak2}}</td>
+                <td id="{{entry.tiebreak3_id}}">{{entry.tiebreak3}}</td>
+            </tr>
+            <tr><td id="table-line" colspan="5"></td></tr>
+        {% endfor %}
+        {% if tiebreaker0_details != None and length(tiebreaker0_details) > 0  %}
+            {% include "tiebreaker0.html" }
+        {% endif %}
+        {% if tiebreaker1_details != None and length(tiebreaker1_details) > 0  %}
+            {% include "tiebreaker1.html" }
+        {% endif %}
+        {% if tiebreaker2_details != None and length(tiebreaker2_details) > 0  %}
+            {% include "tiebreaker2.html" }
+        {% endif %}
+        {% if tiebreaker3_details != None and length(tiebreaker3_details) > 0  %}
+            {% include "tiebreaker3.html" }
+        {% endif %}
+    </table>
+{% endblock %}

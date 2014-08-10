@@ -39,6 +39,7 @@ from pages.week_results_page import *
 from pages.player_results_page import *
 from pages.overall_results_page import *
 from pages.update_games_page import *
+from pages.tiebreak_page import *
 from pages.api.team_api import *
 from pages.api.game_api import *
 from pages.api.week_api import *
@@ -66,6 +67,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/<year_param:([0-9]+)>/week/<week_number_param:([0-9]+)>/results/json', WeekResultsJson),
     webapp2.Route(r'/<year_param:([0-9]+)>/week/<week_number_param:([0-9]+)>/results', WeekResultsPage),
     webapp2.Route(r'/<year_param:([0-9]+)>/week/<week_number_param:([0-9]+)>/games', UpdateGamesPage),
+    webapp2.Route(r'/<year_param:([0-9]+)>/week/<week_number_param:([0-9]+)>/tiebreak', TiebreakPage),
     webapp2.Route(r'/<year_param:([0-9]+)>/results/json', OverallResultsJson),
     webapp2.Route(r'/<year_param:([0-9]+)>/results', OverallResultsPage),
     webapp2.Route(r'/a/tests', MainTestPage),

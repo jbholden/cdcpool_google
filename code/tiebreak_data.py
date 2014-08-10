@@ -6,6 +6,10 @@ class TiebreakSummary:
     tiebreak1 = None
     tiebreak2 = None
     tiebreak3 = None
+    tiebreak0_id = None
+    tiebreak1_id = None
+    tiebreak2_id = None
+    tiebreak3_id = None
 
 class Tiebreak1Summary:
     team1 = None

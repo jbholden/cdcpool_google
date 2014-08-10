@@ -25,6 +25,7 @@ class TiebreakPage(Handler):
         params['week_number'] = week_number
         params['weeks_in_year'] = weeks_in_year
         params['winner_valid'] = tiebreak.was_able_to_determine_winner()
+        params['featured_game_state'] = tiebreak.get_featured_game_state()
         params['summary'] = tiebreak.get_tiebreaker_summary()
         params['tiebreaker0_details'] = tiebreak.get_tiebreaker0_details()
         params['tiebreaker1_details'] = tiebreak.get_tiebreaker1_details()

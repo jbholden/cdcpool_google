@@ -218,3 +218,13 @@
    text-align: left;
    white-space: nowrap;
 }
+#tiebreak-invalid {
+   color: red;
+   background-color: white;
+   font-size: 8pt;
+   padding: 0px 4px;
+   font-family: Helvetica;
+   font-weight: 100;
+   white-space: nowrap;
+   text-align: left;
+}

@@ -31,6 +31,7 @@ class Tiebreak3Summary:
 class Tiebreak0Data:
     player_key = None
     player_name = None
+    result_id = None
     result = None
     player_pick = None
     featured_game_winner = None
@@ -38,6 +39,7 @@ class Tiebreak0Data:
 class Tiebreak1Data:
     player_key = None
     player_name = None
+    result_id = None
     result = None
     difference = None
     team1_score = None
@@ -47,6 +49,7 @@ class Tiebreak1Data:
 class Tiebreak2Data:
     player_key = None
     player_name = None
+    result_id = None
     result = None
     difference = None
     team1_score = None
@@ -56,5 +59,6 @@ class Tiebreak2Data:
 class Tiebreak3Data:
     player_key = None
     player_name = None
+    result_id = None
     result = None
     pick_entry_time = None

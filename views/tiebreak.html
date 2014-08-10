@@ -33,17 +33,17 @@
             </tr>
             <tr><td id="table-line" colspan="5"></td></tr>
         {% endfor %}
-        {% if tiebreaker0_details != None and length(tiebreaker0_details) > 0  %}
-            {% include "tiebreaker0.html" }
-        {% endif %}
-        {% if tiebreaker1_details != None and length(tiebreaker1_details) > 0  %}
-            {% include "tiebreaker1.html" }
-        {% endif %}
-        {% if tiebreaker2_details != None and length(tiebreaker2_details) > 0  %}
-            {% include "tiebreaker2.html" }
-        {% endif %}
-        {% if tiebreaker3_details != None and length(tiebreaker3_details) > 0  %}
-            {% include "tiebreaker3.html" }
-        {% endif %}
     </table>
+    {% if tiebreaker0_valid %}
+        {% include "tiebreaker0.html" %}
+    {% endif %}
+    {% if tiebreaker1_valid %}
+        {% include "tiebreaker1.html" %}
+    {% endif %}
+    {% if tiebreaker2_valid %}
+        {% include "tiebreaker2.html" %}
+    {% endif %}
+    {% if tiebreaker3_valid %}
+        {% include "tiebreaker3.html" %}
+    {% endif %}
 {% endblock %}

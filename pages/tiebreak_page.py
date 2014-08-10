@@ -1,6 +1,7 @@
 import webapp2
 import logging
 from code.tiebreak import *
+from code.database import *
 from handler import *
 import string
 import re
@@ -34,5 +35,24 @@ class TiebreakPage(Handler):
         params['tiebreaker1_summary'] = tiebreak.get_tiebreaker1_summary()
         params['tiebreaker2_summary'] = tiebreak.get_tiebreaker2_summary()
         params['tiebreaker3_summary'] = tiebreak.get_tiebreaker3_summary()
+        params['tiebreaker0_valid'] = params['tiebreaker0_details'] != None and len(params['tiebreaker0_details']) > 0
+        params['tiebreaker1_valid'] = params['tiebreaker1_details'] != None and len(params['tiebreaker1_details']) > 0
+        params['tiebreaker2_valid'] = params['tiebreaker2_details'] != None and len(params['tiebreaker2_details']) > 0
+        params['tiebreaker3_valid'] = params['tiebreaker3_details'] != None and len(params['tiebreaker3_details']) > 0
 
         self.render("tiebreak.html",**params)
+
+    def __get_weeks_in_year(self,year,week_number):
+        d = Database()
+        weeks_and_years = d.load_weeks_and_years()
+        if self.__invalid_year_or_week_number(weeks_and_years,year,week_number):
+            return None
+        weeks_in_year = sorted(weeks_and_years[year])
+        return weeks_in_year
+
+    def __invalid_year_or_week_number(self,weeks_and_years,year,week_number):
+        weeks_in_year = weeks_and_years.get(year)
+        if not(weeks_in_year):
+            return True
+        return week_number not in weeks_in_year
+

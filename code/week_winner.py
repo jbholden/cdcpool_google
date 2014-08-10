@@ -155,6 +155,7 @@ class WeekWinner:
         if self.tiebreaker_0_unnecessary():
             self.players_won_tiebreak0 = None
             self.players_lost_tiebreak0 = None
+            return
 
         if self.__data.featured_game.state == "not_started":
             self.players_won_tiebreak0 = None
@@ -206,27 +207,28 @@ class WeekWinner:
                 first_valid_pick = False
 
         # calculate who won/lost
-        self.won_tiebreak1 = []
-        self.lost_tiebreak1 = []
+        self.players_won_tiebreak1 = []
+        self.players_lost_tiebreak1 = []
         for player_key in players:
             pick = self.__data.player_featured_game_picks[player_key]
 
             # no score entered
             if pick.team1_score == None or pick.team2_score == None:
-                self.lost_tiebreak1.append(player_key)
+                self.players_lost_tiebreak1.append(player_key)
 
             pick_spread = pick.team1_score - pick.team2_score
             pick_difference = abs(pick_spread-result_spread) 
             if pick_difference == min_difference:
-                self.won_tiebreak1.append(player_key)
+                self.players_won_tiebreak1.append(player_key)
             else:
-                self.lost_tiebreak1.append(player_key)
+                self.players_lost_tiebreak1.append(player_key)
 
 
     def __calculate_tiebreaker_2(self):
         if self.tiebreaker_2_unnecessary():
             self.players_won_tiebreak2 = None
             self.players_lost_tiebreak2 = None
+            return
 
         players = self.__get_players_to_use(tiebreaker_number=2)
 
@@ -250,21 +252,21 @@ class WeekWinner:
                 first_valid_pick = False
 
         # calculate who won/lost
-        self.won_tiebreak2 = []
-        self.lost_tiebreak2 = []
+        self.players_won_tiebreak2 = []
+        self.players_lost_tiebreak2 = []
         for player_key in players:
             pick = self.__data.player_featured_game_picks[player_key]
 
             # no score entered
             if pick.team1_score == None or pick.team2_score == None:
-                self.lost_tiebreak2.append(player_key)
+                self.players_lost_tiebreak2.append(player_key)
 
             pick_total = pick.team1_score + pick.team2_score
             pick_difference = abs(result_total-pick_total)
             if pick_difference == min_difference:
-                self.won_tiebreak2.append(player_key)
+                self.players_won_tiebreak2.append(player_key)
             else:
-                self.lost_tiebreak2.append(player_key)
+                self.players_lost_tiebreak2.append(player_key)
 
     def __calculate_tiebreaker_3(self):
         self.__tiebreaker_3_valid = False
@@ -272,6 +274,7 @@ class WeekWinner:
         if self.tiebreaker_3_unnecessary():
             self.players_won_tiebreak3 = None
             self.players_lost_tiebreak3 = None
+            return
 
         players = self.__get_players_to_use(tiebreaker_number=3)
         self.players_won_tiebreak3 = []

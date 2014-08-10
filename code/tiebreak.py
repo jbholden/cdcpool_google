@@ -1,13 +1,17 @@
 from week_winner import *
 from database import *
 from calculator import *
+from tiebreak_data import *
+import logging
 
 class Tiebreak:
 
     def __init__(self,year,week_number):
+        database = Database()
+
         self.__winners = WeekWinner(year,week_number)
         self.__week_data = database.load_week_data(year,week_number)
-        self.__calc = Calculator(self.__week_data)
+        self.__calc = CalculateResults(self.__week_data)
 
         self.__calculate_tiebreak_summary_details()
         self.__calculate_tiebreaker0_details()
@@ -49,13 +53,14 @@ class Tiebreak:
             d = TiebreakSummary()
             d.player_key = player_key
             d.player_name = self.__get_player_name(player_key)
-            details[player_key] = d
 
-            number_of_tiebreaks = 0
-            tiebreak0 = None
-            tiebreak1 = None
-            tiebreak2 = None
-            tiebreak3 = None
+            d.number_of_tiebreaks = 0
+            d.tiebreak0 = ""
+            d.tiebreak1 = ""
+            d.tiebreak2 = ""
+            d.tiebreak3 = ""
+
+            details[player_key] = d
 
         t0_players_won = self.__winners.get_players_that_won_tiebreak_0()
         t0_players_lost = self.__winners.get_players_that_lost_tiebreak_0()
@@ -66,106 +71,116 @@ class Tiebreak:
         t3_players_won = self.__winners.get_players_that_won_tiebreak_3()
         t3_players_lost = self.__winners.get_players_that_lost_tiebreak_3()
 
-        for player_key in t0_players_won:
-            result = self.__get_tiebreak_result("win")
-            css_id = self.__get_tiebreak_id(result)
+        if t0_players_won != None:
+            for player_key in t0_players_won:
+                result = self.__get_tiebreak_result("win")
+                css_id = self.__get_tiebreak_id(result)
 
-            details[player_key].tiebreak0 = result
-            details[player_key].tiebreak0_id = css_id
-            details[player_key].number_of_tiebreaks += 1
+                details[player_key].tiebreak0 = result
+                details[player_key].tiebreak0_id = css_id
+                details[player_key].number_of_tiebreaks += 1
 
-        for player_key in t0_players_lost:
-            result = self.__get_tiebreak_result("loss")
-            css_id = self.__get_tiebreak_id(result)
+        if t0_players_lost != None:
+            for player_key in t0_players_lost:
+                result = self.__get_tiebreak_result("loss")
+                css_id = self.__get_tiebreak_id(result)
 
-            details[player_key].tiebreak0 = result
-            details[player_key].tiebreak0_id = css_id
-            details[player_key].number_of_tiebreaks += 1
+                details[player_key].tiebreak0 = result
+                details[player_key].tiebreak0_id = css_id
+                details[player_key].number_of_tiebreaks += 1
 
 
-        for player_key in t1_players_won:
-            result = self.__get_tiebreak_result("win")
-            css_id = self.__get_tiebreak_id(result)
+        if t1_players_won != None:
+            for player_key in t1_players_won:
+                result = self.__get_tiebreak_result("win")
+                css_id = self.__get_tiebreak_id(result)
 
-            details[player_key].tiebreak1 = result
-            details[player_key].tiebreak1_id = css_id
-            details[player_key].number_of_tiebreaks += 1
+                details[player_key].tiebreak1 = result
+                details[player_key].tiebreak1_id = css_id
+                details[player_key].number_of_tiebreaks += 1
 
-        for player_key in t1_players_lost:
-            result = self.__get_tiebreak_result("loss")
-            css_id = self.__get_tiebreak_id(result)
+        if t1_players_lost != None:
+            for player_key in t1_players_lost:
+                result = self.__get_tiebreak_result("loss")
+                css_id = self.__get_tiebreak_id(result)
+    
+                details[player_key].tiebreak1 = result
+                details[player_key].tiebreak1_id = css_id
+                details[player_key].number_of_tiebreaks += 1
 
-            details[player_key].tiebreak1 = result
-            details[player_key].tiebreak1_id = css_id
-            details[player_key].number_of_tiebreaks += 1
+        if t2_players_won != None:
+            for player_key in t2_players_won:
+                result = self.__get_tiebreak_result("win")
+                css_id = self.__get_tiebreak_id(result)
+    
+                details[player_key].tiebreak2 = result
+                details[player_key].tiebreak2_id = css_id
+                details[player_key].number_of_tiebreaks += 1
 
-        for player_key in t2_players_won:
-            result = self.__get_tiebreak_result("win")
-            css_id = self.__get_tiebreak_id(result)
+        if t2_players_lost != None:
+            for player_key in t2_players_lost:
+                result = self.__get_tiebreak_result("loss")
+                css_id = self.__get_tiebreak_id(result)
+    
+                details[player_key].tiebreak2 = result
+                details[player_key].tiebreak2_id = css_id
+                details[player_key].number_of_tiebreaks += 1
 
-            details[player_key].tiebreak2 = result
-            details[player_key].tiebreak2_id = css_id
-            details[player_key].number_of_tiebreaks += 1
+        if t3_players_won != None:
+            for player_key in t3_players_won:
+                result = self.__get_tiebreak_result("win")
+                css_id = self.__get_tiebreak_id(result)
+    
+                details[player_key].tiebreak3 = result
+                details[player_key].tiebreak3_id = css_id
+                details[player_key].number_of_tiebreaks += 1
 
-        for player_key in t2_players_lost:
-            result = self.__get_tiebreak_result("loss")
-            css_id = self.__get_tiebreak_id(result)
-
-            details[player_key].tiebreak2 = result
-            details[player_key].tiebreak2_id = css_id
-            details[player_key].number_of_tiebreaks += 1
-
-        for player_key in t3_players_won:
-            result = self.__get_tiebreak_result("win")
-            css_id = self.__get_tiebreak_id(result)
-
-            details[player_key].tiebreak3 = result
-            details[player_key].tiebreak3_id = css_id
-            details[player_key].number_of_tiebreaks += 1
-
-        for player_key in t3_players_lost:
-            result = self.__get_tiebreak_result("loss")
-            css_id = self.__get_tiebreak_id(result)
-
-            details[player_key].tiebreak3 = result
-            details[player_key].tiebreak3_id = css_id
-            details[player_key].number_of_tiebreaks += 1
+        if t3_players_lost != None:
+            for player_key in t3_players_lost:
+                result = self.__get_tiebreak_result("loss")
+                css_id = self.__get_tiebreak_id(result)
+    
+                details[player_key].tiebreak3 = result
+                details[player_key].tiebreak3_id = css_id
+                details[player_key].number_of_tiebreaks += 1
 
         self.__tiebreak_summary = self.__sort_tiebreak_summary(details.values())
 
     def __calculate_tiebreaker0_details(self):
         details = []
 
-        players = self.__winners.get_players_that_won_tiebreak_0()
         winner_data = self.__winners.get_week_winner_data()
         featured_game_key = str(winner_data.featured_game.key())
 
-        for player_key in players:
-            result = self.__get_tiebreak_result("win")
-            css_id = self.__get_tiebreak_id(result)
-
-            d = Tiebreak0Data()
-            d.player_key = player_key
-            d.player_name = self.__get_player_name(player_key)
-            d.player_pick = self.__calc.get_team_name_player_picked_to_win(player_key,featured_game_key)
-            d.result = result
-            d.result_id = css_id
-            d.featured_game_winner = self.__get_featured_game_winner()
-            details.append(d)
+        players = self.__winners.get_players_that_won_tiebreak_0()
+        if players != None:
+            for player_key in players:
+                result = self.__get_tiebreak_result("win")
+                css_id = self.__get_tiebreak_id(result)
+    
+                d = Tiebreak0Data()
+                d.player_key = player_key
+                d.player_name = self.__get_player_name(player_key)
+                d.player_pick = self.__calc.get_team_name_player_picked_to_win(player_key,featured_game_key)
+                d.result = result
+                d.result_id = css_id
+                d.featured_game_winner = self.__get_featured_game_winner()
+                details.append(d)
 
         players = self.__winners.get_players_that_lost_tiebreak_0()
-        for player_key in players:
-            result = self.__get_tiebreak_result("loss")
-            css_id = self.__get_tiebreak_id(result)
-
-            d = Tiebreak0Data()
-            d.player_key = player_key
-            d.player_name = self.__get_player_name(player_key)
-            d.player_pick = self.__calc.get_team_name_player_picked_to_win(player_key,featured_game_key)
-            d.result = result
-            d.result_id = css_id
-            d.featured_game_winner = self.__get_featured_game_winner()
-            details.append(d)
+        if players != None:
+            for player_key in players:
+                result = self.__get_tiebreak_result("loss")
+                css_id = self.__get_tiebreak_id(result)
+    
+                d = Tiebreak0Data()
+                d.player_key = player_key
+                d.player_name = self.__get_player_name(player_key)
+                d.player_pick = self.__calc.get_team_name_player_picked_to_win(player_key,featured_game_key)
+                d.result = result
+                d.result_id = css_id
+                d.featured_game_winner = self.__get_featured_game_winner()
+                details.append(d)
 
         self.__tiebreak0_details = self.__sort_tiebreak0(details)
 
@@ -183,46 +198,46 @@ class Tiebreak:
         summary.result_spread = summary.team1_score - summary.team2_score
 
         players = self.__winners.get_players_that_won_tiebreak_1()
-
-        for player_key in players:
-            result = self.__get_tiebreak_result("win")
-            css_id = self.__get_tiebreak_id(result)
-
-            d = Tiebreak1Data()
-            d.player_key = player_key
-            d.player_name = self.__get_player_name(player_key)
-            d.result = result
-            d.result_id = css_id
-
-            pick = self.__calc.get_player_pick_for_game(player_key,featured_game_key)
-
-            d.team1_score = pick.team1_score
-            d.team2_score = pick.team2_score
-            d.pick_spread = pick.team1_score - pick.team2_score
-            d.difference = abs(d.pick_spread - summary.result_spread)
-
-            details.append(d)
+        if players != None:
+            for player_key in players:
+                result = self.__get_tiebreak_result("win")
+                css_id = self.__get_tiebreak_id(result)
+    
+                d = Tiebreak1Data()
+                d.player_key = player_key
+                d.player_name = self.__get_player_name(player_key)
+                d.result = result
+                d.result_id = css_id
+    
+                pick = self.__calc.get_player_pick_for_game(player_key,featured_game_key)
+    
+                d.team1_score = pick.team1_score
+                d.team2_score = pick.team2_score
+                d.pick_spread = pick.team1_score - pick.team2_score
+                d.difference = abs(d.pick_spread - summary.result_spread)
+    
+                details.append(d)
 
         players = self.__winners.get_players_that_lost_tiebreak_1()
+        if players != None:
+            for player_key in players:
+                result = self.__get_tiebreak_result("loss")
+                css_id = self.__get_tiebreak_id(result)
+    
+                d = Tiebreak1Data()
+                d.player_key = player_key
+                d.player_name = self.__get_player_name(player_key)
+                d.result = result
+                d.result_id = css_id
+        
+                pick = self.__calc.get_player_pick_for_game(player_key,featured_game_key)
 
-        for player_key in players:
-            result = self.__get_tiebreak_result("loss")
-            css_id = self.__get_tiebreak_id(result)
+                d.team1_score = pick.team1_score
+                d.team2_score = pick.team2_score
+                d.pick_spread = pick.team1_score - pick.team2_score
+                d.difference = abs(d.pick_spread - summary.result_spread)
 
-            d = Tiebreak1Data()
-            d.player_key = player_key
-            d.player_name = self.__get_player_name(player_key)
-            d.result = result
-            d.result_id = css_id
-
-            pick = self.__calc.get_player_pick_for_game(player_key,featured_game_key)
-
-            d.team1_score = pick.team1_score
-            d.team2_score = pick.team2_score
-            d.pick_spread = pick.team1_score - pick.team2_score
-            d.difference = abs(d.pick_spread - summary.result_spread)
-
-            details.append(d)
+                details.append(d)
 
         self.__tiebreak1_summary = summary
         self.__tiebreak1_details = self.__sort_tiebreak1(details)
@@ -241,46 +256,46 @@ class Tiebreak:
         summary.result_total = summary.team1_score + summary.team2_score
 
         players = self.__winners.get_players_that_won_tiebreak_2()
-
-        for player_key in players:
-            result = self.__get_tiebreak_result("win")
-            css_id = self.__get_tiebreak_id(result)
-
-            d = Tiebreak2Data()
-            d.player_key = player_key
-            d.player_name = self.__get_player_name(player_key)
-            d.result = result
-            d.result_id = css_id
-
-            pick = self.__calc.get_player_pick_for_game(player_key,featured_game_key)
-
-            d.team1_score = pick.team1_score
-            d.team2_score = pick.team2_score
-            d.pick_total = pick.team1_score + pick.team2_score
-            d.difference = abs(summary.result_total - d.pick_total)
-
-            details.append(d)
+        if players != None:
+            for player_key in players:
+                result = self.__get_tiebreak_result("win")
+                css_id = self.__get_tiebreak_id(result)
+    
+                d = Tiebreak2Data()
+                d.player_key = player_key
+                d.player_name = self.__get_player_name(player_key)
+                d.result = result
+                d.result_id = css_id
+    
+                pick = self.__calc.get_player_pick_for_game(player_key,featured_game_key)
+    
+                d.team1_score = pick.team1_score
+                d.team2_score = pick.team2_score
+                d.pick_total = pick.team1_score + pick.team2_score
+                d.difference = abs(summary.result_total - d.pick_total)
+    
+                details.append(d)
 
         players = self.__winners.get_players_that_lost_tiebreak_2()
+        if players != None:
+            for player_key in players:
+                result = self.__get_tiebreak_result("loss")
+                css_id = self.__get_tiebreak_id(result)
+    
+                d = Tiebreak2Data()
+                d.player_key = player_key
+                d.player_name = self.__get_player_name(player_key)
+                d.result = result
+                d.result_id = css_id
+    
+                pick = self.__calc.get_player_pick_for_game(player_key,featured_game_key)
+    
+                d.team1_score = pick.team1_score
+                d.team2_score = pick.team2_score
+                d.pick_total = pick.team1_score + pick.team2_score
+                d.difference = abs(summary.result_total - d.pick_total)
 
-        for player_key in players:
-            result = self.__get_tiebreak_result("loss")
-            css_id = self.__get_tiebreak_id(result)
-
-            d = Tiebreak2Data()
-            d.player_key = player_key
-            d.player_name = self.__get_player_name(player_key)
-            d.result = result
-            d.result_id = css_id
-
-            pick = self.__calc.get_player_pick_for_game(player_key,featured_game_key)
-
-            d.team1_score = pick.team1_score
-            d.team2_score = pick.team2_score
-            d.pick_total = pick.team1_score + pick.team2_score
-            d.difference = abs(summary.result_total - d.pick_total)
-
-            details.append(d)
+                details.append(d)
 
         self.__tiebreak2_summary = summary
         self.__tiebreak2_details = self.__sort_tiebreak2(details)
@@ -292,30 +307,32 @@ class Tiebreak:
         summary.valid = self.__winners.is_tiebreaker_3_valid()
 
         players = self.__winners.get_players_that_won_tiebreak_3()
-        for player_key in players:
-            result = self.__get_tiebreak_result("win")
-            css_id = self.__get_tiebreak_id(result)
-
-            d = Tiebreak3Data()
-            d.player_key = player_key
-            d.player_name = self.__get_player_name(player_key)
-            d.result = result
-            d.result_id = css_id
-            d.pick_entry_time = self.__get_player_submit_time(player_key)
-            details.append(d)
+        if players != None:
+            for player_key in players:
+                result = self.__get_tiebreak_result("win")
+                css_id = self.__get_tiebreak_id(result)
+    
+                d = Tiebreak3Data()
+                d.player_key = player_key
+                d.player_name = self.__get_player_name(player_key)
+                d.result = result
+                d.result_id = css_id
+                d.pick_entry_time = self.__get_player_submit_time(player_key)
+                details.append(d)
 
         players = self.__winners.get_players_that_lost_tiebreak_3()
-        for player_key in players:
-            result = self.__get_tiebreak_result("loss")
-            css_id = self.__get_tiebreak_id(result)
+        if players != None:
+            for player_key in players:
+                result = self.__get_tiebreak_result("loss")
+                css_id = self.__get_tiebreak_id(result)
 
-            d = Tiebreak3Data()
-            d.player_key = player_key
-            d.player_name = self.__get_player_name(player_key)
-            d.result = result
-            d.result_id = css_id
-            d.pick_entry_time = self.__get_player_submit_time(player_key)
-            details.append(d)
+                d = Tiebreak3Data()
+                d.player_key = player_key
+                d.player_name = self.__get_player_name(player_key)
+                d.result = result
+                d.result_id = css_id
+                d.pick_entry_time = self.__get_player_submit_time(player_key)
+                details.append(d)
 
         self.__tiebreak3_summary = summary
         self.__tiebreak3_details = self.__sort_tiebreak3(details)
@@ -368,6 +385,7 @@ class Tiebreak:
     def __get_featured_game_winner(self):
         winner_data = self.__winners.get_week_winner_data()
         featured_game = winner_data.featured_game
+        featured_game_key = str(winner_data.featured_game.key())
 
         if featured_game.state == "not_started":
             return ""
@@ -389,11 +407,47 @@ class Tiebreak:
 
         return pick_entry_time.strftime("%m/%d/%y %I:%M:%S %p UTC")
 
+    def __ahead_or_won(self,value):
+        return value == "ahead" or value == "won"
+
+    def __behind_or_lost(self,value):
+        return value == "behind" or value == "lost"
+
+    def __sort_by_number_of_tiebreaks_then_win_loss(self,item):
+        if item.number_of_tiebreaks == 0:
+            return 0
+
+        if item.number_of_tiebreaks == 1:
+            if self.__ahead_or_won(item.tiebreak0):
+                return 2
+            else:
+                return 1
+
+        if item.number_of_tiebreaks == 2:
+            if self.__ahead_or_won(item.tiebreak1):
+                return 4
+            else:
+                return 3
+
+        if item.number_of_tiebreaks == 3:
+            if self.__ahead_or_won(item.tiebreak2):
+                return 6
+            else:
+                return 5
+
+        if item.number_of_tiebreaks == 4:
+            if self.__ahead_or_won(item.tiebreak3):
+                return 8
+            else:
+                return 7
+
+        raise AssertionError, "unexpected number of tiebreaks"
+
     def __sort_tiebreak_summary(self,summary):
+        # this will sort the data so that it appears in the following order:
+        # number of tiebreaks, then "won" or "ahead", then "lost" or "behind"
         sort_by_name = sorted(summary,key=lambda item:item.player_name)
-        sort_by_wins = sorted(sort_by_name,key=lambda item:item.result == "won",reverse=True)
-        sort_by_ahead = sorted(sort_by_wins,key=lambda item:item.result == "ahead",reverse=True)
-        sort_by_tie = sorted(sort_by_ahead,key=lambda item:item.number_of_tiebreaks,reverse=True)
+        sort_by_tie = sorted(sort_by_name,key=lambda item:self.__sort_by_number_of_tiebreaks_then_win_loss(item),reverse=True)
         return sort_by_tie
 
     def __sort_tiebreak0(self,details):

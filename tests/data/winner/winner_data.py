@@ -12,7 +12,7 @@ class WinnerData(ResultTestData):
         self.featured_game_state('not_started')
         self.number_of_leaders(0)
         self.number_of_players(0)
-        self.tiebreaker_winner(0)
+        self.tiebreaker_winner(None)
         self.week_official()
         self.game_data = dict()
         ResultTestData.__init__(self,year=year,week_number=week_number,data_name=data_name,leave_objects_in_datastore=leave_objects_in_datastore)
@@ -171,13 +171,13 @@ class WinnerData(ResultTestData):
         win_or_lose = random.choice(["win","lose"])
         self.__create_pick(player_name,game_number,win_or_lose)
 
-    def __create_winning_pick(self,player_name,game_number):
-        self.__create_pick(player_name,game_number,"win")
+    def __create_winning_pick(self,player_name,game_number,win_tiebreak=None):
+        self.__create_pick(player_name,game_number,"win",win_tiebreak)
 
     def __create_losing_pick(self,player_name,game_number):
         self.__create_pick(player_name,game_number,"lose")
 
-    def __create_pick(self,player_name,game_number,win_or_lose):
+    def __create_pick(self,player_name,game_number,win_or_lose,win_tiebreak=None):
         game = self.game_data[game_number]
 
         p = Pick(parent=root_picks(self.year,self.week_number))
@@ -187,8 +187,7 @@ class WinnerData(ResultTestData):
             p.winner = self.__get_game_loser(game)
 
         if game_number == 10:
-            p.team1_score = random.randint(0,50)
-            p.team2_score = random.randint(0,50)
+            p.team1_score,p.team2_score = self.__featured_game_pick_score(game,win_tiebreak)
         else:
             p.team1_score = None
             p.team2_score = None
@@ -199,21 +198,25 @@ class WinnerData(ResultTestData):
     def __setup_leaders_and_non_leaders(self):
         winners,losers = self.__get_winners_and_losers()
 
-        # pick a random winner if week is official
-        if self.__week_official:
+        # pick a winner
+        if self.__week_official or self.__tiebreak != None:
             names = list(winners)
             random_winner_name = random.choice(names)
             random_winner_key = str(self.players[random_winner_name])
+
+        if self.__week_official:
             self.setup_week(winner=random_winner_key)
         else:
             self.setup_week()
 
-        leading_wins = random.randint(5,10)
+        leading_wins = random.randint(5,9)
 
         for player_name in winners:
-            games_to_win,games_to_lose = self.__get_games_to_win_and_lose(leading_wins)
+            featured_game_result = self.__get_featured_game_expected_result(player_name,random_winner_name)
+            games_to_win,games_to_lose = self.__get_games_to_win_and_lose(leading_wins,featured_game_result)
             for game_number in games_to_win:
-                self.__create_winning_pick(player_name,game_number)
+                should_player_win_tiebreak = player_name == random_winner_name
+                self.__create_winning_pick(player_name,game_number,should_player_win_tiebreak)
             for game_number in games_to_lose:
                 self.__create_losing_pick(player_name,game_number)
 
@@ -226,11 +229,27 @@ class WinnerData(ResultTestData):
                 self.__create_losing_pick(player_name,game_number)
 
 
-    def __get_games_to_win_and_lose(self,num_wins):
-        game_numbers = range(1,11)
-        random.shuffle(game_numbers)
-        wins = game_numbers[:num_wins]
-        losses = game_numbers[num_wins:]
+    def __get_games_to_win_and_lose(self,num_wins,featured_game_result=None):
+        if featured_game_result == "win":
+            assert num_wins > 1
+            game_numbers = range(1,10)
+            random.shuffle(game_numbers)
+            game_numbers.insert(0,10)  # place feature game at front to ensure a win
+            wins = game_numbers[:num_wins]
+            losses = game_numbers[num_wins:]
+        elif featured_game_result == "loss":
+            assert num_wins < 10,"num wins = %d" % (num_wins)
+            game_numbers = range(1,10)
+            random.shuffle(game_numbers)
+            game_numbers.append(10)  # place feature game at back to ensure a loss
+            wins = game_numbers[:num_wins]
+            losses = game_numbers[num_wins:]
+        else:
+            game_numbers = range(1,11)
+            random.shuffle(game_numbers)
+            wins = game_numbers[:num_wins]
+            losses = game_numbers[num_wins:]
+
         return wins,losses
 
     def __get_game_winner(self,game):
@@ -270,3 +289,63 @@ class WinnerData(ResultTestData):
         else:
             raise AssertionError,"game.favored has an invalid value"
         return score_diff > spread
+
+    def __get_featured_game_expected_result(self,player_name,winner_name):
+        assert self.__tiebreak != None and self.__tiebreak <= 3 and self.__tiebreak >= 0
+
+        if self.__tiebreak == None:
+            return None
+
+        # ensure that tiebreak 0 wins (1 player chooses featured game correctly)
+        if self.__tiebreak == 0:
+            if player_name == winner_name:
+                return "win"
+            else:
+                return "loss"
+
+        # all other tiebreaks, return a win to advance to next tiebreak
+        return "win"
+
+    def __featured_game_pick_score(self,game,win_tiebreak):
+        assert self.__tiebreak != None and self.__tiebreak <= 3 and self.__tiebreak >= 0
+
+        tiebreak_does_not_matter = win_tiebreak == None
+        if tiebreak_does_not_matter or self.__tiebreak == 0:
+            team1_score = random.randint(0,50)
+            team2_score = random.randint(0,50)
+            return team1_score,team2_score
+
+        result_spread = game.team1_score - game.team2_score
+        result_total = game.team1_score + game.team2_score
+
+        if self.__tiebreak == 1:
+            team2_score = random.randint(0,50)
+
+            if win_tiebreak:
+                team1_score = team2_score + result_spread
+            else:
+                team1_score = team2_score + result_spread + random.randint(1,20)
+
+            return team1_score,team2_score
+
+        if self.__tiebreak == 2:
+            team1_score = 10
+            team2_score = 0
+            total_difference = abs(result_total - team1_score - team2_score)
+            spread_difference = abs(team1_score - team2_score - result_spread)
+
+            if not win_tiebreak:
+                diff = 0
+                i = 0
+                while diff < total_difference:
+                    team2_score = random.randint(10,50)
+                    team1_score = team2_score + spread_difference
+                    diff = abs(result_total - team1_score - team2_score)
+                    i += 1
+                    if i > 50:
+                        raise AssertionError,"Error could not find a score"
+
+            return team1_score,team2_score
+
+
+

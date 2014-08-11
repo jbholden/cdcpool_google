@@ -72,10 +72,30 @@ class WeekResultsPage(Handler):
             return True
         return week_number not in weeks_in_year
 
+    def __find_player_id(self,player_id,data):
+        for i,item in enumerate(data):
+            if player_id == item.player_id:
+                return i
+        raise AssertionError
+
+    def __move_winner_to_top(self,sorted_data,results):
+        for result in results:
+            if result.winner != None and result.winner != "":
+                index = self.__find_player_id(result.player_id,sorted_data)
+                item = sorted_data.pop(index)
+                sorted_data.insert(0,item)
+
+    def __move_winner_to_bottom(self,sorted_data,results):
+        for result in results:
+            if result.winner != None and result.winner != "":
+                index = self.__find_player_id(result.player_id,sorted_data)
+                item = sorted_data.pop(index)
+                sorted_data.append(item)
 
     def __sort_by_wins(self,results,winner_info,escape=True):
         sorted_by_players = sorted(results,key=lambda result:result.player_name)
         sorted_by_wins = sorted(sorted_by_players,key=lambda result:result.rank)
+        self.__move_winner_to_top(sorted_by_wins,results)
         highlight = self.__highlight_column('wins')
         content = self.render_str(self.__render_file,results=sorted_by_wins,winner=winner_info,**highlight)
         if escape:
@@ -86,6 +106,7 @@ class WeekResultsPage(Handler):
     def __sort_by_wins_reversed(self,results,winner_info):
         sorted_by_players = sorted(results,key=lambda result:result.player_name,reverse=True)
         sorted_by_wins = sorted(sorted_by_players,key=lambda result:result.rank,reverse=True)
+        self.__move_winner_to_bottom(sorted_by_wins,results)
         highlight = self.__highlight_column('wins')
         content = self.render_str(self.__render_file,results=sorted_by_wins,winner=winner_info,**highlight)
         html_str = escape_string(content)

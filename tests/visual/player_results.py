@@ -165,12 +165,15 @@ class BadWeekNumberPlayerResultsTest(VisualTest):
     def __get_a_valid_player_id(self,year):
         d = Database()
         players = d.load_players(year)
+        if players == None:
+            return 99999
         player = players.values()[0]
         return player.key().id()
 
     def __verify_instructions(self):
         v = []
         v.append('you should get an error page')
+        v.append('Note:  players for 2013 should be loaded in database')
         return v
 
 class BadPlayerPlayerResultsTest(VisualTest):

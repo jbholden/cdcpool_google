@@ -74,7 +74,8 @@ class WeekResultsPage(Handler):
 
 
     def __sort_by_wins(self,results,winner_info,escape=True):
-        sorted_by_wins = sorted(results,key=lambda result:result.rank)
+        sorted_by_players = sorted(results,key=lambda result:result.player_name)
+        sorted_by_wins = sorted(sorted_by_players,key=lambda result:result.rank)
         highlight = self.__highlight_column('wins')
         content = self.render_str(self.__render_file,results=sorted_by_wins,winner=winner_info,**highlight)
         if escape:
@@ -83,21 +84,24 @@ class WeekResultsPage(Handler):
         return content
 
     def __sort_by_wins_reversed(self,results,winner_info):
-        sorted_by_wins = sorted(results,key=lambda result:result.rank,reverse=True)
+        sorted_by_players = sorted(results,key=lambda result:result.player_name,reverse=True)
+        sorted_by_wins = sorted(sorted_by_players,key=lambda result:result.rank,reverse=True)
         highlight = self.__highlight_column('wins')
         content = self.render_str(self.__render_file,results=sorted_by_wins,winner=winner_info,**highlight)
         html_str = escape_string(content)
         return compress_html(html_str)
 
     def __sort_by_losses(self,results,winner_info):
-        sorted_by_losses = sorted(results,key=lambda result:result.rank,reverse=True)
+        sorted_by_players = sorted(results,key=lambda result:result.player_name,reverse=False)
+        sorted_by_losses = sorted(sorted_by_players,key=lambda result:result.rank,reverse=True)
         highlight = self.__highlight_column('losses')
         content = self.render_str(self.__render_file,results=sorted_by_losses,winner=winner_info,**highlight)
         html_str = escape_string(content)
         return compress_html(html_str)
 
     def __sort_by_losses_reversed(self,results,winner_info):
-        sorted_by_losses = sorted(results,key=lambda result:result.rank)
+        sorted_by_players = sorted(results,key=lambda result:result.player_name,reverse=True)
+        sorted_by_losses = sorted(sorted_by_players,key=lambda result:result.rank)
         highlight = self.__highlight_column('losses')
         content = self.render_str(self.__render_file,results=sorted_by_losses,winner=winner_info,**highlight)
         html_str = escape_string(content)
@@ -118,13 +122,15 @@ class WeekResultsPage(Handler):
         return compress_html(html_str)
 
     def __sort_by_projected_wins(self,results,winner_info):
-        sorted_by_wins = sorted(results,key=lambda result:result.projected_rank)
+        sorted_by_players = sorted(results,key=lambda result:result.player_name,reverse=False)
+        sorted_by_wins = sorted(sorted_by_players,key=lambda result:result.projected_rank)
         highlight = self.__highlight_column('projected_wins')
         content = self.render_str(self.__render_file,results=sorted_by_wins,use_projected_rank=True,winner=winner_info,**highlight)
         html_str = escape_string(content)
         return compress_html(html_str)
 
     def __sort_by_projected_wins_reversed(self,results,winner_info):
+        sorted_by_players = sorted(sorted_by_players,key=lambda result:result.player_name,reverse=True)
         sorted_by_wins = sorted(results,key=lambda result:result.projected_rank,reverse=True)
         highlight = self.__highlight_column('projected_wins')
         content = self.render_str(self.__render_file,results=sorted_by_wins,use_projected_rank=True,winner=winner_info,**highlight)
@@ -132,14 +138,16 @@ class WeekResultsPage(Handler):
         return compress_html(html_str)
 
     def __sort_by_possible_wins(self,results,winner_info):
-        sorted_by_wins = sorted(results,key=lambda result:result.possible_wins,reverse=True)
+        sorted_by_players = sorted(results,key=lambda result:result.player_name,reverse=False)
+        sorted_by_wins = sorted(sorted_by_players,key=lambda result:result.possible_wins,reverse=True)
         highlight = self.__highlight_column('possible_wins')
         content = self.render_str(self.__render_file,results=sorted_by_wins,winner=winner_info,**highlight)
         html_str = escape_string(content)
         return compress_html(html_str)
 
     def __sort_by_possible_wins_reversed(self,results,winner_info):
-        sorted_by_wins = sorted(results,key=lambda result:result.possible_wins)
+        sorted_by_players = sorted(results,key=lambda result:result.player_name,reverse=True)
+        sorted_by_wins = sorted(sorted_by_players,key=lambda result:result.possible_wins)
         highlight = self.__highlight_column('possible_wins')
         content = self.render_str(self.__render_file,results=sorted_by_wins,winner=winner_info,**highlight)
         html_str = escape_string(content)

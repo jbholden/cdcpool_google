@@ -137,6 +137,7 @@ class ResultTestData:
         database = Database()
         self.teams = database.load_teams('teams')
         self.team_keys = self.teams.keys()
+        self.team_lookup = database.load_teams('teamkeys')
 
     def __get_player_id(self,player_name):
         player_key = self.weekdata.get_player_key(player_name)

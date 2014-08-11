@@ -34,6 +34,7 @@ class WeekWinner:
 
     def __init__(self,year,week_number):
         self.__data = self.__setup_data_to_use(year,week_number)
+
         if self.__data.week_state == "in_progress":
             self.use_projected_winner = True
         else:
@@ -295,7 +296,9 @@ class WeekWinner:
                 self.players_lost_tiebreak3.append(player_key)
 
     def tiebreaker_0_unnecessary(self):
-        return len(self.players_tied_for_first) == 1
+        return self.__data.week_state == "not_started" or \
+               self.__data.featured_game_state == "not_started" or \
+               len(self.players_tied_for_first) == 1
 
     def tiebreaker_1_unnecessary(self):
         one_player_won_tiebreak0 = self.players_won_tiebreak0 != None and len(self.players_won_tiebreak0) == 1

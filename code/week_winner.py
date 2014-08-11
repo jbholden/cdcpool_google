@@ -297,7 +297,7 @@ class WeekWinner:
 
     def tiebreaker_0_unnecessary(self):
         return self.__data.week_state == "not_started" or \
-               self.__data.featured_game_state == "not_started" or \
+               self.__data.featured_game.state == "not_started" or \
                len(self.players_tied_for_first) == 1
 
     def tiebreaker_1_unnecessary(self):

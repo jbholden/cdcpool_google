@@ -165,7 +165,7 @@ class BadWeekNumberPlayerResultsTest(VisualTest):
     def __get_a_valid_player_id(self,year):
         d = Database()
         players = d.load_players(year)
-        if players == None:
+        if players == None or len(players) < 1:
             return 99999
         player = players.values()[0]
         return player.key().id()

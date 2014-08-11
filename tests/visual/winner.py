@@ -32,24 +32,48 @@ from tests.data.winner.winner_data import *
 class WFO_L1_Test(VisualTest):
     def __init__(self):
         self.description = "Week Final, Official, Only 1 Leader"
-        self.link = "TBD"
+        self.link = "/1984/week/2/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
         v.append('TBD')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1984,2,"wfo_l1",leave_objects_in_datastore=True)
+        testdata.set_week_state("final")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(1)
+        testdata.week_official()
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1984,2,"wfo_l1",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
 
 class WFO_L5_Test(VisualTest):
     def __init__(self):
         self.description = "Week Final, Official, 5 Leaders Tied for First"
-        self.link = "TBD"
+        self.link = "/1984/week/3/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
         v.append('TBD')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1984,3,"wfo_l5",leave_objects_in_datastore=True)
+        testdata.set_week_state("final")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(5)
+        testdata.week_official()
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1984,3,"wfo_l5",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
 
 class WFU_L1_Test(VisualTest):
     def __init__(self):

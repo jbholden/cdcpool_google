@@ -62,3 +62,4 @@ class Tiebreak3Data:
     result_id = None
     result = None
     pick_entry_time = None
+    pick_entry_datetime = None

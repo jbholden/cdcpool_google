@@ -317,7 +317,11 @@ class Tiebreak:
                 d.player_name = self.__get_player_name(player_key)
                 d.result = result
                 d.result_id = css_id
-                d.pick_entry_time = self.__get_player_submit_time(player_key)
+
+                datetime_value,date_as_string = self.__get_player_submit_time(player_key)
+                d.pick_entry_time = date_as_string
+                d.pick_entry_datetime = datetime_value
+
                 details.append(d)
 
         players = self.__winners.get_players_that_lost_tiebreak_3()
@@ -331,7 +335,11 @@ class Tiebreak:
                 d.player_name = self.__get_player_name(player_key)
                 d.result = result
                 d.result_id = css_id
-                d.pick_entry_time = self.__get_player_submit_time(player_key)
+
+                datetime_value,date_as_string = self.__get_player_submit_time(player_key)
+                d.pick_entry_time = date_as_string
+                d.pick_entry_datetime = datetime_value
+
                 details.append(d)
 
         self.__tiebreak3_summary = summary
@@ -403,9 +411,9 @@ class Tiebreak:
         pick_entry_time = winner_data.player_submit_times[player_key]
 
         if pick_entry_time == None:
-            return "indeterminate"
+            return pick_entry_time,"indeterminate"
 
-        return pick_entry_time.strftime("%m/%d/%y %I:%M:%S %p UTC")
+        return pick_entry_time,pick_entry_time.strftime("%m/%d/%y %I:%M:%S %p UTC")
 
     def __ahead_or_won(self,value):
         return value == "ahead" or value == "won"
@@ -468,7 +476,7 @@ class Tiebreak:
 
     def __sort_tiebreak3(self,details):
         sort_by_name = sorted(details,key=lambda item:item.player_name)
-        sort_by_submit_time = sorted(sort_by_name,key=lambda item:item.pick_entry_time)
+        sort_by_submit_time = sorted(sort_by_name,key=lambda item:item.pick_entry_datetime)
         move_none_to_end = sorted(sort_by_submit_time,key=lambda item:item != None,reverse=True)
         return move_none_to_end
 

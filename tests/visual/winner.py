@@ -28,6 +28,7 @@ from tests.data.winner.winner_data import *
 #   TB1 = tiebreaker 1 determines the winner
 #   TB2 = tiebreaker 2 determines the winner
 #   TB3 = tiebreaker 3 determines the winner
+#   TB3I = tiebreaker 3 determines the winner but not enough data to determine winner (indeterminate)
 
 class WFO_L1_Test(VisualTest):
     def __init__(self):
@@ -143,7 +144,7 @@ class WFU_L5_TB1_Test(VisualTest):
         v.append('Note:  teams from 2013 needs to be loaded')
         v.append('There should be only 5 leaders tied for first.')
         v.append('One leader should be the unofficial winner.')
-        v.append('The winner should win because of tiebreak 0')
+        v.append('The winner should win because of tiebreak 1')
         v.append('The unofficial winner should be listed first')
         return v
 
@@ -163,24 +164,88 @@ class WFU_L5_TB1_Test(VisualTest):
 class WFU_L5_TB2_Test(VisualTest):
     def __init__(self):
         self.description = "Week Final, Unofficial, 5 Leaders Tied for First, Tiebreak 2 decides"
-        self.link = "TBD"
+        self.link = "/1984/week/7/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
-        v.append('TBD')
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be only 5 leaders tied for first.')
+        v.append('One leader should be the unofficial winner.')
+        v.append('The winner should win because of tiebreak 2')
+        v.append('The unofficial winner should be listed first')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1984,7,"wfu_l5_tb2",leave_objects_in_datastore=True)
+        testdata.set_week_state("final")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(5)
+        testdata.week_unofficial()
+        testdata.tiebreaker_winner(2)
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1984,7,"wfu_l5_tb2",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
 
 class WFU_L5_TB3_Test(VisualTest):
     def __init__(self):
         self.description = "Week Final, Unofficial, 5 Leaders Tied for First, Tiebreak 3 decides"
-        self.link = "TBD"
+        self.link = "/1984/week/8/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
-        v.append('TBD')
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be only 5 leaders tied for first.')
+        v.append('One leader should be the unofficial winner.')
+        v.append('The winner should win because of tiebreak 3')
+        v.append('The unofficial winner should be listed first')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1984,8,"wfu_l5_tb3",leave_objects_in_datastore=True)
+        testdata.set_week_state("final")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(5)
+        testdata.week_unofficial()
+        testdata.tiebreaker_winner(3)
+        testdata.make_tiebreak3_valid()
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1984,8,"wfu_l5_tb3",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
+
+class WFU_L5_TB3I_Test(VisualTest):
+    def __init__(self):
+        self.description = "Week Final, Unofficial, 5 Leaders Tied for First, Tiebreak 3 decides but indeterminate"
+        self.link = "/1984/week/9/results"
+        self.verify =  self.__verify_instructions()
+
+    def __verify_instructions(self):
+        v = []
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be only 5 leaders tied for first.')
+        v.append('Multiple winners are possible')
+        v.append('Should be unable to determine winner using tiebreak 3')
+        return v
+
+    def setup(self):
+        testdata = WinnerData(1984,9,"wfu_l5_tb3_indeterminate",leave_objects_in_datastore=True)
+        testdata.set_week_state("final")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(5)
+        testdata.week_unofficial()
+        testdata.tiebreaker_winner(3)
+        testdata.make_tiebreak3_indeterminate()
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1984,8,"wfu_l5_tb3_indeterminate",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
+
 
 class WIP_FGF_L1_Test(VisualTest):
     def __init__(self):

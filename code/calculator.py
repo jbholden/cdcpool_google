@@ -457,9 +457,9 @@ class CalculateResults:
         if picks_entered_after_pick_deadline:
             return True
 
-        submit_time_in_wrong_year = submit_time.year != week.year
-        if submit_time_in_wrong_year:
-            return True
+        #submit_time_in_wrong_year = submit_time.year != week.year
+        #if submit_time_in_wrong_year:
+            #return True
 
         return False
 

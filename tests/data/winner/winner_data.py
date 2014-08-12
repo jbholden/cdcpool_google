@@ -13,6 +13,7 @@ class WinnerData(ResultTestData):
         self.number_of_leaders(0)
         self.number_of_players(0)
         self.tiebreaker_winner(None)
+        self.make_tiebreak3_valid()
         self.week_official()
         self.game_data = dict()
         ResultTestData.__init__(self,year=year,week_number=week_number,data_name=data_name,leave_objects_in_datastore=leave_objects_in_datastore)
@@ -37,6 +38,12 @@ class WinnerData(ResultTestData):
 
     def tiebreaker_winner(self,tiebreak_number):
         self.__tiebreak = tiebreak_number
+
+    def make_tiebreak3_indeterminate(self):
+        self.__tiebreak3_indeterminate = True
+
+    def make_tiebreak3_valid(self):
+        self.__tiebreak3_indeterminate = False
 
     def setup_database(self):
         self.__setup_players()
@@ -207,7 +214,11 @@ class WinnerData(ResultTestData):
         if self.__week_official:
             self.setup_week(winner=random_winner_key)
         else:
-            self.setup_week()
+            if self.__tiebreak3_indeterminate:
+                lock_picks = None
+            else:
+                lock_picks = datetime.datetime.now() + datetime.timedelta(days=1)
+            self.setup_week(lock_picks=lock_picks)
 
         leading_wins = random.randint(5,9)
 
@@ -329,22 +340,19 @@ class WinnerData(ResultTestData):
             return team1_score,team2_score
 
         if self.__tiebreak == 2:
-            team1_score = 10
-            team2_score = 0
-            total_difference = abs(result_total - team1_score - team2_score)
-            spread_difference = abs(team1_score - team2_score - result_spread)
+            if win_tiebreak:
+                team1_score = game.team1_score
+                team2_score = game.team2_score
+            else:
+                increase = random.randint(1,10)
+                team1_score = game.team1_score+increase
+                team2_score = game.team2_score+increase
 
-            if not win_tiebreak:
-                diff = 0
-                i = 0
-                while diff < total_difference:
-                    team2_score = random.randint(10,50)
-                    team1_score = team2_score + spread_difference
-                    diff = abs(result_total - team1_score - team2_score)
-                    i += 1
-                    if i > 50:
-                        raise AssertionError,"Error could not find a score"
+            return team1_score,team2_score
 
+        if self.__tiebreak == 3:
+            team1_score = game.team1_score
+            team2_score = game.team2_score
             return team1_score,team2_score
 
 

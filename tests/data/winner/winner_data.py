@@ -53,6 +53,8 @@ class WinnerData(ResultTestData):
             self.__setup_week_not_started()
         elif self.__week_state == "final":
             self.__setup_week_final()
+        elif self.__week_state == "in_progress":
+            self.__setup_week_in_progress()
 
     # defined in result_test_data
     #def cleanup(self):
@@ -83,6 +85,20 @@ class WinnerData(ResultTestData):
             self.__setup_random_game(game_number,"final")
 
         self.__setup_leaders_and_non_leaders()
+
+    def __setup_week_in_progress(self,seed=555):
+        random.seed(seed)
+        self.week_unofficial()
+
+        self.__setup_random_game(1,"in_progress")
+
+        for game_number in range(2,10):
+            state = random.choice(["in_progress","final"])
+            self.__setup_random_game(game_number,state)
+
+        self.__setup_random_game(10,self.__featured_state)
+        self.__setup_leaders_and_non_leaders()
+
 
     def __setup_game_teams(self):
         game_team_names = dict()
@@ -188,7 +204,9 @@ class WinnerData(ResultTestData):
         game = self.game_data[game_number]
 
         p = Pick(parent=root_picks(self.year,self.week_number))
-        if win_or_lose == "win":
+        if game.state == "not_started":
+            p.winner = "team1"
+        elif win_or_lose == "win":
             p.winner = self.__get_game_winner(game)
         else:
             p.winner = self.__get_game_loser(game)
@@ -206,10 +224,9 @@ class WinnerData(ResultTestData):
         winners,losers = self.__get_winners_and_losers()
 
         # pick a winner
-        if self.__week_official or self.__tiebreak != None:
-            names = list(winners)
-            random_winner_name = random.choice(names)
-            random_winner_key = str(self.players[random_winner_name])
+        names = list(winners)
+        random_winner_name = random.choice(names)
+        random_winner_key = str(self.players[random_winner_name])
 
         if self.__week_official:
             self.setup_week(winner=random_winner_key)
@@ -224,20 +241,24 @@ class WinnerData(ResultTestData):
 
         for player_name in winners:
             featured_game_result = self.__get_featured_game_expected_result(player_name,random_winner_name)
-            games_to_win,games_to_lose = self.__get_games_to_win_and_lose(leading_wins,featured_game_result)
+            games_to_win,games_to_lose,not_started = self.__get_games_to_win_and_lose(leading_wins,featured_game_result)
             for game_number in games_to_win:
                 should_player_win_tiebreak = player_name == random_winner_name
                 self.__create_winning_pick(player_name,game_number,should_player_win_tiebreak)
             for game_number in games_to_lose:
                 self.__create_losing_pick(player_name,game_number)
+            for game_number in not_started:
+                self.__create_random_pick(player_name,game_number)
 
         for player_name in losers:
             num_wins = random.randint(0,leading_wins-1)
-            games_to_win,games_to_lose = self.__get_games_to_win_and_lose(num_wins)
+            games_to_win,games_to_lose,not_started = self.__get_games_to_win_and_lose(num_wins)
             for game_number in games_to_win:
                 self.__create_winning_pick(player_name,game_number)
             for game_number in games_to_lose:
                 self.__create_losing_pick(player_name,game_number)
+            for game_number in not_started:
+                self.__create_random_pick(player_name,game_number)
 
 
     def __get_games_to_win_and_lose(self,num_wins,featured_game_result=None):
@@ -248,6 +269,7 @@ class WinnerData(ResultTestData):
             game_numbers.insert(0,10)  # place feature game at front to ensure a win
             wins = game_numbers[:num_wins]
             losses = game_numbers[num_wins:]
+            not_started = []
         elif featured_game_result == "loss":
             assert num_wins < 10,"num wins = %d" % (num_wins)
             game_numbers = range(1,10)
@@ -255,13 +277,21 @@ class WinnerData(ResultTestData):
             game_numbers.append(10)  # place feature game at back to ensure a loss
             wins = game_numbers[:num_wins]
             losses = game_numbers[num_wins:]
+            not_started = []
+        elif featured_game_result == "not_started":
+            game_numbers = range(1,10)
+            random.shuffle(game_numbers)
+            wins = game_numbers[:num_wins]
+            losses = game_numbers[num_wins:]
+            not_started = [10]
         else:
             game_numbers = range(1,11)
             random.shuffle(game_numbers)
             wins = game_numbers[:num_wins]
             losses = game_numbers[num_wins:]
+            not_started = []
 
-        return wins,losses
+        return wins,losses,not_started
 
     def __get_game_winner(self,game):
         if self.__is_team1_winning(game):
@@ -302,7 +332,10 @@ class WinnerData(ResultTestData):
         return score_diff > spread
 
     def __get_featured_game_expected_result(self,player_name,winner_name):
-        assert self.__tiebreak != None and self.__tiebreak <= 3 and self.__tiebreak >= 0
+        assert self.__tiebreak == None or (self.__tiebreak <= 3 and self.__tiebreak >= 0)
+
+        if self.__featured_state == "not_started":
+            return "not_started"
 
         if self.__tiebreak == None:
             return None
@@ -318,9 +351,9 @@ class WinnerData(ResultTestData):
         return "win"
 
     def __featured_game_pick_score(self,game,win_tiebreak):
-        assert self.__tiebreak != None and self.__tiebreak <= 3 and self.__tiebreak >= 0
+        assert self.__tiebreak == None or (self.__tiebreak <= 3 and self.__tiebreak >= 0)
 
-        tiebreak_does_not_matter = win_tiebreak == None
+        tiebreak_does_not_matter = self.__tiebreak == None or win_tiebreak == None
         if tiebreak_does_not_matter or self.__tiebreak == 0:
             team1_score = random.randint(0,50)
             team2_score = random.randint(0,50)

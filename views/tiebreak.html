@@ -8,6 +8,12 @@
 {% endblock %}
 
 {% block content %}
+  {% if featured_game_state == "not_started" %}    
+        <div>The featured game has not started yet.</div>
+  {% else %}
+    {% if tiebreaker_required == False %}
+        <div>No tiebreaker is required.</div><br>
+    {% endif %}
     <table class="tiebreaker-title">
         <tr>
             <td id="tiebreaker-number">Summary</td>
@@ -46,4 +52,5 @@
     {% if tiebreaker3_valid %}
         {% include "tiebreaker3.html" %}
     {% endif %}
+  {% endif %}
 {% endblock %}

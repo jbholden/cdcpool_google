@@ -35,6 +35,7 @@ class TiebreakPage(Handler):
         params['tiebreaker1_summary'] = tiebreak.get_tiebreaker1_summary()
         params['tiebreaker2_summary'] = tiebreak.get_tiebreaker2_summary()
         params['tiebreaker3_summary'] = tiebreak.get_tiebreaker3_summary()
+        params['tiebreaker_required'] = params['summary'] != None and len(params['summary']) > 1
         params['tiebreaker0_valid'] = params['tiebreaker0_details'] != None and len(params['tiebreaker0_details']) > 0
         params['tiebreaker1_valid'] = params['tiebreaker1_details'] != None and len(params['tiebreaker1_details']) > 0
         params['tiebreaker2_valid'] = params['tiebreaker2_details'] != None and len(params['tiebreaker2_details']) > 0

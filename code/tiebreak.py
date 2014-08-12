@@ -48,6 +48,12 @@ class Tiebreak:
 
     def __calculate_tiebreak_summary_details(self):
         details = dict()
+
+        winner_data = self.__winners.get_week_winner_data()
+        if winner_data.featured_game.state == "not_started":
+            self.__tiebreak_summary = []
+            return
+
         players = self.__winners.get_players_tied_for_first()
         for player_key in players:
             d = TiebreakSummary()
@@ -152,6 +158,10 @@ class Tiebreak:
         winner_data = self.__winners.get_week_winner_data()
         featured_game_key = str(winner_data.featured_game.key())
 
+        if winner_data.featured_game.state == "not_started":
+            self.__tiebreak0_details = []
+            return
+
         players = self.__winners.get_players_that_won_tiebreak_0()
         if players != None:
             for player_key in players:
@@ -189,6 +199,11 @@ class Tiebreak:
 
         winner_data = self.__winners.get_week_winner_data()
         featured_game_key = str(winner_data.featured_game.key())
+
+        if winner_data.featured_game.state == "not_started":
+            self.__tiebreak1_summary = None
+            self.__tiebreak1_details = []
+            return
 
         summary = Tiebreak1Summary()
         summary.team1 = self.__week_data.get_team1_name(featured_game_key)
@@ -248,6 +263,11 @@ class Tiebreak:
         winner_data = self.__winners.get_week_winner_data()
         featured_game_key = str(winner_data.featured_game.key())
 
+        if winner_data.featured_game.state == "not_started":
+            self.__tiebreak2_summary = None
+            self.__tiebreak2_details = []
+            return
+
         summary = Tiebreak2Summary()
         summary.team1 = self.__week_data.get_team1_name(featured_game_key)
         summary.team2 = self.__week_data.get_team2_name(featured_game_key)
@@ -302,6 +322,12 @@ class Tiebreak:
 
     def __calculate_tiebreaker3_details(self):
         details = []
+
+        winner_data = self.__winners.get_week_winner_data()
+        if winner_data.featured_game.state == "not_started":
+            self.__tiebreak3_summary = None
+            self.__tiebreak3_details = []
+            return
 
         summary = Tiebreak3Summary()
         summary.valid = self.__winners.is_tiebreaker_3_valid()

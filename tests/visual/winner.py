@@ -48,6 +48,7 @@ class WFO_L1_Test(VisualTest):
         testdata.number_of_players(10)
         testdata.number_of_leaders(1)
         testdata.week_official()
+        testdata.featured_game_state("final")
         testdata.setup()
 
     def cleanup(self):
@@ -75,6 +76,7 @@ class WFO_L5_Test(VisualTest):
         testdata.number_of_players(10)
         testdata.number_of_leaders(5)
         testdata.week_official()
+        testdata.featured_game_state("final")
         testdata.setup()
 
     def cleanup(self):
@@ -99,6 +101,7 @@ class WFU_L1_Test(VisualTest):
         testdata.number_of_players(10)
         testdata.number_of_leaders(1)
         testdata.week_unofficial()
+        testdata.featured_game_state("final")
         testdata.setup()
 
     def cleanup(self):
@@ -127,6 +130,7 @@ class WFU_L5_TB0_Test(VisualTest):
         testdata.number_of_leaders(5)
         testdata.week_unofficial()
         testdata.tiebreaker_winner(0)
+        testdata.featured_game_state("final")
         testdata.setup()
 
     def cleanup(self):
@@ -155,6 +159,7 @@ class WFU_L5_TB1_Test(VisualTest):
         testdata.number_of_leaders(5)
         testdata.week_unofficial()
         testdata.tiebreaker_winner(1)
+        testdata.featured_game_state("final")
         testdata.setup()
 
     def cleanup(self):
@@ -183,6 +188,7 @@ class WFU_L5_TB2_Test(VisualTest):
         testdata.number_of_leaders(5)
         testdata.week_unofficial()
         testdata.tiebreaker_winner(2)
+        testdata.featured_game_state("final")
         testdata.setup()
 
     def cleanup(self):
@@ -212,6 +218,7 @@ class WFU_L5_TB3_Test(VisualTest):
         testdata.week_unofficial()
         testdata.tiebreaker_winner(3)
         testdata.make_tiebreak3_valid()
+        testdata.featured_game_state("final")
         testdata.setup()
 
     def cleanup(self):
@@ -233,151 +240,406 @@ class WFU_L5_TB3I_Test(VisualTest):
         return v
 
     def setup(self):
-        testdata = WinnerData(1984,9,"wfu_l5_tb3_indeterminate",leave_objects_in_datastore=True)
+        testdata = WinnerData(1984,9,"wfu_l5_tb3i",leave_objects_in_datastore=True)
         testdata.set_week_state("final")
         testdata.number_of_players(10)
         testdata.number_of_leaders(5)
         testdata.week_unofficial()
         testdata.tiebreaker_winner(3)
         testdata.make_tiebreak3_indeterminate()
+        testdata.featured_game_state("final")
         testdata.setup()
 
     def cleanup(self):
-        testdata = WinnerData(1984,8,"wfu_l5_tb3_indeterminate",leave_objects_in_datastore=True)
+        testdata = WinnerData(1984,8,"wfu_l5_tb3i",leave_objects_in_datastore=True)
         testdata.cleanup_database()
 
 
 class WIP_FGF_L1_Test(VisualTest):
     def __init__(self):
         self.description = "Week In Progress, Featured Game Final, Only 1 Leader"
-        self.link = "TBD"
+        self.link = "/1985/week/1/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
-        v.append('TBD')
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be 1 leader in first place')
+        v.append('The leader should be labeled as the PROJECTED WINNER')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1985,1,"wip_fgf_l1",leave_objects_in_datastore=True)
+        testdata.set_week_state("in_progress")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(1)
+        testdata.week_unofficial()
+        testdata.featured_game_state("final")
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1985,1,"wip_fgf_l1",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
 
 class WIP_FGF_L5_TB0_Test(VisualTest):
     def __init__(self):
         self.description = "Week In Progress, Featured Game Final, 5 Leaders Tied for First, Tiebreak 0 decides"
-        self.link = "TBD"
+        self.link = "/1985/week/2/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
-        v.append('TBD')
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be 5 leaders tied for first place')
+        v.append('The leader should be labeled as the PROJECTED WINNER')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1985,2,"wip_fgf_l5_tb0",leave_objects_in_datastore=True)
+        testdata.set_week_state("in_progress")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(5)
+        testdata.week_unofficial()
+        testdata.tiebreaker_winner(0)
+        testdata.featured_game_state("final")
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1985,2,"wip_fgf_l5_tb0",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
 
 class WIP_FGF_L5_TB1_Test(VisualTest):
     def __init__(self):
         self.description = "Week In Progress, Featured Game Final, 5 Leaders Tied for First, Tiebreak 1 decides"
-        self.link = "TBD"
+        self.link = "/1985/week/3/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
-        v.append('TBD')
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be 5 leaders tied for first place')
+        v.append('The leader should be labeled as the PROJECTED WINNER')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1985,3,"wip_fgf_l5_tb1",leave_objects_in_datastore=True)
+        testdata.set_week_state("in_progress")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(5)
+        testdata.week_unofficial()
+        testdata.tiebreaker_winner(1)
+        testdata.featured_game_state("final")
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1985,3,"wip_fgf_l5_tb1",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
 
 class WIP_FGF_L5_TB2_Test(VisualTest):
     def __init__(self):
         self.description = "Week In Progress, Featured Game Final, 5 Leaders Tied for First, Tiebreak 2 decides"
-        self.link = "TBD"
+        self.link = "/1985/week/4/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
-        v.append('TBD')
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be 5 leaders tied for first place')
+        v.append('The leader should be labeled as the PROJECTED WINNER')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1985,4,"wip_fgf_l5_tb2",leave_objects_in_datastore=True)
+        testdata.set_week_state("in_progress")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(5)
+        testdata.week_unofficial()
+        testdata.tiebreaker_winner(2)
+        testdata.featured_game_state("final")
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1985,4,"wip_fgf_l5_tb2",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
 
 class WIP_FGF_L5_TB3_Test(VisualTest):
     def __init__(self):
         self.description = "Week In Progress, Featured Game Final, 5 Leaders Tied for First, Tiebreak 3 decides"
-        self.link = "TBD"
+        self.link = "/1985/week/5/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
-        v.append('TBD')
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be 5 leaders tied for first place')
+        v.append('The leader should be labeled as the PROJECTED WINNER')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1985,5,"wip_fgf_l5_tb3",leave_objects_in_datastore=True)
+        testdata.set_week_state("in_progress")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(5)
+        testdata.week_unofficial()
+        testdata.tiebreaker_winner(3)
+        testdata.make_tiebreak3_valid()
+        testdata.featured_game_state("final")
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1985,5,"wip_fgf_l5_tb3",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
+
+class WIP_FGF_L5_TB3I_Test(VisualTest):
+    def __init__(self):
+        self.description = "Week In Progress, Featured Game Final, 5 Leaders Tied for First, Tiebreak 3 decides but indeterminate"
+        self.link = "/1987/week/1/results"
+        self.verify =  self.__verify_instructions()
+
+    def __verify_instructions(self):
+        v = []
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be 5 leaders tied for first place')
+        v.append('The leaders should be labeled as POSSIBLE WINNER')
+        v.append('')
+        return v
+
+    def setup(self):
+        testdata = WinnerData(1987,1,"wip_fgf_l5_tb3i",leave_objects_in_datastore=True)
+        testdata.set_week_state("in_progress")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(5)
+        testdata.week_unofficial()
+        testdata.tiebreaker_winner(3)
+        testdata.make_tiebreak3_indeterminate()
+        testdata.featured_game_state("final")
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1987,1,"wip_fgf_l5_tb3i",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
+
+
 
 class WIP_FGIP_L1_Test(VisualTest):
     def __init__(self):
         self.description = "Week In Progress, Featured Game In Progress, Only 1 Leader"
-        self.link = "TBD"
+        self.link = "/1985/week/6/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
-        v.append('TBD')
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be 1 leader in first place')
+        v.append('The leader should be labeled as the PROJECTED WINNER')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1985,6,"wip_fgip_l1",leave_objects_in_datastore=True)
+        testdata.set_week_state("in_progress")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(1)
+        testdata.week_unofficial()
+        testdata.featured_game_state("in_progress")
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1985,6,"wip_fgip_l1",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
+
 
 class WIP_FGIP_L5_TB0_Test(VisualTest):
     def __init__(self):
         self.description = "Week In Progress, Featured Game In Progress, 5 Leaders Tied for First, Tiebreak 0 decides"
-        self.link = "TBD"
+        self.link = "/1985/week/7/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
-        v.append('TBD')
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be 5 leaders tied for first place')
+        v.append('The leader should be labeled as the PROJECTED WINNER')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1985,7,"wip_fgip_l5_tb0",leave_objects_in_datastore=True)
+        testdata.set_week_state("in_progress")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(5)
+        testdata.week_unofficial()
+        testdata.tiebreaker_winner(0)
+        testdata.featured_game_state("in_progress")
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1985,7,"wip_fgip_l5_tb0",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
+
 
 class WIP_FGIP_L5_TB1_Test(VisualTest):
     def __init__(self):
         self.description = "Week In Progress, Featured Game In Progress, 5 Leaders Tied for First, Tiebreak 1 decides"
-        self.link = "TBD"
+        self.link = "/1985/week/8/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
-        v.append('TBD')
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be 5 leaders tied for first place')
+        v.append('The leader should be labeled as the PROJECTED WINNER')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1985,8,"wip_fgip_l5_tb1",leave_objects_in_datastore=True)
+        testdata.set_week_state("in_progress")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(5)
+        testdata.week_unofficial()
+        testdata.tiebreaker_winner(1)
+        testdata.featured_game_state("in_progress")
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1985,8,"wip_fgip_l5_tb1",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
+
 
 class WIP_FGIP_L5_TB2_Test(VisualTest):
     def __init__(self):
         self.description = "Week In Progress, Featured Game In Progress, 5 Leaders Tied for First, Tiebreak 2 decides"
-        self.link = "TBD"
+        self.link = "/1985/week/9/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
-        v.append('TBD')
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be 5 leaders tied for first place')
+        v.append('The leader should be labeled as the PROJECTED WINNER')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1985,9,"wip_fgip_l5_tb2",leave_objects_in_datastore=True)
+        testdata.set_week_state("in_progress")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(5)
+        testdata.week_unofficial()
+        testdata.tiebreaker_winner(2)
+        testdata.featured_game_state("in_progress")
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1985,9,"wip_fgip_l5_tb2",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
 
 class WIP_FGIP_L5_TB3_Test(VisualTest):
     def __init__(self):
         self.description = "Week In Progress, Featured Game In Progress, 5 Leaders Tied for First, Tiebreak 3 decides"
-        self.link = "TBD"
+        self.link = "/1985/week/10/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
-        v.append('TBD')
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be 5 leaders tied for first place')
+        v.append('The leader should be labeled as the PROJECTED WINNER')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1985,10,"wip_fgip_l5_tb3",leave_objects_in_datastore=True)
+        testdata.set_week_state("in_progress")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(5)
+        testdata.week_unofficial()
+        testdata.tiebreaker_winner(3)
+        testdata.make_tiebreak3_valid()
+        testdata.featured_game_state("in_progress")
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1985,10,"wip_fgip_l5_tb3",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
+
+class WIP_FGIP_L5_TB3I_Test(VisualTest):
+    def __init__(self):
+        self.description = "Week In Progress, Featured Game In Progress, 5 Leaders Tied for First, Tiebreak 3 decides but indeterminate"
+        self.link = "/1987/week/2/results"
+        self.verify =  self.__verify_instructions()
+
+    def __verify_instructions(self):
+        v = []
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be 5 leaders tied for first place')
+        v.append('The leaders should be labeled as POSSIBLE WINNER')
+        v.append('')
+        return v
+
+    def setup(self):
+        testdata = WinnerData(1987,2,"wip_fgip_l5_tb3i",leave_objects_in_datastore=True)
+        testdata.set_week_state("in_progress")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(5)
+        testdata.week_unofficial()
+        testdata.tiebreaker_winner(3)
+        testdata.make_tiebreak3_indeterminate()
+        testdata.featured_game_state("in_progress")
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1987,2,"wip_fgip_l5_tb3i",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
 
 class WIP_FGNS_L1_Test(VisualTest):
     def __init__(self):
         self.description = "Week In Progress, Featured Game Not Started, Only 1 Leader"
-        self.link = "TBD"
+        self.link = "/1985/week/11/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
-        v.append('TBD')
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be 1 leader in first place')
+        v.append('No leader should be selected as the winner')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1985,11,"wip_fgns_l1",leave_objects_in_datastore=True)
+        testdata.set_week_state("in_progress")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(1)
+        testdata.week_unofficial()
+        testdata.featured_game_state("not_started")
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1985,11,"wip_fgns_l1",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
 
 class WIP_FGNS_L5_Test(VisualTest):
     def __init__(self):
         self.description = "Week In Progress, Featured Game Not Started, 5 Leaders Tied for First"
-        self.link = "TBD"
+        self.link = "/1985/week/12/results"
         self.verify =  self.__verify_instructions()
 
     def __verify_instructions(self):
         v = []
-        v.append('TBD')
+        v.append('Note:  teams from 2013 needs to be loaded')
+        v.append('There should be 5 leaders tied for first place')
+        v.append('No leader should be selected as the winner')
         return v
+
+    def setup(self):
+        testdata = WinnerData(1985,12,"wip_fgns_l5",leave_objects_in_datastore=True)
+        testdata.set_week_state("in_progress")
+        testdata.number_of_players(10)
+        testdata.number_of_leaders(5)
+        testdata.week_unofficial()
+        testdata.tiebreaker_winner(0)
+        testdata.featured_game_state("not_started")
+        testdata.setup()
+
+    def cleanup(self):
+        testdata = WinnerData(1985,12,"wip_fgns_l5",leave_objects_in_datastore=True)
+        testdata.cleanup_database()
 
 class WNS_Test(VisualTest):
     def __init__(self):
@@ -395,6 +657,7 @@ class WNS_Test(VisualTest):
         testdata = WinnerData(1984,1,"wns",leave_objects_in_datastore=True)
         testdata.set_week_state("not_started")
         testdata.number_of_players(10)
+        testdata.featured_game_state("not_started")
         testdata.setup()
 
     def cleanup(self):

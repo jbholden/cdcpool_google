@@ -55,9 +55,6 @@ class WeekWinner:
         if self.__data.featured_game.state == "not_started":
             return None
 
-        if self.__data.featured_game.state == "in_progress":
-            return None
-
         return self.calculated_winner
 
     def get_projected_winner(self):

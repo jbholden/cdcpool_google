@@ -78,15 +78,27 @@ class WeekResultsPage(Handler):
                 return i
         raise AssertionError
 
-    def __move_winner_to_top(self,sorted_data,results):
+    def __move_winner_to_top(self,sorted_data,results,use_projected_rank=False):
         for result in results:
+            if use_projected_rank and result.projected_rank != 1:
+                continue
+
+            if use_projected_rank == False and result.rank != 1:
+                continue
+
             if result.winner != None and result.winner != "":
                 index = self.__find_player_id(result.player_id,sorted_data)
                 item = sorted_data.pop(index)
                 sorted_data.insert(0,item)
 
-    def __move_winner_to_bottom(self,sorted_data,results):
+    def __move_winner_to_bottom(self,sorted_data,results,use_projected_rank=False):
         for result in results:
+            if use_projected_rank and result.projected_rank != 1:
+                continue
+
+            if use_projected_rank == False and result.rank != 1:
+                continue
+
             if result.winner != None and result.winner != "":
                 index = self.__find_player_id(result.player_id,sorted_data)
                 item = sorted_data.pop(index)
@@ -145,14 +157,16 @@ class WeekResultsPage(Handler):
     def __sort_by_projected_wins(self,results,winner_info):
         sorted_by_players = sorted(results,key=lambda result:result.player_name,reverse=False)
         sorted_by_wins = sorted(sorted_by_players,key=lambda result:result.projected_rank)
+        self.__move_winner_to_top(sorted_by_wins,results,use_projected_rank=True)
         highlight = self.__highlight_column('projected_wins')
         content = self.render_str(self.__render_file,results=sorted_by_wins,use_projected_rank=True,winner=winner_info,**highlight)
         html_str = escape_string(content)
         return compress_html(html_str)
 
     def __sort_by_projected_wins_reversed(self,results,winner_info):
-        sorted_by_players = sorted(sorted_by_players,key=lambda result:result.player_name,reverse=True)
+        sorted_by_players = sorted(results,key=lambda result:result.player_name,reverse=True)
         sorted_by_wins = sorted(results,key=lambda result:result.projected_rank,reverse=True)
+        self.__move_winner_to_bottom(sorted_by_wins,results,use_projected_rank=True)
         highlight = self.__highlight_column('projected_wins')
         content = self.render_str(self.__render_file,results=sorted_by_wins,use_projected_rank=True,winner=winner_info,**highlight)
         html_str = escape_string(content)

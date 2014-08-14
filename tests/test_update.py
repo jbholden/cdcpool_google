@@ -959,21 +959,8 @@ class TestUpdate(unittest.TestCase):
             result = results[i]
             expected = self.__find_expected_result(result,expected_results)
 
-            # TODO:  temporary code, fix this after winner implemented
-            # code does not currently figure out the winner so the rank
-            # for the players tied for first will be wrong
-            # current code:  first place ties all have a rank of 1
-            # future correct code:  winner is in 1st place, others tied for 1st in 2nd place
-            if result.wins == first_place_wins and result.losses == first_place_losses:
-                self.assertEqual(result.rank,1)
-            else:
-                self.assertEqual(result.rank,expected.rank)
-
-            if result.projected_wins == first_place_projected_wins:
-                self.assertEqual(result.projected_rank,1)
-            else:
-                self.assertEqual(result.projected_rank,expected.projected_rank)
-            # end of code to change
+            self.assertEqual(result.rank,expected.rank)
+            self.assertEqual(result.projected_rank,expected.projected_rank)
 
             self.assertEqual(result.player_id,expected.player_id)
             self.assertEqual(result.player_name,expected.player_name)

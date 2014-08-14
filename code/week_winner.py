@@ -47,6 +47,36 @@ class WeekWinner:
         self.__calculate_tiebreaker_3()
         self.__calculate_winner()
 
+    def get_winner_state(self):
+        if self.__data.week_state == "not_started":
+            return "no_winner_yet"
+
+        if self.__data.featured_game.state == "not_started":
+            return "no_winner_yet"
+
+        if self.__data.featured_game.state == "in_progress":
+            if self.__tiebreaker_3_indeterminate:
+                return "possible"
+            else:
+                return "projected"
+
+        if self.__data.week_state == "in_progress" and self.__data.featured_game.state == "final":
+            if self.__tiebreaker_3_indeterminate:
+                return "possible"
+            else:
+                return "projected"
+
+        if self.__data.week_state == "final" and self.__data.featured_game.state == "final":
+            if self.__data.week.winner == None:
+                if self.__tiebreaker_3_indeterminate:
+                    return "possible"
+                else:
+                    return "unofficial"
+            else:
+                return "official"
+
+        raise AssertionError,"should not get here"
+
 
     def get_winner(self):
         if self.__data.week.winner != None:
@@ -268,6 +298,7 @@ class WeekWinner:
 
     def __calculate_tiebreaker_3(self):
         self.__tiebreaker_3_valid = False
+        self.__tiebreaker_3_indeterminate = False
 
         if self.tiebreaker_3_unnecessary():
             self.players_won_tiebreak3 = None
@@ -280,6 +311,7 @@ class WeekWinner:
 
         entry_times = [ value for value in self.__data.player_submit_times.values() if value != None ]
         if len(entry_times) == 0:
+            self.__tiebreaker_3_indeterminate = True
             for player_key in players:
                 self.players_won_tiebreak3.append(player_key)
             return

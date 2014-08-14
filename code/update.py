@@ -264,10 +264,10 @@ class Update:
         if recalculate_week_results:
             self.update_week_results(year,week_number)
 
-        if recalculate_week_results:
+        if recalculate_player_results:
             self.update_player_results(year,week_number)
 
-        if recalculate_week_results:
+        if recalculate_overall_results:
             self.update_overall_results(year)
 
     def __week_games_all_final(self,week_games):
@@ -399,16 +399,35 @@ class Update:
             player_results.win_pct = calc.get_win_percent_string(player_key)
             player_results.projected_wins = calc.get_number_of_projected_wins(player_key)
             player_results.possible_wins = calc.get_number_of_possible_wins(player_key)
-            player_results.winner = self.__get_winner_message(player_key,winner,week_state)
+            player_results.winner = self.__get_winner_message(player_key,winner)
 
             results.append(player_results)
 
         if len(results) > 0:
-            if winner.is_winner_official():
-                results = self.assign_rank(results,winner=winner.get_winner())
+            winner_state = winner.get_winner_state()
+
+            if winner_state == "no_winner_yet":
+                results = self.assign_rank(results,winner=None)
+                results = self.assign_projected_rank(results,projected_winner=None)
+            elif winner_state == "official":
+                calculated_winner = winner.get_winner()
+                results = self.assign_rank(results,winner=calculated_winner)
+                results = self.assign_projected_rank(results,projected_winner=calculated_winner)
+            elif winner_state == "unofficial":
+                calculated_winner = winner.get_winner()
+                results = self.assign_rank(results,winner=calculated_winner)
+                results = self.assign_projected_rank(results,projected_winner=None)
+            elif winner_state == "projected":
+                calculated_winner = winner.get_winner()
+                results = self.assign_rank(results,winner=None)
+                results = self.assign_projected_rank(results,projected_winner=calculated_winner)
+            elif winner_state == "possible":
+                calculated_winner = winner.get_winner()
+                results = self.assign_rank(results,winner=None)
+                results = self.assign_projected_rank(results,projected_winner=None)
             else:
-                results = self.assign_rank(results)
-            results = self.assign_projected_rank(results)
+                raise AssertionError,"unexpected winner state %s" % (winner_state)
+
             results = self.__sort_by_rank(results)
 
         return results
@@ -568,7 +587,7 @@ class Update:
 
         assigned_results = []
 
-        if projected_winner:
+        if projected_winner != None:
             self.__move_winner_to_top_of_results(sorted_results,projected_winner)
             self.__projected_winner_sanity_check(sorted_results)
             next_rank = 2   # no ties for first place
@@ -686,38 +705,21 @@ class Update:
         winner = WeekWinner(year,week_number)
         return winner.get_winner_data_object()
 
-    def __get_winner_message(self,player_key,winner,week_state):
+    def __get_winner_message(self,player_key,winner):
+        winner_state = winner.get_winner_state()
         winning_player = winner.get_winner()
-
         if winning_player == None:
             return ""
 
-        # official winner, return week.winner
-        if winner.is_winner_official(): 
-            if player_key == winning_player:
-                return "WINNER"
-            else:
-                return ""
-
-        win_message = "UNOFFICIAL WINNER" if week_state == "final" else "PROJECTED WINNER"
-
-        if winner.tiebreaker_3_unnecessary():
-            if player_key == winning_player:
-                return win_message
-            else:
-                return ""
-
-        if winner.is_tiebreaker_3_valid():
-            if player_key == winning_player:
-                return win_message
-            else:
-                return ""
-
-        # in this case, was unable to determine the winner of tiebreak 3
-        # this is the case where the pick submit time is unavailable or invalid
-        players_in_tiebreak3 = winning_player  # this will be an array in this case only
-        if player_key in players_in_tiebreak3:
+        if winner_state == "no_winner_yet":
+            return ""
+        elif winner_state == "official" and player_key == winning_player:
+            return "WINNER"
+        elif winner_state == "unofficial" and player_key == winning_player:
+            return "UNOFFICIAL WINNER"
+        elif winner_state == "projected" and player_key == winning_player:
+            return "PROJECTED WINNER"
+        elif winner_state == "possible" and player_key in winning_player:
             return "POSSIBLE WINNER"
         else:
             return ""
-

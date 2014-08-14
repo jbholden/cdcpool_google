@@ -36,6 +36,7 @@ class TestUpdateGames(unittest.TestCase):
         self.hostname = socket.gethostname()
         urlfetch.set_default_fetch_deadline(60)
         self.__saved_games = self.__get_week_games(2013,1)
+        self.__modify_week_winner(2013,1)
 
     def tearDown(self):
         api = API()
@@ -80,6 +81,8 @@ class TestUpdateGames(unittest.TestCase):
         d.update_games(2013,1)
         memcache.delete("week_games_2013_1")
         api.delete_games_cache()
+
+        self.__restore_week_winner()
 
 
     def __find_game(self,games,number):
@@ -449,6 +452,19 @@ class TestUpdateGames(unittest.TestCase):
         for game_key in week.games:
             games.append(api.get_game_by_key(game_key))
         return games
+
+    def __modify_week_winner(self,year,week_number):
+        api = API()
+        self.__saved_week = api.get_week_in_year(year,week_number)
+        api.edit_week_by_key(str(self.__saved_week.key()),{'winner':None})
+        d = Database()
+        d.update_week_cache(year,week_number)
+
+    def __restore_week_winner(self):
+        api = API()
+        api.edit_week_by_key(str(self.__saved_week.key()),{'winner':self.__saved_week.winner})
+        d = Database()
+        d.update_week_cache(self.__saved_week.year,self.__saved_week.number)
 
     def __http_post(self,address,data=None):
         url = "http://%s%s" % (self.hostname,address)

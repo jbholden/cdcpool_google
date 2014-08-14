@@ -92,8 +92,11 @@ class WinnerData(ResultTestData):
 
         self.__setup_random_game(1,"in_progress")
 
-        for game_number in range(2,10):
-            state = random.choice(["in_progress","final"])
+        states = ["final"]*5+["in_progress"]*4
+        random.shuffle(states)
+
+        for game_number in range(1,10):
+            state = states[game_number-1] 
             self.__setup_random_game(game_number,state)
 
         self.__setup_random_game(10,self.__featured_state)

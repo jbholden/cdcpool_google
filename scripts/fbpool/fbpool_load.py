@@ -133,7 +133,7 @@ class FBPoolLoad:
         FBPoolError.exit_with_error("loading games",additional_message)
 
 
-    def __load_week_picks(self,excel,week,week_games,batch_size=50):
+    def __load_week_picks(self,excel,week,week_games,batch_size=10):
         excel_picks = excel.get_picks(week['number'])
 
         self.__verbose.update("week picks...")

@@ -35,3 +35,6 @@ def escape_string(s):
 def compress_html(html):
     s1 = string.replace(html,'\n','')
     return re.sub(r'\s\s+',' ',s1)
+
+def memcache_time():
+    return 604800

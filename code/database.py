@@ -141,7 +141,7 @@ class Database:
         weeks_and_years = memcache.get(key)
         if update or not(weeks_and_years):
             weeks_and_years = self.__load_week_numbers_and_years()
-            memcache.set(key,weeks_and_years)
+            memcache.set(key,weeks_and_years,time=memcache_time())
         return weeks_and_years
 
     def load_players(self,year,update=False):
@@ -152,7 +152,7 @@ class Database:
             assert players_query != None
             results = list(players_query)
             players = { str(player.key()):player for player in results }
-            memcache.set(key,players)
+            memcache.set(key,players,time=memcache_time())
         return players
 
     def delete_players_from_memcache(self,year):
@@ -173,7 +173,7 @@ class Database:
               teams = { str(team.key()):team for team in results }
             elif key == "teamkeys":
               teams = { team.name:str(team.key()) for team in results }
-            memcache.set(key,teams)
+            memcache.set(key,teams,time=memcache_time())
         return teams
 
 
@@ -201,7 +201,7 @@ class Database:
             weeks = list(weeks_query)
             assert len(weeks) == 1,"Found %d weeks for %d week %d" % (len(weeks),year,week_number)
             week = weeks[0]
-            memcache.set(key,week)
+            memcache.set(key,week,time=memcache_time())
         return week
 
     def __get_week_games_in_database(self,week,update):
@@ -210,7 +210,7 @@ class Database:
         if update or not(games):
             games = { str(game_key):db.get(game_key) for game_key in week.games }
             #assert len(games) == 10
-            memcache.set(key,games)
+            memcache.set(key,games,time=memcache_time())
         return games
 
     def __get_player_week_picks_in_database(self,week,update):
@@ -228,7 +228,7 @@ class Database:
             for pick in picks:
                 player_picks[pick.player].append(pick)
 
-            memcache.set(key,player_picks)
+            memcache.set(key,player_picks,time=memcache_time())
 
         return player_picks
 
@@ -242,7 +242,7 @@ class Database:
             picks = list(picks_query) 
 
             week_picks = { str(pick.key()):pick for pick in picks }
-            memcache.set(key,week_picks)
+            memcache.set(key,week_picks,time=memcache_time())
 
         return week_picks
 
@@ -270,7 +270,7 @@ class Database:
 
     def update_games_cache(self,year,week_number,data):
         key = "games_%d_%d" % (year,week_number)
-        games = memcache.set(key,data)
+        games = memcache.set(key,data,time=memcache_time())
 
     def update_games(self,year,week_number):
         week = self.__get_week_in_database(year,week_number,update=False)
@@ -285,12 +285,12 @@ class Database:
         teams = memcache.get('teams')
         if teams:
             teams[team_key] = team
-            memcache.set('teams',teams)
+            memcache.set('teams',teams,time=memcache_time())
 
         teamkeys = memcache.get('teamkeys')
         if teamkeys:
             teamkeys[team.name] = team_key
-            memcache.set('teamkeys',teamkeys)
+            memcache.set('teamkeys',teamkeys,time=memcache_time())
 
     def delete_team_from_memcache(self,team):
         team_key = str(team.key())
@@ -298,9 +298,9 @@ class Database:
         teams = memcache.get('teams')
         if teams and team_key in teams:
             del teams[team_key]
-            memcache.set('teams',teams)
+            memcache.set('teams',teams,time=memcache_time())
 
         teamkeys = memcache.get('teamkeys')
         if teamkeys and team.name in teamkeys:
             del teamkeys[team.name]
-            memcache.set('teamkeys',teamkeys)
+            memcache.set('teamkeys',teamkeys,time=memcache_time())

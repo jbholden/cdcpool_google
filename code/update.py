@@ -9,6 +9,7 @@ from code.game_data import *
 from code.week_winner import *
 from models.root import *
 import logging
+from utils.utils import *
 
 # TODO:  create test to simulate start of a pool
 #        - players signed up for year
@@ -92,7 +93,7 @@ class Update:
         results = memcache.get(key)
         if update or not(results):
             results = self.__calculate_week_results(year,week_number)
-            memcache.set(key,results)
+            memcache.set(key,results,time=memcache_time())
         return results
 
     def delete_week_results_from_memcache(self,year,week_number):
@@ -114,7 +115,7 @@ class Update:
         player_results = memcache.get(key)
         if update or not(player_results):
             player_results = self.__calculate_player_results(player_id,year,week_number)
-            memcache.set(key,player_results)
+            memcache.set(key,player_results,time=memcache_time())
         summary = player_results[0]  # redundant but makes code clearer
         results = player_results[1]  # redundant but makes code clearer
         return summary,results
@@ -124,7 +125,7 @@ class Update:
         week_games = memcache.get(key)
         if update or not(week_games):
             week_games = self.__calculate_week_games(year,week_number)
-            memcache.set(key,week_games)
+            memcache.set(key,week_games,time=memcache_time())
 
         return week_games
 
@@ -172,7 +173,7 @@ class Update:
         if changes['something_changed']:
             d.update_games_cache(year,week_number,cached_games)
             key = "week_games_%d_%d" % (year,week_number)
-            memcache.set(key,week_games)
+            memcache.set(key,week_games,time=memcache_time())
 
         return changes
 
@@ -525,7 +526,7 @@ class Update:
         results = memcache.get(key)
         if update != "none" or not(results):
             results = self.__calculate_overall_results(year,update)
-            memcache.set(key,results)
+            memcache.set(key,results,time=memcache_time())
         return results
 
     def __sort_by_rank(self,results):

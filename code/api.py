@@ -8,6 +8,7 @@ from api_exception import *
 from database import *
 from update import *
 import logging
+from utils.utils import *
 
 class API:
 
@@ -477,20 +478,20 @@ class API:
         if not(data):
             data = dict()
         data[dict_key] = dict_value
-        memcache.set(key,data)
+        memcache.set(key,data,time=memcache_time())
 
     def __delete_from_memcache_dict(self,key,dict_key):
         data = memcache.get(key)
         if data != None and dict_key in data:
             del data[dict_key]
-            memcache.set(key,data)
+            memcache.set(key,data,time=memcache_time())
 
     def __load_players_in_memcache(self):
         players = dict()
         players_query = db.GqlQuery('select * from Player where ANCESTOR is :ancestor',ancestor=root_players())
         if players_query != None:
             players = {str(player.key()):player for player in players_query}
-        memcache.set("players",players)
+        memcache.set("players",players,time=memcache_time())
         return players
 
     def __find_player_in_memcache(self,name):

@@ -40,6 +40,7 @@ from pages.player_results_page import *
 from pages.overall_results_page import *
 from pages.update_games_page import *
 from pages.tiebreak_page import *
+from pages.refresh_page import *
 from pages.api.team_api import *
 from pages.api.game_api import *
 from pages.api.week_api import *
@@ -89,6 +90,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/a/load_weeks', LoadWeeksPage),
     webapp2.Route(r'/a/load_picks', LoadPicksPage),
     webapp2.Route(r'/a/create_week', CreateWeekPage),
+    webapp2.Route(r'/a/refresh', RefreshPage),
     webapp2.Route(r'/api/team', TeamAPICreateDelete),
     webapp2.Route(r'/api/teams', TeamAPIGetDeleteAll),
     webapp2.Route(r'/api/team/name/<team_name>', TeamAPIGetByName),

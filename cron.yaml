@@ -1,0 +1,4 @@
+cron:
+- description: refresh memcache
+  url: /a/refresh
+  schedule: every 20 minutes

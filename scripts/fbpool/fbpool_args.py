@@ -137,7 +137,7 @@ class FBPoolArgs:
         name = file_ext[0]
         extension = file_ext[1]
 
-        not_excel_file = extension not in [ "xls", "xlsm" ]
+        not_excel_file = extension not in [ "xls", "xlsm","xlsx" ]
         if not_excel_file:
             return None
 

@@ -165,3 +165,18 @@ class FBPoolDelete:
 
         self.__verbose.done("deleting database")
 
+    def delete_player_picks(self,player_name,year,week_number):
+        # TODO delete not working on production site
+        try:
+            fbpool_api = FBPoolAPI(url=self.url)
+            week = fbpool_api.getWeek(year,week_number)
+            print "week key = '%s'" % (week['key'])
+            player = fbpool_api.getPlayer(player_name)
+            print "player key = '%s'" % (player['key'])
+            player_picks = fbpool_api.getPlayerPicks(year,week_number,player_name)
+            for pick in player_picks:
+                print "pick key = '%s'" % (pick['key'])
+                #fbpool_api.deletePickByKey(pick['key'])
+        except FBAPIException as e:
+            FBPoolError.delete_error("player picks",e)
+

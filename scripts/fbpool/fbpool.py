@@ -53,6 +53,11 @@ if __name__ == "__main__":
         fbpool = FBPoolLoad(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file,quiet=args.quiet)
         fbpool.load_year(args.year)
 
+    elif action == "load_player_picks":
+        excel_file = fbpool_args.get_excel_file(args.year)
+        fbpool = FBPoolLoad(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file,quiet=args.quiet)
+        # TODO fbpool.load_player_picks(args.year,args.week,args.player)
+
     elif action == "update_week":
         excel_file = fbpool_args.get_excel_file(args.year)
         fbpool = FBPoolUpdate(url=url,excel_dir=args.excel_dir,excel_workbook=excel_file,quiet=args.quiet)
@@ -81,6 +86,10 @@ if __name__ == "__main__":
     elif action == "delete_teams":
         fbpool = FBPoolDelete(url=url,quiet=args.quiet)
         fbpool.delete_teams()
+
+    elif action == "delete_player_picks":
+        fbpool = FBPoolDelete(url=url,quiet=args.quiet)
+        fbpool.delete_player_picks(args.player,args.year,args.week)
 
     elif action == "flush_memcache":
         fbpool = FBPoolCache(url=url,quiet=args.quiet)
@@ -121,6 +130,13 @@ if __name__ == "__main__":
     elif action == "list_week_games":
         fbpool = FBPoolList(url=url,quiet=args.quiet)
         fbpool.list_week_games(args.year,args.week)
+
+    elif action == "list_same_players":
+        excel_file = fbpool_args.get_excel_file(args.year)
+        excel_file_full_path = "%s/%s" % (args.excel_dir,excel_file)
+        excel = PoolSpreadsheet(args.year,excel_file_full_path)
+        fbpool = FBPoolList(url=None,quiet=args.quiet)
+        fbpool.list_excel_players_with_same_name(excel)
 
     else:
         print ""

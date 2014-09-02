@@ -34,6 +34,14 @@ class FBPoolPlayerName:
             return "Scott Fe." 
         if last_name == "Freedman": 
             return "Scott Fr."
+        if last_name == "Murphy":
+            return "William Mu."
+        if last_name == "Mccoy":
+            return "William Mc."
+        if last_name == "Sams":
+            return "David Sa."
+        if last_name == "Stonecypher":
+            return "David St."
         return None
 
     def __remove_remote_and_middle_name(self,name):

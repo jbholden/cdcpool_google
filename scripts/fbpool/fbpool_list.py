@@ -6,6 +6,7 @@ from scripts.api.fbpool_api import *
 from scripts.api.fbpool_api_exception import *
 from fbpool_error import *
 from fbpool_verbose import *
+from fbpool_player_name import *
 import string
 
 class FBPoolList:
@@ -164,6 +165,66 @@ class FBPoolList:
 
         print "----------------------------------------------------------------------------------"
         print ""
+
+    def list_excel_players_with_same_name(self,excel):
+        players = excel.get_player_names()
+        players.sort()
+        print ""
+        print "All Players"
+        print "----------------------------------------------------------------------------------"
+        for name in players:
+            print name
+        print "----------------------------------------------------------------------------------"
+        print ""
+
+        name_count = { name:0 for name in players }
+        for name in players:
+            name_count[name] += 1
+
+        players_with_same_name = [ name for name in name_count if name_count[name] > 1 ]
+        players_with_same_name.sort()
+
+        if len(players_with_same_name) == 0:
+            print ""
+            print "There are no players with the same name."
+            print ""
+        else:
+            print ""
+            print "Players With the Same Name"
+            print "----------------------------------------------------------------------------------"
+            for name in players_with_same_name:
+                print name
+            print "----------------------------------------------------------------------------------"
+            print ""
+
+        fbpool_player_name = FBPoolPlayerName('hide_lastname')
+        abbreviated_names = [ fbpool_player_name.get_name(name) for name in players ]
+        name_count = { name:0 for name in abbreviated_names }
+        for name in abbreviated_names:
+            name_count[name] += 1
+
+        same_abbreviations = [ name for name in name_count if name_count[name] > 1 ]
+
+        players_with_same_abbreviation = []
+        for name in players:
+            abbreviated = fbpool_player_name.get_name(name)
+            if abbreviated in same_abbreviations:
+                players_with_same_abbreviation.append(name)
+        players_with_same_abbreviation.sort()
+
+        # TODO:  print out abbreviation as well
+        if len(players_with_same_abbreviation) == 0:
+            print ""
+            print "There are no players with the same abbreviated name."
+            print ""
+        else:
+            print ""
+            print "Players With the Abbreviated Name"
+            print "----------------------------------------------------------------------------------"
+            for name in players_with_same_abbreviation:
+                print name
+            print "----------------------------------------------------------------------------------"
+            print ""
 
     def __array_str(self,a):
         s = ""

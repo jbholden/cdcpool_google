@@ -8,6 +8,7 @@ from scripts.excel.pool_spreadsheet import *
 from scripts.excel.team import *
 from fbpool_error import *
 from fbpool_verbose import *
+from fbpool_player_name import *
 import string
 
 class FBPoolUpdate:
@@ -66,6 +67,10 @@ class FBPoolUpdate:
                 edit_data['state'] = excel_game.state
 
                 fbpool_api.editGameByKey(game_key,edit_data)
+
+            # update the cache
+            self.__verbose.update("updating memcache...")
+            fbpool_api.updateCacheForWeek(year,week_number)
 
         except FBAPIException as e:
             FBPoolError.exit_with_error("updating week",e)

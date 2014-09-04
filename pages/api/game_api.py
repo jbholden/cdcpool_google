@@ -159,7 +159,7 @@ class GameAPIEditDelete(APIHandler):
             self.write("id or key must be passed in")
             return 
 
-        if data['date'] != None:
+        if 'date' in data and data['date'] != None:
             data['date'] = self.convert_to_datetime(data['date'])
 
         try:

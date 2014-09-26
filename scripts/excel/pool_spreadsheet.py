@@ -377,10 +377,10 @@ class PoolSpreadsheet:
     def __get_favored_and_spread(self,top_spread,bottom_spread):
         assert not(top_spread == "" and bottom_spread == "")
 
-        if top_spread != "":
+        if top_spread.strip() != "":
             favored = "team1"
             spread = float(top_spread)
-        elif bottom_spread != "":
+        elif bottom_spread.strip() != "":
             favored = "team2"
             spread = float(bottom_spread)
         else:

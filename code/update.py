@@ -230,7 +230,7 @@ class Update:
         assert len(game_match) == 1
         return game_match[0]
 
-    def update_week_games(self,year,week_number,week_games):
+    def update_week_games(self,year,week_number,week_games,recalculate=False):
         recalculate_week_results = False
         recalculate_overall_results = False
         recalculate_player_results = False
@@ -261,6 +261,10 @@ class Update:
             elif changes['quarter_or_time_changed']:
                 recalculate_player_results = True
 
+        if recalculate == False:
+            page_update_required = recalculate_week_results or recalculate_player_results or recalculate_overall_results
+            return page_update_required
+
         if recalculate_week_results:
             self.update_week_results(year,week_number)
 
@@ -269,6 +273,13 @@ class Update:
 
         if recalculate_overall_results:
             self.update_overall_results(year)
+
+        return False
+
+    def update_pages_with_game_results(self,year,week_number):
+        self.update_week_results(year,week_number)
+        self.update_player_results(year,week_number)
+        self.update_overall_results(year)
 
     def __week_games_all_final(self,week_games):
         final_games = 0

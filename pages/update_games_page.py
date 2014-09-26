@@ -6,6 +6,7 @@ from handler import *
 import string
 import re
 from utils.utils import *
+from google.appengine.api import taskqueue
 
 class BadInputException(Exception):
     def __init__(self,errmsg):
@@ -85,7 +86,12 @@ class UpdateGamesPage(Handler):
             self.render("error_message.html",message=e.errmsg)
             return
 
-        u.update_week_games(year,week_number,week_games)
+        page_update_required = u.update_week_games(year,week_number,week_games)
+
+        if page_update_required:
+            url = '/a/update_game_pages/%d/%d' % (year,week_number)
+            taskqueue.add(url=url)
+
         self.redirect("results")
 
     def __is_week_scores_locked(self,year,week_number):
@@ -151,6 +157,35 @@ class UpdateGamesPage(Handler):
 
         return score
 
+
+    def __get_weeks_in_year(self,year,week_number):
+        d = Database()
+        weeks_and_years = d.load_weeks_and_years()
+        if self.__invalid_year_or_week_number(weeks_and_years,year,week_number):
+            return None
+        weeks_in_year = sorted(weeks_and_years[year])
+        return weeks_in_year
+
+    def __invalid_year_or_week_number(self,weeks_and_years,year,week_number):
+        weeks_in_year = weeks_and_years.get(year)
+        if not(weeks_in_year):
+            return True
+        return week_number not in weeks_in_year
+
+class UpdateGamePages(Handler):
+
+    def post(self,year_param,week_number_param):
+        year = int(year_param)
+        week_number = int(week_number_param)
+
+        weeks_in_year = self.__get_weeks_in_year(year,week_number)
+        if not(weeks_in_year):
+            self.error(400)
+            self.render("bad_week.html",year=year,week_number=week_number)
+            return
+
+        u = Update()
+        u.update_pages_with_game_results(year,week_number)
 
     def __get_weeks_in_year(self,year,week_number):
         d = Database()

@@ -91,6 +91,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/a/load_picks', LoadPicksPage),
     webapp2.Route(r'/a/create_week', CreateWeekPage),
     webapp2.Route(r'/a/refresh', RefreshPage),
+    webapp2.Route(r'/a/update_game_pages/<year_param:([0-9]+)>/<week_number_param:([0-9]+)>', UpdateGamePages),
     webapp2.Route(r'/api/team', TeamAPICreateDelete),
     webapp2.Route(r'/api/teams', TeamAPIGetDeleteAll),
     webapp2.Route(r'/api/team/name/<team_name>', TeamAPIGetByName),

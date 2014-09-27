@@ -174,6 +174,12 @@ class UpdateGamesPage(Handler):
 
 class UpdateGamePages(Handler):
 
+    def get(self,year_param,week_number_param):
+        year = int(year_param)
+        week_number = int(week_number_param)
+        url = '/a/update_game_pages/%d/%d' % (year,week_number)
+        taskqueue.add(url=url)
+
     def post(self,year_param,week_number_param):
         year = int(year_param)
         week_number = int(week_number_param)

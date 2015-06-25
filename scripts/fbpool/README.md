@@ -16,8 +16,8 @@ Specify the options in one of the following ways:
 
 
 ```
-    python -p 10090 <.. more options>
-    python --port 10090 <.. more options>
+    python fbpool.py -p 10090 <.. more options>
+    python fbpool.py --port 10090 <.. more options>
 ```
 
 This will use the url http://localhost:10090 as the base URL.
@@ -25,8 +25,8 @@ The default URL is http://localhost.
 
 
 ```
-    python -u http://cdcpool.appspot.com <.. more options>
-    python --url http://cdcpool.appspot.com <.. more options>
+    python fbpool.py -u http://cdcpool.appspot.com <.. more options>
+    python fbpool.py --url http://cdcpool.appspot.com <.. more options>
 ```
 
 This will use the url http://cdcpool.appspot.com as the base URL with no port number.
@@ -39,8 +39,8 @@ The following commands can be used to load historical data into the database.
 #### load a year
 
 ```
-    python -p 10090 --load year -y 2013  
-    python --port 10090 --load year --year 2013  
+    python fbpool.py -p 10090 --load year -y 2013  
+    python fbpool.py --port 10090 --load year --year 2013  
 ```
 
 This will load all of the data for the year 2013.
@@ -53,8 +53,8 @@ in the 2013 sheet will not overwrite the values from 2012.
 #### load a week
 
 ```
-    python -p 10090 --load week -y 2013 -w 1
-    python --port 10090 --load week --year 2013 --week 1
+    python fbpool.py -p 10090 --load week -y 2013 -w 1
+    python fbpool.py --port 10090 --load week --year 2013 --week 1
 ```
 
 This will load all of the data for 2013 week 1.
@@ -68,15 +68,15 @@ could be to delete a week from the database and then reload it (for debug purpos
 #### delete a year
 
 ```
-    python -p 10090 --delete year -y 2013
-    python --port 10090 --delete year --year 2013
+    python fbpool.py -p 10090 --delete year -y 2013
+    python fbpool.py --port 10090 --delete year --year 2013
 ```
 
 #### delete a week
 
 ```
-    python -p 10090 --delete week -y 2013 -w 1
-    python --port 10090 --delete week --year 2013 --week 1
+    python fbpool.py -p 10090 --delete week -y 2013 -w 1
+    python fbpool.py --port 10090 --delete week --year 2013 --week 1
 ```
 
 ### Step 4.  Updating a week
@@ -86,8 +86,8 @@ The use case for this is when a week is loaded but has not started yet.  Once al
 have completed for a week, then this command can be used to update the game scores and winner.
 
 ```
-    python -p 10090 --update week -y 2013 -w 1
-    python --port 10090 --update week --year 2013 --week 1
+    python fbpool.py -p 10090 --update week -y 2013 -w 1
+    python fbpool.py --port 10090 --update week --year 2013 --week 1
 ```
 
 ### Examples
@@ -95,106 +95,106 @@ have completed for a week, then this command can be used to update the game scor
 # note:  in these examples, the target is http://localhost:10090
 
 # load the teams the most recent year
-python -p 10090 --load teams
+python fbpool.py -p 10090 --load teams
 
 # load the teams for a particular year
-python -p 10090 --load teams --year 2010
+python fbpool.py -p 10090 --load teams --year 2010
 
 # load the players for every year
-python -p 10090 --load players
+python fbpool.py -p 10090 --load players
 
 # load the players for a particular year
-python -p 10090 --load players --year 2009
+python fbpool.py -p 10090 --load players --year 2009
 
 # load the data for a specific week
-python -p 10090 --load week --year 2013 --week 4
+python fbpool.py -p 10090 --load week --year 2013 --week 4
 
 # load the data for each week in a year
-python -p 10090 --load week --year 2013
+python fbpool.py -p 10090 --load week --year 2013
 
 # update the game scores and winner for a week
-python -p 10090 --update week --year 2013 --week 4
+python fbpool.py -p 10090 --update week --year 2013 --week 4
 
 # delete the week data for a year
-python -p 10090 --delete year --year 2013
+python fbpool.py -p 10090 --delete year --year 2013
 
 # delete the week data for a specific week
-python -p 10090 --delete year --year 2013 --week 5
+python fbpool.py -p 10090 --delete year --year 2013 --week 5
 
 # delete the entire database
-python -p 10090 --delete all
+python fbpool.py -p 10090 --delete all
 
 # delete the players in a year
-python -p 10090 --delete players --year 2012
+python fbpool.py -p 10090 --delete players --year 2012
 
 # delete all the players in the database
 python -p 10090 --delete players
 
 # delete all the teams
-python -p 10090 --delete teams
+python fbpool.py -p 10090 --delete teams
 
 # flush the memcache
-python -p 10090 --delete cache
+python fbpool.py -p 10090 --delete cache
 
 # reload the entire memcache
-python -p 10090 --load cache
+python fbpool.py -p 10090 --load cache
 
 # reload year data into the memcache
-python -p 10090 --load cache --year 2010
+python fbpool.py -p 10090 --load cache --year 2010
 
 # reload a specific week's data into the memcache
-python -p 10090 --load cache --year 2011 --week 3
+python fbpool.py -p 10090 --load cache --year 2011 --week 3
 
 # delete a week and reload it
-python -p 10090 --delete week --year 2013 --week 2
-python -p 10090 --load week --year 2013 --week 2
+python fbpool.py -p 10090 --delete week --year 2013 --week 2
+python fbpool.py -p 10090 --load week --year 2013 --week 2
 
 # delete a year and reload it
-python -p 10090 --delete year --year 2013
-python -p 10090 --load year --year 2013
+python fbpool.py -p 10090 --delete year --year 2013
+python fbpool.py -p 10090 --load year --year 2013
 
 # load a year in multiple steps
-python -p 10090 --load teams
-python -p 10090 --load players --year 2013
-python -p 10090 --load week --year 2013 --week 1
-python -p 10090 --load week --year 2013 --week 2
-python -p 10090 --load week --year 2013 --week 3
-python -p 10090 --load week --year 2013 --week 4
-python -p 10090 --load week --year 2013 --week 5
-python -p 10090 --load week --year 2013 --week 6
-python -p 10090 --load week --year 2013 --week 7
-python -p 10090 --load week --year 2013 --week 8
-python -p 10090 --load week --year 2013 --week 9
-python -p 10090 --load week --year 2013 --week 10 
-python -p 10090 --load week --year 2013 --week 11
-python -p 10090 --load week --year 2013 --week 12
-python -p 10090 --load week --year 2013 --week 13
+python fbpool.py -p 10090 --load teams
+python fbpool.py -p 10090 --load players --year 2013
+python fbpool.py -p 10090 --load week --year 2013 --week 1
+python fbpool.py -p 10090 --load week --year 2013 --week 2
+python fbpool.py -p 10090 --load week --year 2013 --week 3
+python fbpool.py -p 10090 --load week --year 2013 --week 4
+python fbpool.py -p 10090 --load week --year 2013 --week 5
+python fbpool.py -p 10090 --load week --year 2013 --week 6
+python fbpool.py -p 10090 --load week --year 2013 --week 7
+python fbpool.py -p 10090 --load week --year 2013 --week 8
+python fbpool.py -p 10090 --load week --year 2013 --week 9
+python fbpool.py -p 10090 --load week --year 2013 --week 10 
+python fbpool.py -p 10090 --load week --year 2013 --week 11
+python fbpool.py -p 10090 --load week --year 2013 --week 12
+python fbpool.py -p 10090 --load week --year 2013 --week 13
 
 # load a week at cdcpool.appspot.com
-python --url http://cdcpool.appspot.com --load week --year 2013 --week 1
+python fbpool.py --url http://cdcpool.appspot.com --load week --year 2013 --week 1
 
 # API calls store some data in the memcache to speed up other API calls
 # this call will cleanup that data from the memcache
-python -p 10090 --clean api
+python fbpool.py -p 10090 --clean api
 
 ```
 
 List examples
 ```
 # list all teams in database
-python -p 10090 --list teams
+python fbpool.py -p 10090 --list teams
 
 # list all players in database
-python -p 10090 --list players
+python fbpool.py -p 10090 --list players
 
 # list all weeks in database
-python -p 10090 --list weeks
+python fbpool.py -p 10090 --list weeks
 
 # list a particular player picks for a week
-python -p 10090 --list picks --year 2013 --week 1 --player "Brent H."
+python fbpool.py -p 10090 --list picks --year 2013 --week 1 --player "Brent H."
 
 # list the games in a given week
-python -p 10090 --list games --year 2013 --week 1
+python fbpool.py -p 10090 --list games --year 2013 --week 1
 ```
 
 ### Implementation Details
